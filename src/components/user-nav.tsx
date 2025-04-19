@@ -11,8 +11,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Book, LogOut, Settings, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function UserNav() {
+  const { profile, signOut } = useAuth();
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,9 +31,11 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">User Name</p>
+            <p className="text-sm font-medium leading-none">
+              {profile?.first_name} {profile?.last_name}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
-              user@example.com
+              {profile?.user_type}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -50,7 +55,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

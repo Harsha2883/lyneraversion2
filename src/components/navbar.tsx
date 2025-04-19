@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { UserNav } from "./user-nav";
+import { useAuth } from "@/hooks/useAuth";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -16,7 +17,7 @@ const routes = [
 ];
 
 export function Navbar() {
-  const [isAuth, setIsAuth] = useState(false);
+  const { profile } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -39,7 +40,7 @@ export function Navbar() {
 
         {/* Auth Buttons or User Nav */}
         <div className="hidden md:flex items-center space-x-4">
-          {isAuth ? (
+          {profile ? (
             <UserNav />
           ) : (
             <>
@@ -88,12 +89,18 @@ export function Navbar() {
                 </div>
 
                 <div className="mt-auto pt-6 flex flex-col space-y-4">
-                  <Button variant="outline" className="w-full" size="lg" asChild>
-                    <Link to="/auth">Sign In</Link>
-                  </Button>
-                  <Button className="w-full" size="lg" asChild>
-                    <Link to="/auth">Sign Up</Link>
-                  </Button>
+                  {profile ? (
+                    <UserNav />
+                  ) : (
+                    <>
+                      <Button variant="outline" className="w-full" size="lg" asChild>
+                        <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign In</Link>
+                      </Button>
+                      <Button className="w-full" size="lg" asChild>
+                        <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign Up</Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>

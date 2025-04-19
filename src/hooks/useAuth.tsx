@@ -22,10 +22,12 @@ export function useAuth() {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          // Important: Use setTimeout to prevent Supabase deadlocks
           setTimeout(async () => {
             const { data: profile } = await supabase
               .from("profiles")
@@ -33,6 +35,7 @@ export function useAuth() {
               .eq("id", session.user.id)
               .single();
             
+            console.log("Profile fetched:", profile);
             setProfile(profile);
           }, 0);
         } else {
@@ -43,6 +46,7 @@ export function useAuth() {
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -52,6 +56,7 @@ export function useAuth() {
           .eq("id", session.user.id)
           .single()
           .then(({ data }) => {
+            console.log("Initial profile loaded:", data);
             setProfile(data);
             setLoading(false);
           });
@@ -63,5 +68,10 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { user, profile, session, loading };
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
+  return { user, profile, session, loading, signOut };
 }
