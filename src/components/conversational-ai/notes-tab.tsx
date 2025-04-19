@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { note } from "lucide-react";
+import { StickyNote } from "lucide-react";
 
 export function NotesTab() {
   // Mocked data for demonstration
@@ -14,7 +14,7 @@ export function NotesTab() {
       {notes.map((note) => (
         <Card key={note.id}>
           <CardHeader className="flex flex-row items-center gap-2">
-            <note className="h-4 w-4 text-primary" />
+            <StickyNote className="h-4 w-4 text-primary" />
             <CardTitle className="text-lg">{note.title}</CardTitle>
           </CardHeader>
           <CardContent>

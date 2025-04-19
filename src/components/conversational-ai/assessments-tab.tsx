@@ -1,25 +1,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { award } from "lucide-react";
+import { Award } from "lucide-react";
 
 export function AssessmentsTab() {
   // Mocked data for demonstration
   const assessments = [
-    { 
-      id: 1, 
-      title: "Sustainability Fundamentals", 
-      score: 85, 
-      maxScore: 100,
-      status: "Completed"
-    },
-    { 
-      id: 2, 
-      title: "Environmental Impact", 
-      score: 45, 
-      maxScore: 100,
-      status: "In Progress"
-    }
+    { id: 1, title: "Sustainability Fundamentals", score: 85, passed: true },
+    { id: 2, title: "Carbon Reduction Strategies", score: 65, passed: false }
   ];
 
   return (
@@ -27,16 +14,15 @@ export function AssessmentsTab() {
       {assessments.map((assessment) => (
         <Card key={assessment.id}>
           <CardHeader className="flex flex-row items-center gap-2">
-            <award className="h-4 w-4 text-primary" />
+            <Award className="h-4 w-4 text-primary" />
             <CardTitle className="text-lg">{assessment.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <Progress value={(assessment.score / assessment.maxScore) * 100} />
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Score: {assessment.score}/{assessment.maxScore}</span>
-                <span className="text-muted-foreground">Status: {assessment.status}</span>
-              </div>
+            <div className="flex justify-between">
+              <p>Score: {assessment.score}%</p>
+              <span className={`font-semibold ${assessment.passed ? 'text-green-600' : 'text-red-600'}`}>
+                {assessment.passed ? 'Passed' : 'Not Passed'}
+              </span>
             </div>
           </CardContent>
         </Card>
