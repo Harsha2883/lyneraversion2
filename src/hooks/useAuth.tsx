@@ -25,10 +25,12 @@ export function useAuth() {
         .from("profiles")
         .select("*")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      setProfile(profile);
+      if (profile) {
+        setProfile(profile);
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load user profile");
@@ -36,46 +38,84 @@ export function useAuth() {
   };
 
   useEffect(() => {
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event);
-        setSession(session);
-        setUser(session?.user ?? null);
+    let mounted = true;
+    let authListener: any;
+
+    const setupAuthListener = () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event, currentSession) => {
+          console.log("Auth state changed:", event, currentSession?.user?.id);
+          
+          if (!mounted) return;
+
+          if (event === 'TOKEN_REFRESHED') {
+            // Just update the session without any redirects
+            setSession(currentSession);
+            setUser(currentSession?.user ?? null);
+            return;
+          }
+
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
+          
+          if (currentSession?.user) {
+            // Use setTimeout to prevent Supabase deadlocks
+            setTimeout(() => {
+              if (mounted) fetchProfile(currentSession.user.id);
+            }, 0);
+          } else {
+            setProfile(null);
+          }
+
+          // Only navigate on explicit sign in/out events
+          if (event === 'SIGNED_IN') {
+            toast.success("Successfully signed in!");
+            navigate("/dashboard");
+          } else if (event === 'SIGNED_OUT') {
+            toast.success("Successfully signed out!");
+            navigate("/auth");
+          }
+        }
+      );
+
+      return subscription;
+    };
+
+    // Initialize auth state
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
         
-        if (session?.user) {
-          // Important: Use setTimeout to prevent Supabase deadlocks
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
+        if (mounted) {
+          setSession(initialSession);
+          setUser(initialSession?.user ?? null);
+          
+          if (initialSession?.user) {
+            await fetchProfile(initialSession.user.id);
+          }
+          
+          setLoading(false);
         }
-
-        // Handle special auth events
-        if (event === 'SIGNED_IN') {
-          toast.success("Successfully signed in!");
-          navigate("/dashboard");
-        } else if (event === 'SIGNED_OUT') {
-          toast.success("Successfully signed out!");
-          navigate("/auth");
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        if (mounted) {
+          setLoading(false);
+          toast.error("Failed to initialize authentication");
         }
       }
-    );
+    };
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session?.user?.id);
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchProfile(session.user.id);
+    // Set up auth
+    authListener = setupAuthListener();
+    initializeAuth();
+
+    // Cleanup
+    return () => {
+      mounted = false;
+      if (authListener) {
+        authListener.unsubscribe();
       }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const signOut = async () => {
@@ -84,7 +124,6 @@ export function useAuth() {
       setUser(null);
       setProfile(null);
       setSession(null);
-      navigate("/auth");
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Failed to sign out");
