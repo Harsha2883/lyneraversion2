@@ -3,19 +3,35 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Mail, MessageSquare, Pause, Play, History, StopCircle } from "lucide-react";
+import { ArrowLeft, Mail, MessageSquare, Pause, Play, StopCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface ProcessPlayDashboardProps {
   courseId: string;
   onBack: () => void;
 }
 
+interface Message {
+  id: string;
+  content: string;
+  role: 'assistant' | 'user';
+  timestamp: Date;
+}
+
 export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
   const [activeTab, setActiveTab] = useState("process");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Sample learning history entries
   const learningHistory = [
@@ -23,6 +39,43 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
     { id: "2", title: "Renewable Energy Sources", date: "1 day ago", duration: "22 mins" },
     { id: "3", title: "Carbon Footprint Reduction", date: "Today", duration: "18 mins" },
   ];
+
+  const sendMessage = async (message: string) => {
+    if (!message.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: message,
+      role: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-course', {
+        body: { courseId, userMessage: message }
+      });
+
+      if (error) throw error;
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.message,
+        role: 'assistant',
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to get response from AI');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
@@ -34,9 +87,16 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
     toast.info("Stopped lesson");
   };
 
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    toast.success(isRecording ? "Stopped recording" : "Started recording");
+  const toggleRecording = async () => {
+    if (isRecording) {
+      setIsRecording(false);
+      toast.success("Stopped recording");
+    } else {
+      setIsRecording(true);
+      toast.success("Started recording");
+      // For demo purposes, simulate a question after recording
+      await sendMessage("Tell me more about this topic");
+    }
   };
 
   const emailNotes = () => {
@@ -66,24 +126,44 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
           >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="process">Process and Play</TabsTrigger>
-              <TabsTrigger value="history">Listening History</TabsTrigger>
+              <TabsTrigger value="history">Learning History</TabsTrigger>
             </TabsList>
           </Tabs>
         </CardHeader>
         
         <CardContent className="p-6">
           <TabsContent value="process" className="mt-0">
-            <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-              <div className="text-center space-y-4">
-                {isPlaying ? (
-                  <Pause className="h-16 w-16 text-primary mx-auto" />
-                ) : (
-                  <Play className="h-16 w-16 text-primary mx-auto" />
-                )}
-                <p className="text-muted-foreground">
-                  {isPlaying ? "Playing course content..." : "Click play to start the lesson"}
-                </p>
+            <div className="space-y-4">
+              <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  {isPlaying ? (
+                    <Pause className="h-16 w-16 text-primary mx-auto" />
+                  ) : (
+                    <Play className="h-16 w-16 text-primary mx-auto" />
+                  )}
+                  <p className="text-muted-foreground">
+                    {isPlaying ? "Playing course content..." : "Click play to start the lesson"}
+                  </p>
+                </div>
               </div>
+              
+              <ScrollArea className="h-[200px] border rounded-md p-4">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`mb-4 p-3 rounded-lg ${
+                      msg.role === 'assistant' ? 'bg-muted' : 'bg-primary/10'
+                    }`}
+                  >
+                    <p>{msg.content}</p>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="text-center text-muted-foreground">
+                    AI is thinking...
+                  </div>
+                )}
+              </ScrollArea>
             </div>
           </TabsContent>
           
@@ -148,7 +228,7 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
           </div>
         </CardFooter>
       </Card>
-      
+
       <div className="mt-6">
         <h3 className="text-lg font-medium mb-4">Learning History</h3>
         <div className="space-y-3">
