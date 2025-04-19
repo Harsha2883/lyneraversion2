@@ -21,23 +21,28 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("user_type")
-        .eq("id", (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (existingProfile && existingProfile.user_type !== userType) {
-        toast.error("This email is already registered as a different user type");
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+
+      // Fetch the user's profile to confirm user type
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', data.user?.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Check if the logged-in user type matches the selected type
+      if (profileData.user_type !== userType) {
+        await supabase.auth.signOut();
+        toast.error(`Please log in as a ${profileData.user_type}`);
+        return;
+      }
 
       navigate("/dashboard");
       toast.success("Successfully logged in!");
@@ -60,7 +65,7 @@ export function LoginForm() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <RadioGroup 
-              defaultValue="learner" 
+              value={userType}
               className="flex space-x-2"
               onValueChange={(value) => setUserType(value as "learner" | "creator")}
             >

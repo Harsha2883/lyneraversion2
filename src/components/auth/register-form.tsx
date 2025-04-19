@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,18 +23,6 @@ export function RegisterForm() {
     setLoading(true);
 
     try {
-      // Check if email already exists with a different user type
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("user_type")
-        .eq("email", email)
-        .single();
-
-      if (existingProfile) {
-        toast.error("This email is already registered");
-        return;
-      }
-
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -71,7 +58,7 @@ export function RegisterForm() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <RadioGroup 
-              defaultValue="learner" 
+              value={userType}
               className="flex space-x-4"
               onValueChange={(value) => setUserType(value as "learner" | "creator")}
             >
