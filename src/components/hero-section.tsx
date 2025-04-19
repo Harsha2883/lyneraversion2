@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { GraduationCap, Leaf, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
@@ -29,11 +30,11 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-              <Button size="lg" className="rounded-full">
-                Start Learning
+              <Button size="lg" className="rounded-full" asChild>
+                <Link to="/auth">Start Learning</Link>
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full">
-                For Creators
+              <Button size="lg" variant="outline" className="rounded-full" asChild>
+                <Link to="/auth">For Creators</Link>
               </Button>
             </div>
 

@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { NavItem } from "@/types/navigation";
+import type { NavItem } from "@/types/navigation";
 
 interface NavItemProps {
   item: NavItem;

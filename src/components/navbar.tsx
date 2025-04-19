@@ -4,13 +4,14 @@ import { Logo } from "@/components/ui/logo";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { UserNav } from "./user-nav";
 
 const routes = [
   { name: "Home", path: "/" },
   { name: "Courses", path: "/courses" },
-  { name: "For Creators", path: "/creators" },
-  { name: "For Learners", path: "/learners" },
+  { name: "For Creators", path: "/auth" },
+  { name: "For Learners", path: "/auth" },
   { name: "About", path: "/about" },
 ];
 
@@ -26,13 +27,13 @@ export function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
           {routes.map((route) => (
-            <a
+            <Link
               key={route.path}
-              href={route.path}
+              to={route.path}
               className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
             >
               {route.name}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -42,10 +43,12 @@ export function Navbar() {
             <UserNav />
           ) : (
             <>
-              <Button variant="ghost" size="sm">
-                Sign In
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth">Sign In</Link>
               </Button>
-              <Button size="sm">Sign Up</Button>
+              <Button size="sm" asChild>
+                <Link to="/auth">Sign Up</Link>
+              </Button>
             </>
           )}
         </div>
@@ -73,23 +76,23 @@ export function Navbar() {
 
                 <div className="flex flex-col space-y-6">
                   {routes.map((route) => (
-                    <a
+                    <Link
                       key={route.path}
-                      href={route.path}
+                      to={route.path}
                       className="text-base font-medium text-foreground/80 hover:text-primary transition-colors"
                       onClick={() => setMenuOpen(false)}
                     >
                       {route.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
 
                 <div className="mt-auto pt-6 flex flex-col space-y-4">
-                  <Button variant="outline" className="w-full" size="lg">
-                    Sign In
+                  <Button variant="outline" className="w-full" size="lg" asChild>
+                    <Link to="/auth">Sign In</Link>
                   </Button>
-                  <Button className="w-full" size="lg">
-                    Sign Up
+                  <Button className="w-full" size="lg" asChild>
+                    <Link to="/auth">Sign Up</Link>
                   </Button>
                 </div>
               </div>
