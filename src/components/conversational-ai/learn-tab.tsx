@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LearnCourseTypes } from "@/components/conversational-ai/learn-course-types";
 import { ProcessPlayDashboard } from "@/components/conversational-ai/process-play-dashboard";
 

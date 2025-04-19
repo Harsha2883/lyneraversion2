@@ -1,7 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Data, GraduationCap } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Database, GraduationCap } from "lucide-react";
 
 interface LearnCourseTypesProps {
   onSelectCourse: (courseId: string) => void;
@@ -24,7 +25,7 @@ export function LearnCourseTypes({ onSelectCourse }: LearnCourseTypesProps) {
       <Tabs defaultValue="data-backed" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="data-backed" className="flex items-center gap-2">
-            <Data className="h-4 w-4" />
+            <Database className="h-4 w-4" />
             Data-backed Courses
           </TabsTrigger>
           <TabsTrigger value="ai-backed" className="flex items-center gap-2">
