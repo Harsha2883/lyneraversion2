@@ -7,6 +7,9 @@ import { BarChart3, BookOpen, LucideIcon, Settings, Shield, User, Users, Layers,
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { UserNav } from "@/components/user-nav";
+import { useAuth } from "@/hooks/useAuth";
 
 type NavItem = {
   name: string;
@@ -15,17 +18,27 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { name: "Dashboard", icon: BarChart3, href: "#" },
-  { name: "User Management", icon: Users, href: "#" },
-  { name: "Creator Approvals", icon: User, href: "#" },
-  { name: "Course Reviews", icon: BookOpen, href: "#" },
-  { name: "Access Control", icon: Shield, href: "#" },
-  { name: "Content Management", icon: Layers, href: "#" },
-  { name: "Settings", icon: Settings, href: "#" },
+  { name: "Dashboard", icon: BarChart3, href: "/admin" },
+  { name: "User Management", icon: Users, href: "/admin/users" },
+  { name: "Creator Approvals", icon: User, href: "/admin/creators" },
+  { name: "Course Reviews", icon: BookOpen, href: "/admin/courses" },
+  { name: "Access Control", icon: Shield, href: "/admin/access" },
+  { name: "Content Management", icon: Layers, href: "/admin/content" },
+  { name: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const { signOut } = useAuth();
+
+  // Helper function to check if a route is active
+  const isRouteActive = (href: string) => {
+    if (href === '/admin' && location.pathname === '/admin') {
+      return true;
+    }
+    return location.pathname.startsWith(href) && href !== '/admin';
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-secondary/20">
@@ -44,15 +57,17 @@ const AdminDashboard = () => {
                   <Logo />
                   <div className="mt-6 space-y-1">
                     {navItems.map((item) => (
-                      <a 
+                      <Link
                         key={item.name}
-                        href={item.href}
-                        className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary"
+                        to={item.href}
+                        className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary ${
+                          isRouteActive(item.href) ? 'bg-secondary' : ''
+                        }`}
                         onClick={() => setSidebarOpen(false)}
                       >
                         <item.icon className="h-4 w-4" />
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -69,12 +84,7 @@ const AdminDashboard = () => {
               placeholder="Search..." 
               className="w-64 hidden md:flex h-9"
             />
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <LogOut className="h-5 w-5" />
-            </Button>
+            <UserNav />
           </div>
         </div>
       </header>
@@ -85,14 +95,16 @@ const AdminDashboard = () => {
         <aside className="w-64 border-r bg-background hidden lg:block sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
           <div className="p-4 space-y-1">
             {navItems.map((item) => (
-              <a 
+              <Link
                 key={item.name}
-                href={item.href}
-                className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary"
+                to={item.href}
+                className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-secondary ${
+                  isRouteActive(item.href) ? 'bg-secondary' : ''
+                }`}
               >
                 <item.icon className="h-4 w-4" />
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
         </aside>
