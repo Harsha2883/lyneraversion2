@@ -7,10 +7,18 @@ import {
   Library,
   User,
   Settings,
-  LogOut // Add LogOut icon
+  LogOut
 } from "lucide-react";
 import { NavItem } from "@/types/navigation";
-import { useAuth } from "@/hooks/useAuth"; // Import useAuth
+import { useAuth } from "@/hooks/useAuth";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { EnrolledCourses } from "@/components/dashboard/enrolled-courses";
+import { CarbonFootprint } from "@/components/dashboard/carbon-footprint";
+import { AssessmentProgress } from "@/components/dashboard/assessment-progress";
+import { TokensEarned } from "@/components/dashboard/tokens-earned";
+import { RecentActivity } from "@/components/dashboard/recent-activity";
+import { SkillsProgress } from "@/components/dashboard/skills-progress";
+import { CourseRecommendations } from "@/components/dashboard/course-recommendations";
 
 const sidebarNavItems: NavItem[] = [
   {
@@ -53,16 +61,37 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export function LearnerDashboard() {
-  const { signOut } = useAuth(); // Get signOut method
+  const { signOut, profile } = useAuth();
 
   return (
     <div className="flex min-h-screen">
       <SidebarNav 
         items={sidebarNavItems} 
-        onLogout={signOut} // Pass signOut method
+        onLogout={signOut}
       />
-      <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold">Welcome to your Learning Dashboard</h1>
+      <main className="flex-1 overflow-auto">
+        <div className="container mx-auto py-6 px-4 md:px-6">
+          <DashboardHeader 
+            title={`Welcome, ${profile?.first_name || 'Learner'}`} 
+            description="Track your sustainability learning journey"
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            <EnrolledCourses />
+            <CarbonFootprint />
+            <AssessmentProgress />
+            <TokensEarned />
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <RecentActivity />
+            <SkillsProgress />
+          </div>
+          
+          <div className="mt-6">
+            <CourseRecommendations />
+          </div>
+        </div>
       </main>
     </div>
   );
