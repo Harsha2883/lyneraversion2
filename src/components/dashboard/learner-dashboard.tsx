@@ -6,9 +6,11 @@ import {
   GraduationCap,
   Library,
   User,
-  Settings
+  Settings,
+  LogOut // Add LogOut icon
 } from "lucide-react";
 import { NavItem } from "@/types/navigation";
+import { useAuth } from "@/hooks/useAuth"; // Import useAuth
 
 const sidebarNavItems: NavItem[] = [
   {
@@ -41,12 +43,24 @@ const sidebarNavItems: NavItem[] = [
     href: "/dashboard/settings",
     icon: Settings,
   },
+  // Add logout nav item
+  {
+    title: "Logout",
+    href: "#logout",
+    icon: LogOut,
+    isLogout: true // Custom prop to differentiate logout item
+  }
 ];
 
 export function LearnerDashboard() {
+  const { signOut } = useAuth(); // Get signOut method
+
   return (
     <div className="flex min-h-screen">
-      <SidebarNav items={sidebarNavItems} />
+      <SidebarNav 
+        items={sidebarNavItems} 
+        onLogout={signOut} // Pass signOut method
+      />
       <main className="flex-1 p-8">
         <h1 className="text-2xl font-bold">Welcome to your Learning Dashboard</h1>
       </main>
