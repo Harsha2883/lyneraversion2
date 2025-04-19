@@ -1,36 +1,45 @@
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
+import {
+  LayoutDashboard,
+  PlusCircle,
+  Compass,
+  Library,
+  User,
+  Settings
+} from "lucide-react";
+import { NavItem } from "@/types/navigation";
 
-const sidebarNavItems = [
+const sidebarNavItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
-    icon: "LayoutDashboard",
+    icon: LayoutDashboard,
   },
   {
     title: "Create Course",
     href: "/dashboard/create-course",
-    icon: "PlusCircle",
+    icon: PlusCircle,
   },
   {
     title: "Creator Journey",
     href: "/dashboard/creator-journey",
-    icon: "Compass",
+    icon: Compass,
   },
   {
     title: "E-Library",
     href: "/dashboard/library",
-    icon: "Library",
+    icon: Library,
   },
   {
     title: "Profile",
     href: "/dashboard/profile",
-    icon: "User",
+    icon: User,
   },
   {
     title: "Settings",
     href: "/dashboard/settings",
-    icon: "Settings",
+    icon: Settings,
   },
 ];
 
