@@ -1,84 +1,148 @@
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function RegisterForm() {
   const [userType, setUserType] = useState<"learner" | "creator">("learner");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Check if email already exists with a different user type
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("user_type")
+        .eq("email", email)
+        .single();
+
+      if (existingProfile) {
+        toast.error("This email is already registered");
+        return;
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            user_type: userType,
+            first_name: firstName,
+            last_name: lastName,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      navigate("/dashboard");
+      toast.success("Successfully registered! Please check your email for verification.");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>
-          Join Lynera.ai to access sustainable learning resources
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <RadioGroup 
-            defaultValue="learner" 
-            className="flex space-x-4"
-            onValueChange={(value) => setUserType(value as "learner" | "creator")}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="learner" id="r-learner" />
-              <Label htmlFor="r-learner">Join as Learner</Label>
+      <form onSubmit={handleSubmit}>
+        <CardHeader>
+          <CardTitle>Create an account</CardTitle>
+          <CardDescription>
+            Join Lynera.ai to access sustainable learning resources
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <RadioGroup 
+              defaultValue="learner" 
+              className="flex space-x-4"
+              onValueChange={(value) => setUserType(value as "learner" | "creator")}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="learner" id="r-learner" />
+                <Label htmlFor="r-learner">Join as Learner</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="creator" id="r-creator" />
+                <Label htmlFor="r-creator">Join as Creator</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First name</Label>
+              <Input 
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="creator" id="r-creator" />
-              <Label htmlFor="r-creator">Join as Creator</Label>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last name</Label>
+              <Input 
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
             </div>
-          </RadioGroup>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName">First name</Label>
-            <Input id="firstName" />
           </div>
+          
           <div className="space-y-2">
-            <Label htmlFor="lastName">Last name</Label>
-            <Input id="lastName" />
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="your@email.com" />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input id="confirmPassword" type="password" />
-        </div>
-
-        {userType === "creator" && (
+          
           <div className="space-y-2">
-            <Label htmlFor="expertise">Area of Expertise</Label>
-            <Input id="expertise" placeholder="e.g., ESG Reporting, Carbon Management" />
+            <Label htmlFor="password">Password</Label>
+            <Input 
+              id="password" 
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-        )}
 
-        <div className="flex items-center space-x-2">
-          <Checkbox id="terms" />
-          <Label htmlFor="terms" className="text-sm">
-            I agree to the <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>
-          </Label>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button className="w-full">Create Account</Button>
-      </CardFooter>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="terms" required />
+            <Label htmlFor="terms" className="text-sm">
+              I agree to the <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            </Label>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full" type="submit" disabled={loading}>
+            {loading ? "Creating Account..." : "Create Account"}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }
