@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { LearnerDashboard } from "@/components/dashboard/learner-dashboard";
 import { CreatorDashboard } from "@/components/dashboard/creator-dashboard";
+import { DashboardContent } from "@/components/dashboard/dashboard-content";
 
 export default function DashboardPage() {
   const { profile, loading } = useAuth();
@@ -22,7 +23,9 @@ export default function DashboardPage() {
   if (!profile) return null;
 
   return profile.user_type === "learner" ? (
-    <LearnerDashboard />
+    <LearnerDashboard>
+      <DashboardContent />
+    </LearnerDashboard>
   ) : (
     <CreatorDashboard />
   );
