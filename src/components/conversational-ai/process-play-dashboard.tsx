@@ -3,104 +3,53 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Mail, MessageSquare, Pause, Play, StopCircle } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
+import { ProcessTab } from "./learning/process-tab";
+import { LearningHistoryTab } from "./learning/learning-history-tab";
+import { LearningControls } from "./learning/learning-controls";
+import { useAIChat } from "@/hooks/use-ai-chat";
+import { useLearningControl } from "@/hooks/use-learning-control";
+import { getLearningHistory } from "@/utils/learning-history";
+import { LearningHistoryItem } from "./learning/history-item";
 
 interface ProcessPlayDashboardProps {
   courseId: string;
   onBack: () => void;
 }
 
-interface Message {
-  id: string;
-  content: string;
-  role: 'assistant' | 'user';
-  timestamp: Date;
-}
-
 export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
   const [activeTab, setActiveTab] = useState("process");
-  const [isLoading, setIsLoading] = useState(false);
+  const { 
+    messages, 
+    inputMessage, 
+    isLoading, 
+    sendMessage, 
+    setInputMessage 
+  } = useAIChat(courseId);
+  
+  const {
+    isPlaying,
+    isRecording,
+    togglePlayPause,
+    stopPlayback,
+    toggleRecording,
+    emailNotes
+  } = useLearningControl();
 
-  // Sample learning history entries
-  const learningHistory = [
-    { id: "1", title: "Introduction to Sustainability", date: "2 days ago", duration: "15 mins" },
-    { id: "2", title: "Renewable Energy Sources", date: "1 day ago", duration: "22 mins" },
-    { id: "3", title: "Carbon Footprint Reduction", date: "Today", duration: "18 mins" },
-  ];
-
-  const sendMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: message,
-      role: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
-    setIsLoading(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-course', {
-        body: { courseId, userMessage: message }
-      });
-
-      if (error) throw error;
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.message,
-        role: 'assistant',
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to get response from AI');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-    toast.success(isPlaying ? "Paused lesson" : "Resumed lesson");
-  };
-
-  const stopPlayback = () => {
-    setIsPlaying(false);
-    toast.info("Stopped lesson");
-  };
-
-  const toggleRecording = async () => {
-    if (isRecording) {
-      setIsRecording(false);
-      toast.success("Stopped recording");
-    } else {
-      setIsRecording(true);
-      toast.success("Started recording");
-      // For demo purposes, simulate a question after recording
-      await sendMessage("Tell me more about this topic");
-    }
-  };
-
-  const emailNotes = () => {
-    toast.success("Notes have been emailed to you");
-  };
+  // Get learning history
+  const learningHistory = getLearningHistory();
 
   const reviseCourse = (historyId: string) => {
     toast.info(`Reviewing lesson from history item ${historyId}`);
+  };
+
+  const handleRecordingWithChat = async () => {
+    const stopped = toggleRecording();
+    if (stopped && activeTab === "process") {
+      // For demo purposes, simulate a question after recording
+      await sendMessage("Tell me more about this topic");
+    }
   };
 
   return (
@@ -129,122 +78,40 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
         
         <CardContent className="p-6">
           <TabsContent value="process" className="mt-0">
-            <div className="space-y-4">
-              <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  {isPlaying ? (
-                    <Pause className="h-16 w-16 text-primary mx-auto" />
-                  ) : (
-                    <Play className="h-16 w-16 text-primary mx-auto" />
-                  )}
-                  <p className="text-muted-foreground">
-                    {isPlaying ? "Playing course content..." : "Click play to start the lesson"}
-                  </p>
-                </div>
-              </div>
-              
-              <ScrollArea className="h-[200px] border rounded-md p-4">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`mb-4 p-3 rounded-lg ${
-                      msg.role === 'assistant' ? 'bg-muted' : 'bg-primary/10'
-                    }`}
-                  >
-                    <p>{msg.content}</p>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="text-center text-muted-foreground">
-                    AI is thinking...
-                  </div>
-                )}
-              </ScrollArea>
-
-              <div className="flex gap-2">
-                <Input 
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputMessage)}
-                  placeholder="Ask a question about the course..."
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={() => sendMessage(inputMessage)}
-                  disabled={!inputMessage.trim() || isLoading}
-                >
-                  Send
-                </Button>
-              </div>
-            </div>
+            <ProcessTab 
+              isPlaying={isPlaying}
+              messages={messages}
+              inputMessage={inputMessage}
+              isLoading={isLoading}
+              setInputMessage={setInputMessage}
+              sendMessage={sendMessage}
+            />
           </TabsContent>
           
           <TabsContent value="history" className="mt-0">
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4">
-                {learningHistory.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center p-3 border rounded-md">
-                    <div>
-                      <h4 className="font-medium">{item.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {item.date} • {item.duration}
-                      </p>
-                    </div>
-                    <Button size="sm" variant="outline" onClick={() => reviseCourse(item.id)}>
-                      Revise
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+            <LearningHistoryTab 
+              learningHistory={learningHistory}
+              onRevise={reviseCourse}
+            />
           </TabsContent>
         </CardContent>
         
-        <CardFooter className="border-t p-4 flex flex-wrap gap-2 justify-between">
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={stopPlayback}
-              disabled={!isPlaying}
-            >
-              <StopCircle className="h-4 w-4" />
-            </Button>
-            
-            <Button 
-              variant={isPlaying ? "destructive" : "default"}
-              onClick={togglePlayPause}
-            >
-              {isPlaying ? "Pause" : "Play"}
-            </Button>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button 
-              variant={isRecording ? "destructive" : "outline"}
-              onClick={toggleRecording}
-              className="flex items-center gap-2"
-            >
-              <MessageSquare className="h-4 w-4" />
-              {isRecording ? "Stop Recording" : "Ask Question"}
-            </Button>
-            
-            <Button 
-              variant="outline"
-              onClick={emailNotes}
-              className="flex items-center gap-2"
-            >
-              <Mail className="h-4 w-4" />
-              Email Notes
-            </Button>
-          </div>
+        <CardFooter>
+          <LearningControls 
+            isPlaying={isPlaying}
+            isRecording={isRecording}
+            togglePlayPause={togglePlayPause}
+            stopPlayback={stopPlayback}
+            toggleRecording={handleRecordingWithChat}
+            emailNotes={emailNotes}
+          />
         </CardFooter>
       </Card>
 
       <div className="mt-6">
         <h3 className="text-lg font-medium mb-4">Learning History</h3>
         <div className="space-y-3">
-          {learningHistory.map((item) => (
+          {learningHistory.map((item: LearningHistoryItem) => (
             <div key={item.id} className="flex justify-between items-center p-3 border rounded-md">
               <div>
                 <h4 className="font-medium">{item.title}</h4>
