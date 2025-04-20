@@ -8,6 +8,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -20,13 +21,13 @@ serve(async (req) => {
       throw new Error('Missing OpenAI API key')
     }
 
-    // Define course-specific contexts
+    // Enhanced course-specific contexts with more detailed guidance
     const courseContexts = {
-      'ai-1': 'You are a knowledgeable teacher specializing in Green Technology. Focus on innovative technologies for environmental sustainability.',
-      'ai-2': 'You are an expert in sustainable living practices. Guide users through practical steps for a more eco-friendly lifestyle.',
+      'ai-1': 'You are an expert in Green Technology. Provide in-depth, innovative insights about sustainable technologies. Explain complex concepts clearly, use analogies, and offer practical applications.',
+      'ai-2': 'You are a sustainability lifestyle coach. Provide actionable, personalized advice on sustainable living. Break down complex environmental concepts into easy-to-understand, practical steps.',
     }
 
-    const systemPrompt = courseContexts[courseId] || 'You are a sustainability education expert.'
+    const systemPrompt = courseContexts[courseId] || 'You are a sustainability education expert. Provide clear, engaging, and informative responses.'
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -41,21 +42,25 @@ serve(async (req) => {
           { role: 'user', content: userMessage }
         ],
         temperature: 0.7,
+        max_tokens: 300,
       }),
     })
 
     if (!response.ok) {
-      throw new Error('OpenAI API error')
+      const errorBody = await response.text()
+      throw new Error(`OpenAI API error: ${errorBody}`)
     }
 
     const data = await response.json()
     return new Response(JSON.stringify({
-      message: data.choices[0].message.content
+      message: data.choices[0].message.content,
+      courseContext: courseContexts[courseId] || 'General Sustainability'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
   } catch (error) {
+    console.error('Error in AI course function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

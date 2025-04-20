@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { ArrowLeft, Mail, MessageSquare, Pause, Play, StopCircle } from "lucide-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
 
 interface ProcessPlayDashboardProps {
   courseId: string;
@@ -158,6 +160,22 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
                   </div>
                 )}
               </ScrollArea>
+
+              <div className="flex gap-2">
+                <Input 
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && sendMessage(inputMessage)}
+                  placeholder="Ask a question about the course..."
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={() => sendMessage(inputMessage)}
+                  disabled={!inputMessage.trim() || isLoading}
+                >
+                  Send
+                </Button>
+              </div>
             </div>
           </TabsContent>
           
