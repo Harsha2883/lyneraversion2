@@ -7,7 +7,7 @@ interface LearningControlsProps {
   isRecording: boolean;
   togglePlayPause: () => void;
   stopPlayback: () => void;
-  toggleRecording: () => boolean;
+  toggleRecording: () => Promise<boolean> | boolean;
   emailNotes: () => void;
 }
 
@@ -42,11 +42,9 @@ export function LearningControls({
       <div className="flex gap-2">
         <Button 
           variant={isRecording ? "destructive" : "outline"}
-          onClick={() => {
-            const stopped = toggleRecording();
-            if (stopped) {
-              // This would integrate with the chat in a real app
-            }
+          onClick={async () => {
+            const stopped = await toggleRecording();
+            // This would integrate with the chat in a real app
           }}
           className="flex items-center gap-2"
         >
