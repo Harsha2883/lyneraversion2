@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { ProcessTab } from "./learning/process-tab";
@@ -11,7 +11,6 @@ import { LearningControls } from "./learning/learning-controls";
 import { useAIChat } from "@/hooks/use-ai-chat";
 import { useLearningControl } from "@/hooks/use-learning-control";
 import { getLearningHistory } from "@/utils/learning-history";
-import { LearningHistoryItem } from "./learning/history-item";
 
 interface ProcessPlayDashboardProps {
   courseId: string;
@@ -47,9 +46,9 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
   const handleRecordingWithChat = async () => {
     const stopped = toggleRecording();
     if (stopped && activeTab === "process") {
-      // For demo purposes, simulate a question after recording
       await sendMessage("Tell me more about this topic");
     }
+    return stopped;
   };
 
   return (
@@ -107,25 +106,6 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
           />
         </CardFooter>
       </Card>
-
-      <div className="mt-6">
-        <h3 className="text-lg font-medium mb-4">Learning History</h3>
-        <div className="space-y-3">
-          {learningHistory.map((item: LearningHistoryItem) => (
-            <div key={item.id} className="flex justify-between items-center p-3 border rounded-md">
-              <div>
-                <h4 className="font-medium">{item.title}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {item.date} • {item.duration}
-                </p>
-              </div>
-              <Button size="sm" onClick={() => reviseCourse(item.id)}>
-                Revise
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
