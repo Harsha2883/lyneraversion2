@@ -1,40 +1,36 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Coins } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TokenHistory } from "./tokens/token-history";
+import { TokenStatsCard } from "./tokens/token-stats";
+import { TokenRedemption } from "./tokens/token-redemption";
+import { mockTokenHistory, mockRedemptionOptions, mockTokenStats } from "./data/mock-tokens";
 
 export function TokensTab() {
-  // Mocked data for demonstration
-  const tokenHistory = [
-    { 
-      id: 1, 
-      description: "Completed Sustainability Course", 
-      tokens: 50, 
-      date: "2024-01-15" 
-    },
-    { 
-      id: 2, 
-      description: "Passed Carbon Footprint Assessment", 
-      tokens: 25, 
-      date: "2024-02-20" 
-    }
-  ];
-
   return (
-    <div className="mt-6 grid gap-4">
-      {tokenHistory.map((entry) => (
-        <Card key={entry.id}>
-          <CardHeader className="flex flex-row items-center gap-2">
-            <Coins className="h-4 w-4 text-primary" />
-            <CardTitle className="text-lg">{entry.description}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between">
-              <p>Tokens Earned: {entry.tokens}</p>
-              <p className="text-muted-foreground">{entry.date}</p>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="mt-6 space-y-6">
+      <TokenStatsCard stats={mockTokenStats} />
+      
+      <Tabs defaultValue="history" className="w-full">
+        <TabsList>
+          <TabsTrigger value="history">History</TabsTrigger>
+          <TabsTrigger value="redeem">Redeem Tokens</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="history">
+          <div className="mt-4">
+            <TokenHistory tokens={mockTokenHistory} />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="redeem">
+          <div className="mt-4">
+            <TokenRedemption 
+              options={mockRedemptionOptions} 
+              currentTokens={mockTokenStats.total} 
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

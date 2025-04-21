@@ -10,6 +10,7 @@ export const mockAssessments: Assessment[] = [
     attemptsUsed: 1,
     maxAttempts: 3,
     passScore: 70,
+    tokenReward: 25,
     questions: [
       {
         id: 101,
@@ -33,6 +34,7 @@ export const mockAssessments: Assessment[] = [
     attemptsUsed: 0,
     maxAttempts: 3,
     passScore: 60,
+    tokenReward: 30,
     questions: [
       {
         id: 201,
@@ -56,6 +58,7 @@ export const mockAssessments: Assessment[] = [
     attemptsUsed: 2,
     maxAttempts: 3,
     passScore: 80,
+    tokenReward: 40,
     questions: [
       {
         id: 301,
