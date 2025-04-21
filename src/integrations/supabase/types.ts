@@ -33,6 +33,75 @@ export type Database = {
         }
         Relationships: []
       }
+      carbon_contributions: {
+        Row: {
+          amount: number
+          carbon_offset: number
+          contribution_type: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          carbon_offset: number
+          contribution_type: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          carbon_offset?: number
+          contribution_type?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      carbon_footprints: {
+        Row: {
+          battery_emissions: number
+          course_id: string
+          created_at: string | null
+          credits_earned: number
+          data_usage_emissions: number
+          id: string
+          inperson_equivalent: number
+          live_online_equivalent: number
+          online_emissions: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          battery_emissions: number
+          course_id: string
+          created_at?: string | null
+          credits_earned: number
+          data_usage_emissions: number
+          id?: string
+          inperson_equivalent: number
+          live_online_equivalent: number
+          online_emissions: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          battery_emissions?: number
+          course_id?: string
+          created_at?: string | null
+          credits_earned?: number
+          data_usage_emissions?: number
+          id?: string
+          inperson_equivalent?: number
+          live_online_equivalent?: number
+          online_emissions?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           aspiration: string | null

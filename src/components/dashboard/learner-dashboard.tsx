@@ -7,7 +7,8 @@ import {
   Library,
   User,
   Settings,
-  LogOut
+  LogOut,
+  Leaf
 } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,6 +23,11 @@ const sidebarNavItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Carbon Footprint",
+    href: "/dashboard/carbon",
+    icon: Leaf,
   },
   {
     title: "Conversational AI",

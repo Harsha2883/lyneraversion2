@@ -13,6 +13,8 @@ import ConversationalAIPage from "./pages/ConversationalAIPage";
 import LearningJourneyPage from "./pages/LearningJourneyPage";
 import ELibraryPage from "./pages/ELibraryPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
+import CarbonFootprintPage from "./pages/CarbonFootprintPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard/carbon" element={<CarbonFootprintPage />} />
           <Route path="/dashboard/ai" element={<ConversationalAIPage />} />
           <Route path="/dashboard/journey" element={<LearningJourneyPage />} />
           <Route path="/dashboard/library" element={<ELibraryPage />} />
