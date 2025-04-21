@@ -36,7 +36,7 @@ export function OAuthProviders({ variant = "login" }: OAuthProviderProps) {
         onClick={() => handleOAuthLogin("google")}
         className="flex items-center gap-2"
       >
-        <Chrome className="h-4 w-4" />
+        <Chrome size={16} />
         {variant === "login" ? "Sign in" : "Sign up"} with Google
       </Button>
       <Button 
@@ -45,7 +45,7 @@ export function OAuthProviders({ variant = "login" }: OAuthProviderProps) {
         onClick={() => handleOAuthLogin("linkedin_oidc")}
         className="flex items-center gap-2"
       >
-        <Linkedin className="h-4 w-4" />
+        <Linkedin size={16} />
         {variant === "login" ? "Sign in" : "Sign up"} with LinkedIn
       </Button>
     </div>
