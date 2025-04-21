@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { OAuthProviders } from "./oauth-providers";
 
 export function RegisterForm() {
   const [userType, setUserType] = useState<"learner" | "creator">("learner");
@@ -123,6 +125,8 @@ export function RegisterForm() {
               I agree to the <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>
             </Label>
           </div>
+
+          <OAuthProviders variant="signup" />
         </CardContent>
         <CardFooter>
           <Button className="w-full" type="submit" disabled={loading}>

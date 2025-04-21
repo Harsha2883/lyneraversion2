@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { OAuthProviders } from "./oauth-providers";
 
 export function LoginForm() {
   const [userType, setUserType] = useState<"learner" | "creator">("learner");
@@ -107,6 +108,8 @@ export function LoginForm() {
               required 
             />
           </div>
+
+          <OAuthProviders variant="login" />
         </CardContent>
         <CardFooter>
           <Button className="w-full" type="submit" disabled={loading}>
