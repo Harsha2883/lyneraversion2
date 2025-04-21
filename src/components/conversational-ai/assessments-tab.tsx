@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { toast } from "sonner";
-import { Assessment, AssessmentMode } from "./types/assessment-types";
-import { AssessmentCard } from "./components/assessment-card";
+import { Assessment } from "./types/assessment-types";
+import { AssessmentList } from "./components/assessment-list";
 import { AssessmentModeSelector } from "./components/assessment-mode-selector";
 import { WrittenAssessment } from "./components/written-assessment";
 import { VoiceAssessment } from "./components/voice-assessment";
+import { useAssessmentState } from "./hooks/use-assessment-state";
 
 // Mock data
 const assessments: Assessment[] = [
@@ -80,105 +80,25 @@ const assessments: Assessment[] = [
 ];
 
 export function AssessmentsTab() {
-  const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
-  const [assessmentMode, setAssessmentMode] = useState<AssessmentMode | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string | number>>({});
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [editingAnswer, setEditingAnswer] = useState(false);
-
-  const handleSelectAssessment = (assessment: Assessment) => {
-    setSelectedAssessment(assessment);
-    setAssessmentMode(null);
-    setCurrentQuestionIndex(0);
-    setAnswers({});
-  };
-
-  const handleSelectMode = (mode: AssessmentMode) => {
-    setAssessmentMode(mode);
-  };
-
-  const handleBack = () => {
-    if (assessmentMode) {
-      setAssessmentMode(null);
-    } else if (selectedAssessment) {
-      setSelectedAssessment(null);
-    }
-  };
-
-  const handleAnswerChange = (questionId: number, answer: string | number) => {
-    setAnswers({
-      ...answers,
-      [questionId]: answer
-    });
-  };
-
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    if (isRecording) {
-      // Simulate transcription
-      setTimeout(() => {
-        const currentQuestion = selectedAssessment?.questions[currentQuestionIndex];
-        if (currentQuestion) {
-          const simulatedAnswer = currentQuestion.type === "subjective" 
-            ? "This is a simulated voice response that would be transcribed from the user's speech."
-            : 0;
-          
-          handleAnswerChange(currentQuestion.id, simulatedAnswer);
-          setIsRecording(false);
-          setEditingAnswer(true);
-          toast.success("Answer recorded");
-        }
-      }, 2000);
-    } else {
-      toast.info("Started recording...");
-    }
-  };
-
-  const togglePlayback = () => {
-    setIsPlaying(!isPlaying);
-    if (!isPlaying) {
-      toast.info(`Playing question: ${selectedAssessment?.questions[currentQuestionIndex].text}`);
-      setTimeout(() => {
-        setIsPlaying(false);
-      }, 3000);
-    }
-  };
-
-  const handleSubmitAnswer = () => {
-    const currentQuestion = selectedAssessment?.questions[currentQuestionIndex];
-    if (currentQuestion && answers[currentQuestion.id] !== undefined) {
-      toast.success("Answer submitted");
-      
-      if (selectedAssessment && currentQuestionIndex < selectedAssessment.questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setEditingAnswer(false);
-      } else {
-        toast.success("Assessment completed!");
-        setSelectedAssessment(null);
-        setAssessmentMode(null);
-      }
-    } else {
-      toast.error("Please provide an answer");
-    }
-  };
+  const {
+    selectedAssessment,
+    assessmentMode,
+    currentQuestionIndex,
+    answers,
+    isRecording,
+    isPlaying,
+    editingAnswer,
+    handleSelectAssessment,
+    handleSelectMode,
+    handleBack,
+    handleAnswerChange,
+    toggleRecording,
+    togglePlayback,
+    handleSubmitAnswer
+  } = useAssessmentState();
 
   if (!selectedAssessment) {
-    return (
-      <div className="mt-6">
-        <h3 className="text-lg font-medium mb-4">Available Assessments</h3>
-        <div className="flex overflow-x-auto pb-4 space-x-4">
-          {assessments.map((assessment) => (
-            <AssessmentCard
-              key={assessment.id}
-              assessment={assessment}
-              onSelect={handleSelectAssessment}
-            />
-          ))}
-        </div>
-      </div>
-    );
+    return <AssessmentList assessments={assessments} onSelectAssessment={handleSelectAssessment} />;
   }
 
   if (!assessmentMode) {
@@ -193,22 +113,18 @@ export function AssessmentsTab() {
 
   const currentQuestion = selectedAssessment.questions[currentQuestionIndex];
 
-  if (assessmentMode === "write") {
-    return (
-      <WrittenAssessment
-        question={currentQuestion}
-        currentQuestionIndex={currentQuestionIndex}
-        totalQuestions={selectedAssessment.questions.length}
-        answer={answers[currentQuestion.id]}
-        onAnswerChange={handleAnswerChange}
-        onBack={handleBack}
-        onSubmit={handleSubmitAnswer}
-        title={selectedAssessment.title}
-      />
-    );
-  }
-
-  return (
+  return assessmentMode === "write" ? (
+    <WrittenAssessment
+      question={currentQuestion}
+      currentQuestionIndex={currentQuestionIndex}
+      totalQuestions={selectedAssessment.questions.length}
+      answer={answers[currentQuestion.id]}
+      onAnswerChange={handleAnswerChange}
+      onBack={handleBack}
+      onSubmit={handleSubmitAnswer}
+      title={selectedAssessment.title}
+    />
+  ) : (
     <VoiceAssessment
       question={currentQuestion}
       currentQuestionIndex={currentQuestionIndex}
