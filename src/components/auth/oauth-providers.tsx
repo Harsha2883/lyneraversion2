@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Google, Linkedin } from "lucide-react";
+import { icons } from "lucide-react";
 
 interface OAuthProviderProps {
   variant?: "login" | "signup";
@@ -36,7 +36,7 @@ export function OAuthProviders({ variant = "login" }: OAuthProviderProps) {
         onClick={() => handleOAuthLogin("google")}
         className="flex items-center gap-2"
       >
-        <Google className="h-4 w-4" />
+        {icons.Chrome({ className: "h-4 w-4" })}
         {variant === "login" ? "Sign in" : "Sign up"} with Google
       </Button>
       <Button 
@@ -45,7 +45,7 @@ export function OAuthProviders({ variant = "login" }: OAuthProviderProps) {
         onClick={() => handleOAuthLogin("linkedin_oidc")}
         className="flex items-center gap-2"
       >
-        <Linkedin className="h-4 w-4" />
+        {icons.Linkedin({ className: "h-4 w-4" })}
         {variant === "login" ? "Sign in" : "Sign up"} with LinkedIn
       </Button>
     </div>
