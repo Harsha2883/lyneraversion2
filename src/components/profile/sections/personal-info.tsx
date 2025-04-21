@@ -1,80 +1,59 @@
 
-import { useForm } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface PersonalInfoProps {
-  control: any;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  birthdate: Date | undefined;
+  onFieldChange: (field: string, value: any) => void;
 }
 
-export function PersonalInfo({ control }: PersonalInfoProps) {
+export function PersonalInfo({ 
+  firstName, 
+  lastName, 
+  gender, 
+  birthdate, 
+  onFieldChange 
+}: PersonalInfoProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <FormField
-        control={control}
-        name="first_name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>First Name</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name="last_name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Last Name</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name="gender"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Gender</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={control}
-        name="birthdate"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Birthdate</FormLabel>
-            <FormControl>
-              <Input type="date" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Personal Information</h3>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            id="firstName"
+            value={firstName}
+            onChange={(e) => onFieldChange('firstName', e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            value={lastName}
+            onChange={(e) => onFieldChange('lastName', e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="gender">Gender</Label>
+        <Input
+          id="gender"
+          value={gender}
+          onChange={(e) => onFieldChange('gender', e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="birthdate">Date of Birth</Label>
+        <DatePicker
+          date={birthdate}
+          onSelect={(date) => onFieldChange('birthdate', date)}
+        />
+      </div>
     </div>
   );
 }
