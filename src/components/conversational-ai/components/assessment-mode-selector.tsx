@@ -2,15 +2,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic } from "lucide-react";
-import { AssessmentMode } from "../types/assessment-types";
+import { AssessmentModeSelectorProps } from "../types/assessment-types";
 
-interface AssessmentModeSelectorProps {
-  onModeSelect: (mode: AssessmentMode) => void;
-  onBack: () => void;
-  title: string;
-}
-
-export function AssessmentModeSelector({ onModeSelect, onBack, title }: AssessmentModeSelectorProps) {
+export function AssessmentModeSelector({ 
+  onModeSelect, 
+  onBack, 
+  title 
+}: AssessmentModeSelectorProps) {
   return (
     <div className="mt-6">
       <div className="flex items-center mb-4">

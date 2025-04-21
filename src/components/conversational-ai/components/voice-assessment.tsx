@@ -4,23 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { CircleStop, Edit, Mic, Play, Repeat, Save } from "lucide-react";
-import { Question } from "../types/assessment-types";
-
-interface VoiceAssessmentProps {
-  question: Question;
-  currentQuestionIndex: number;
-  totalQuestions: number;
-  answer: string | number;
-  isPlaying: boolean;
-  isRecording: boolean;
-  editingAnswer: boolean;
-  onAnswerChange: (questionId: number, answer: string | number) => void;
-  onBack: () => void;
-  onTogglePlayback: () => void;
-  onToggleRecording: () => void;
-  onSubmit: () => void;
-  title: string;
-}
+import { VoiceAssessmentProps } from "../types/assessment-types";
 
 export function VoiceAssessment({
   question,

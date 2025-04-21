@@ -3,18 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Question } from "../types/assessment-types";
-
-interface WrittenAssessmentProps {
-  question: Question;
-  currentQuestionIndex: number;
-  totalQuestions: number;
-  answer: string | number;
-  onAnswerChange: (questionId: number, answer: string | number) => void;
-  onBack: () => void;
-  onSubmit: () => void;
-  title: string;
-}
+import { WrittenAssessmentProps } from "../types/assessment-types";
 
 export function WrittenAssessment({
   question,

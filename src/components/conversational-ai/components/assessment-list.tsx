@@ -1,11 +1,6 @@
 
-import { Assessment } from "../types/assessment-types";
+import { AssessmentListProps } from "../types/assessment-types";
 import { AssessmentCard } from "./assessment-card";
-
-interface AssessmentListProps {
-  assessments: Assessment[];
-  onSelectAssessment: (assessment: Assessment) => void;
-}
 
 export function AssessmentList({ assessments, onSelectAssessment }: AssessmentListProps) {
   return (

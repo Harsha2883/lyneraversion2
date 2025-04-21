@@ -21,3 +21,47 @@ export interface Assessment {
   questions: Question[];
   passScore: number;
 }
+
+// New interfaces for component props
+export interface AssessmentListProps {
+  assessments: Assessment[];
+  onSelectAssessment: (assessment: Assessment) => void;
+}
+
+export interface AssessmentModeSelectorProps {
+  onModeSelect: (mode: AssessmentMode) => void;
+  onBack: () => void;
+  title: string;
+}
+
+export interface WrittenAssessmentProps {
+  question: Question;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  answer: string | number;
+  onAnswerChange: (questionId: number, answer: string | number) => void;
+  onBack: () => void;
+  onSubmit: () => void;
+  title: string;
+}
+
+export interface VoiceAssessmentProps {
+  question: Question;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  answer: string | number;
+  isPlaying: boolean;
+  isRecording: boolean;
+  editingAnswer: boolean;
+  onAnswerChange: (questionId: number, answer: string | number) => void;
+  onBack: () => void;
+  onTogglePlayback: () => void;
+  onToggleRecording: () => void;
+  onSubmit: () => void;
+  title: string;
+}
+
+export interface AssessmentCardProps {
+  assessment: Assessment;
+  onSelect: (assessment: Assessment) => void;
+}

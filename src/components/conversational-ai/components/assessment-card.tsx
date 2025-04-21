@@ -3,12 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Award } from "lucide-react";
-import { Assessment } from "../types/assessment-types";
-
-interface AssessmentCardProps {
-  assessment: Assessment;
-  onSelect: (assessment: Assessment) => void;
-}
+import { AssessmentCardProps } from "../types/assessment-types";
 
 export function AssessmentCard({ assessment, onSelect }: AssessmentCardProps) {
   return (
