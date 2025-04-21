@@ -17,6 +17,7 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
 
   const fetchProfile = async (userId: string) => {
@@ -42,38 +43,36 @@ export function useAuth() {
     let authListener: any;
 
     const setupAuthListener = () => {
+      // Setup auth listener FIRST before checking current session
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         (event, currentSession) => {
           console.log("Auth state changed:", event, currentSession?.user?.id);
           
           if (!mounted) return;
 
-          if (event === 'TOKEN_REFRESHED') {
-            // Just update the session without any redirects
-            setSession(currentSession);
-            setUser(currentSession?.user ?? null);
-            return;
-          }
-
+          // Always update the session state
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
           
-          if (currentSession?.user) {
-            // Use setTimeout to prevent Supabase deadlocks
-            setTimeout(() => {
-              if (mounted) fetchProfile(currentSession.user.id);
-            }, 0);
-          } else {
-            setProfile(null);
-          }
+          // Only handle profile fetching and navigation after initialization
+          if (initialized) {
+            if (currentSession?.user) {
+              // Use setTimeout to prevent Supabase deadlocks
+              setTimeout(() => {
+                if (mounted) fetchProfile(currentSession.user.id);
+              }, 0);
+            } else {
+              setProfile(null);
+            }
 
-          // Only navigate on explicit sign in/out events
-          if (event === 'SIGNED_IN') {
-            toast.success("Successfully signed in!");
-            navigate("/dashboard");
-          } else if (event === 'SIGNED_OUT') {
-            toast.success("Successfully signed out!");
-            navigate("/auth");
+            // Only navigate on explicit sign in/out events
+            if (event === 'SIGNED_IN') {
+              toast.success("Successfully signed in!");
+              navigate("/dashboard");
+            } else if (event === 'SIGNED_OUT') {
+              toast.success("Successfully signed out!");
+              navigate("/auth");
+            }
           }
         }
       );
@@ -84,7 +83,12 @@ export function useAuth() {
     // Initialize auth state
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        // Setup auth listener first
+        authListener = setupAuthListener();
+        
+        // Then get the initial session
+        const { data } = await supabase.auth.getSession();
+        const initialSession = data.session;
         
         if (mounted) {
           setSession(initialSession);
@@ -95,18 +99,19 @@ export function useAuth() {
           }
           
           setLoading(false);
+          setInitialized(true);
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
         if (mounted) {
           setLoading(false);
+          setInitialized(true);
           toast.error("Failed to initialize authentication");
         }
       }
     };
 
     // Set up auth
-    authListener = setupAuthListener();
     initializeAuth();
 
     // Cleanup
@@ -121,9 +126,7 @@ export function useAuth() {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      setUser(null);
-      setProfile(null);
-      setSession(null);
+      // Let the auth listener handle state updates and navigation
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Failed to sign out");

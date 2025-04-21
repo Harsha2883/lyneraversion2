@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Shield, ShieldCheck, ShieldAlert, Info, Warning } from "lucide-react";
+import { Mail, Shield, ShieldCheck, ShieldAlert, Info, AlertTriangle } from "lucide-react";
 
 export function CodeOfConductTab() {
   return (
@@ -95,7 +95,7 @@ export function CodeOfConductTab() {
 
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <Warning className="h-6 w-6 text-primary" />
+            <AlertTriangle className="h-6 w-6 text-primary" />
             <h2 className="text-2xl font-semibold m-0">7. Violations & Consequences</h2>
           </div>
           <p>Depending on severity, actions may include:</p>
