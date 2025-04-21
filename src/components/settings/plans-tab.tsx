@@ -1,9 +1,11 @@
 
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 
 export function PlansTab() {
+  const navigate = useNavigate();
   const plans = [
     {
       name: "Basic",
@@ -29,6 +31,10 @@ export function PlansTab() {
     },
   ];
 
+  const handleUpgrade = () => {
+    navigate("/pricing");  // Navigate to pricing page for plan selection
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {plans.map((plan) => (
@@ -51,6 +57,7 @@ export function PlansTab() {
             <Button 
               className="w-full" 
               variant={plan.current ? "outline" : "default"}
+              onClick={!plan.current ? handleUpgrade : undefined}
             >
               {plan.current ? "Current Plan" : "Upgrade"}
             </Button>
