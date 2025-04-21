@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Award, Mic, Play, Repeat, Save, Edit, Stop } from "lucide-react";
+import { Award, Mic, Play, Repeat, Save, Edit, CircleStop } from "lucide-react";
 import { toast } from "sonner";
 
 // Assessment types
@@ -417,7 +416,7 @@ export function AssessmentsTab() {
               onClick={togglePlayback}
               className="flex items-center gap-2"
             >
-              {isPlaying ? <Stop /> : <Play />}
+              {isPlaying ? <CircleStop className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               {isPlaying ? "Stop" : "Play"}
             </Button>
             
@@ -427,7 +426,7 @@ export function AssessmentsTab() {
               className="flex items-center gap-2"
               disabled={isPlaying}
             >
-              <Repeat />
+              <Repeat className="h-4 w-4" />
               Repeat
             </Button>
             
@@ -437,7 +436,7 @@ export function AssessmentsTab() {
               className="flex items-center gap-2"
               disabled={isPlaying || editingAnswer}
             >
-              <Mic />
+              <Mic className="h-4 w-4" />
               {isRecording ? "Stop Recording" : "Answer Question"}
             </Button>
           </CardFooter>
