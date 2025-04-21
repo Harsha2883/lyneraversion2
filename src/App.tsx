@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import DashboardPage from "./pages/DashboardPage";
 import ConversationalAIPage from "./pages/ConversationalAIPage";
 import LearningJourneyPage from "./pages/LearningJourneyPage";
+import ELibraryPage from "./pages/ELibraryPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/dashboard/ai" element={<ConversationalAIPage />} />
           <Route path="/dashboard/journey" element={<LearningJourneyPage />} />
+          <Route path="/dashboard/library" element={<ELibraryPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
