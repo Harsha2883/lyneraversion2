@@ -12,6 +12,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ConversationalAIPage from "./pages/ConversationalAIPage";
 import LearningJourneyPage from "./pages/LearningJourneyPage";
 import ELibraryPage from "./pages/ELibraryPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/dashboard/ai" element={<ConversationalAIPage />} />
           <Route path="/dashboard/journey" element={<LearningJourneyPage />} />
           <Route path="/dashboard/library" element={<ELibraryPage />} />
+          <Route path="/dashboard/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

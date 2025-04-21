@@ -11,26 +11,47 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          aspiration: string | null
+          avatar_url: string | null
+          birthdate: string | null
           created_at: string
+          education: string | null
           first_name: string | null
+          gender: string | null
           id: string
           last_name: string | null
+          profession: string | null
+          social_media: Json | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
+          aspiration?: string | null
+          avatar_url?: string | null
+          birthdate?: string | null
           created_at?: string
+          education?: string | null
           first_name?: string | null
+          gender?: string | null
           id: string
           last_name?: string | null
+          profession?: string | null
+          social_media?: Json | null
           updated_at?: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Update: {
+          aspiration?: string | null
+          avatar_url?: string | null
+          birthdate?: string | null
           created_at?: string
+          education?: string | null
           first_name?: string | null
+          gender?: string | null
           id?: string
           last_name?: string | null
+          profession?: string | null
+          social_media?: Json | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
         }
