@@ -30,6 +30,7 @@ const App = () => (
           <Route path="/dashboard/journey" element={<LearningJourneyPage />} />
           <Route path="/dashboard/library" element={<ELibraryPage />} />
           <Route path="/dashboard/profile" element={<ProfilePage />} />
+          <Route path="/dashboard/settings" element={<SettingsPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
