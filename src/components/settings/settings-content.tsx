@@ -4,15 +4,17 @@ import { PrivacyPolicy } from "./privacy-policy";
 import { BillingHistory } from "./billing-history";
 import { PaymentsTab } from "./payments-tab";
 import { PlansTab } from "./plans-tab";
+import { CodeOfConductTab } from "./code-of-conduct";
 
 export function SettingsContent() {
   return (
     <Tabs defaultValue="privacy" className="space-y-6">
-      <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+      <TabsList className="grid grid-cols-5 w-full max-w-2xl">
         <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
         <TabsTrigger value="billing">Billing History</TabsTrigger>
         <TabsTrigger value="payments">Payments</TabsTrigger>
         <TabsTrigger value="plans">Plans</TabsTrigger>
+        <TabsTrigger value="conduct">Code of Conduct</TabsTrigger>
       </TabsList>
 
       <TabsContent value="privacy" className="space-y-4">
@@ -29,6 +31,10 @@ export function SettingsContent() {
 
       <TabsContent value="plans" className="space-y-4">
         <PlansTab />
+      </TabsContent>
+
+      <TabsContent value="conduct" className="space-y-4">
+        <CodeOfConductTab />
       </TabsContent>
     </Tabs>
   );
