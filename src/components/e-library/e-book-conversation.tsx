@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -56,7 +55,6 @@ export function EBookConversation({ book, onBack }: EBookConversationProps) {
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
     
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -68,7 +66,6 @@ export function EBookConversation({ book, onBack }: EBookConversationProps) {
     setInputMessage("");
     setIsLoading(true);
     
-    // Simulate AI response
     setTimeout(() => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

@@ -60,6 +60,11 @@ export function ProfileForm() {
     setSaving(true);
 
     try {
+      // Make sure we have a valid profile ID, otherwise we can't save
+      if (!profile?.id) {
+        throw new Error("Profile ID is missing. Cannot save changes.");
+      }
+
       let avatar_url = formData.avatar_url;
 
       // If the user selected a new avatar, upload it now
@@ -94,10 +99,13 @@ export function ProfileForm() {
         avatar_url,
       };
 
+      console.log("Updating profile with ID:", profile.id);
+      console.log("Data to submit:", dataToSubmit);
+
       const { error } = await supabase
         .from("profiles")
         .update(dataToSubmit)
-        .eq("id", profile?.id);
+        .eq("id", profile.id);
 
       if (error) throw error;
 
@@ -112,6 +120,7 @@ export function ProfileForm() {
       await refreshProfile();
       toast.success("Profile updated successfully!");
     } catch (error: any) {
+      console.error("Error saving profile:", error);
       toast.error(error.message || "Error saving profile");
     } finally {
       setSaving(false);
@@ -192,4 +201,3 @@ export function ProfileForm() {
     </form>
   );
 }
-

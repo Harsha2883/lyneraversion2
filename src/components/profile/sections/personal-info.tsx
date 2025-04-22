@@ -59,9 +59,9 @@ export function PersonalInfo({
           onSelect={(date) => {
             if (editMode) onFieldChange("birthdate", date)
           }}
+          disabled={!editMode}
         />
       </div>
     </div>
   );
 }
-
