@@ -4,6 +4,7 @@ import { ProfileFormError, ProfileFormLoading } from "../states/profile-form-sta
 import { FormActions } from "../form-actions";
 import { ProfileFormCard } from "./ProfileFormCard";
 import { ProfileFormSections } from "./ProfileFormSections";
+import { toast } from "sonner";
 
 export function ProfileFormContainer() {
   const {
@@ -37,6 +38,7 @@ export function ProfileFormContainer() {
     if (editMode) {
       if (!formData.first_name || !formData.last_name) {
         console.error("First name and last name are required");
+        toast.error("First name and last name are required");
         return;
       }
     }

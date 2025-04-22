@@ -127,12 +127,16 @@ export function useAuth() {
         const { data } = await supabase.auth.getSession();
         const initialSession = data.session;
         
+        console.log("Initial auth session:", initialSession?.user?.id ? "User signed in" : "No user");
+        
         if (mounted) {
           setSession(initialSession);
           setUser(initialSession?.user ?? null);
           
           if (initialSession?.user) {
             await fetchProfile(initialSession.user.id);
+          } else {
+            console.log("No active session found during initialization");
           }
           
           setLoading(false);

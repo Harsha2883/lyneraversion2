@@ -86,13 +86,17 @@ export const checkAvatarBucket = async (): Promise<boolean> => {
     if (!avatarBucketExists) {
       console.log("Creating avatars bucket...");
       try {
+        // Check if we have permission to create buckets
         const { error: createError } = await supabase.storage.createBucket('avatars', {
           public: true
         });
+        
         if (createError) {
           console.error("Error creating avatars bucket:", createError);
+          // Don't throw, just return false
           return false;
         }
+        
         console.log("Avatars bucket created successfully");
         return true;
       } catch (err) {
@@ -104,6 +108,7 @@ export const checkAvatarBucket = async (): Promise<boolean> => {
     return avatarBucketExists;
   } catch (error) {
     console.error("Exception checking storage buckets:", error);
+    // Continue without bucket
     return false;
   }
 };
@@ -115,6 +120,13 @@ export const uploadAvatar = async (file: File, userId: string): Promise<string |
   }
   
   try {
+    // Check if avatar bucket exists before upload
+    const bucketExists = await checkAvatarBucket();
+    if (!bucketExists) {
+      console.warn("Avatar bucket does not exist and could not be created. Skipping upload.");
+      return null;
+    }
+    
     const fileExt = file.name.split('.').pop();
     const filePath = `${userId}/avatar.${fileExt}`;
     

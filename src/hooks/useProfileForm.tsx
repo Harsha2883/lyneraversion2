@@ -7,7 +7,7 @@ import { ProfileFormData, ProfileFormState } from "@/types/profile";
 import { mapProfileToFormData, formatBirthdate, checkAvatarBucket, uploadAvatar } from "@/utils/profile-utils";
 
 export function useProfileForm() {
-  const { profile, refreshProfile, user } = useAuth();
+  const { profile, refreshProfile, user, session } = useAuth();
   const [state, setState] = useState<ProfileFormState>({
     formData: mapProfileToFormData(profile),
     saving: false,
@@ -26,8 +26,26 @@ export function useProfileForm() {
           setState(prev => ({ ...prev, loading: true, error: null }));
         }
         
-        // Check for avatar bucket
-        await checkAvatarBucket();
+        // Check for authentication first
+        if (!session) {
+          console.log("No active session found in useProfileForm");
+          if (mounted) {
+            setState(prev => ({
+              ...prev,
+              error: "Please sign in to view your profile",
+              loading: false,
+            }));
+          }
+          return;
+        }
+
+        // Only try to access avatar bucket if we have an active session
+        try {
+          await checkAvatarBucket();
+        } catch (bucketError) {
+          console.warn("Avatar bucket check failed, but continuing:", bucketError);
+          // Continue anyway - this shouldn't block profile loading
+        }
         
         if (profile && mounted) {
           console.log("Loading profile data:", profile);
@@ -37,12 +55,15 @@ export function useProfileForm() {
             loading: false,
           }));
         } else if (!user && mounted) {
+          console.log("No user found but session exists");
           setState(prev => ({
             ...prev,
             error: "Please sign in to view your profile",
             loading: false,
           }));
         } else if (mounted) {
+          // We have a user but no profile yet
+          console.log("User exists but no profile data found");
           setState(prev => ({ ...prev, loading: false }));
         }
       } catch (err: any) {
@@ -62,7 +83,7 @@ export function useProfileForm() {
     return () => {
       mounted = false;
     };
-  }, [profile, user]);
+  }, [profile, user, session]);
 
   const handleFieldChange = (field: string, value: any) => {
     console.log(`Updating field: ${field} with value:`, value);
@@ -83,6 +104,10 @@ export function useProfileForm() {
     try {
       console.log("Starting profile save with user:", user?.id);
       
+      if (!session) {
+        throw new Error("No active session. Please sign in again.");
+      }
+      
       if (!user?.id) {
         throw new Error("User ID is missing. Please sign in again.");
       }
@@ -96,13 +121,19 @@ export function useProfileForm() {
       // Handle avatar upload if there's a pending file
       if (state.pendingAvatarFile && user) {
         console.log("Uploading avatar...");
-        const uploadedUrl = await uploadAvatar(state.pendingAvatarFile, user.id);
-        if (uploadedUrl) {
-          avatar_url = uploadedUrl;
-          console.log("Avatar uploaded successfully:", avatar_url);
-        } else {
-          console.error("Avatar upload failed");
-          toast.error("Error uploading avatar");
+        try {
+          const uploadedUrl = await uploadAvatar(state.pendingAvatarFile, user.id);
+          if (uploadedUrl) {
+            avatar_url = uploadedUrl;
+            console.log("Avatar uploaded successfully:", avatar_url);
+          } else {
+            console.error("Avatar upload failed");
+            toast.error("Error uploading avatar");
+          }
+        } catch (avatarError) {
+          console.error("Avatar upload error:", avatarError);
+          toast.error("Failed to upload avatar image");
+          // Continue with profile update even if avatar upload fails
         }
       }
 
