@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,25 +31,47 @@ export function useAuth() {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log("Fetching profile for user:", userId);
+      
+      if (!userId) {
+        console.error("Invalid user ID provided to fetchProfile");
+        return null;
+      }
+      
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error in fetchProfile:", error);
+        throw error;
+      }
+      
+      console.log("Profile data received:", profile);
+      
       if (profile) {
         setProfile(profile);
+        return profile;
+      } else {
+        console.warn("No profile found for user:", userId);
+        return null;
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load user profile");
+      return null;
     }
   };
 
   const refreshProfile = async () => {
     if (user) {
-      await fetchProfile(user.id);
+      console.log("Refreshing profile for user:", user.id);
+      return await fetchProfile(user.id);
+    } else {
+      console.warn("Cannot refresh profile: No user is signed in");
+      return null;
     }
   };
 

@@ -71,6 +71,16 @@ export function DatePicker({ date, onSelect, disabled = false }: DatePickerProps
     { value: 11, label: "December" },
   ];
 
+  const formatDisplayDate = () => {
+    if (!date) return "Pick a date";
+    try {
+      return format(date, "PPP");
+    } catch (error) {
+      console.error("Error formatting date:", error, date);
+      return "Invalid date";
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -84,7 +94,7 @@ export function DatePicker({ date, onSelect, disabled = false }: DatePickerProps
           disabled={disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {formatDisplayDate()}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

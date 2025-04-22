@@ -21,6 +21,17 @@ export function PersonalInfo({
   onFieldChange,
   editMode
 }: PersonalInfoProps) {
+  // Format gender display value for non-edit mode
+  const getGenderDisplayValue = (value: string): string => {
+    switch (value) {
+      case 'male': return 'Male';
+      case 'female': return 'Female';
+      case 'other': return 'Other';
+      case 'prefer-not-to-say': return 'Prefer not to say';
+      default: return value;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Personal Information</h3>
@@ -65,7 +76,7 @@ export function PersonalInfo({
         ) : (
           <Input
             id="gender"
-            value={gender}
+            value={getGenderDisplayValue(gender)}
             disabled={true}
           />
         )}

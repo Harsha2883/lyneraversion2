@@ -1,5 +1,4 @@
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -14,6 +13,7 @@ export function ProfileForm() {
   const { profile, refreshProfile, user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
@@ -28,23 +28,54 @@ export function ProfileForm() {
     avatar_url: "",
   });
 
-  // Initialize form data when profile is loaded
   useEffect(() => {
+    const createBucketIfNeeded = async () => {
+      try {
+        const { data: buckets } = await supabase.storage.listBuckets();
+        const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
+        
+        if (!avatarBucketExists) {
+          console.warn("Avatars storage bucket doesn't exist. File uploads may fail.");
+        }
+      } catch (error) {
+        console.error("Error checking storage buckets:", error);
+      }
+    };
+    
+    createBucketIfNeeded();
+  }, []);
+
+  useEffect(() => {
+    console.log("Profile data:", profile);
+    setLoading(true);
+    setError(null);
+    
     if (profile) {
-      setFormData({
-        first_name: profile.first_name || "",
-        last_name: profile.last_name || "",
-        gender: profile.gender || "",
-        birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
-        profession: profile.profession || "",
-        education: profile.education || "",
-        aspiration: profile.aspiration || "",
-        social_media: profile.social_media || {},
-        avatar_url: profile.avatar_url || "",
-      });
+      try {
+        setFormData({
+          first_name: profile.first_name || "",
+          last_name: profile.last_name || "",
+          gender: profile.gender || "",
+          birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
+          profession: profile.profession || "",
+          education: profile.education || "",
+          aspiration: profile.aspiration || "",
+          social_media: profile.social_media || {},
+          avatar_url: profile.avatar_url || "",
+        });
+        setLoading(false);
+      } catch (err: any) {
+        console.error("Error parsing profile data:", err);
+        setError("Error loading profile: " + err.message);
+        setLoading(false);
+      }
+    } else if (!user) {
+      setError("Please sign in to view your profile");
       setLoading(false);
+    } else {
+      console.log("User signed in but profile not loaded yet");
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const handleFieldChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -53,20 +84,17 @@ export function ProfileForm() {
     }));
   };
 
-  // Handle Save functionality including image upload if needed
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setSaving(true);
 
     try {
-      // Make sure we have a valid profile ID, otherwise we can't save
       if (!profile?.id) {
         throw new Error("Profile ID is missing. Cannot save changes.");
       }
 
       let avatar_url = formData.avatar_url;
 
-      // If the user selected a new avatar, upload it now
       if (pendingAvatarFile && user) {
         const fileExt = pendingAvatarFile.name.split('.').pop();
         const filePath = `${user.id}/avatar.${fileExt}`;
@@ -78,7 +106,6 @@ export function ProfileForm() {
           
           if (uploadError) throw uploadError;
           
-          // Get the public URL
           const { data: { publicUrl } } = supabase.storage
             .from("avatars")
             .getPublicUrl(filePath);
@@ -91,16 +118,17 @@ export function ProfileForm() {
         }
       }
 
-      // Prepare payload for update
+      const formattedBirthdate = formData.birthdate
+        ? (formData.birthdate instanceof Date
+            ? formData.birthdate.toISOString().split("T")[0]
+            : formData.birthdate)
+        : null;
+
       const dataToSubmit = {
         first_name: formData.first_name,
         last_name: formData.last_name,
         gender: formData.gender,
-        birthdate: formData.birthdate
-          ? (formData.birthdate instanceof Date
-              ? formData.birthdate.toISOString().split("T")[0]
-              : formData.birthdate)
-          : null,
+        birthdate: formattedBirthdate,
         profession: formData.profession,
         education: formData.education,
         aspiration: formData.aspiration,
@@ -120,11 +148,11 @@ export function ProfileForm() {
 
       setFormData(prev => ({
         ...prev,
-        avatar_url, // make sure image url is in state
+        avatar_url,
       }));
 
       setEditMode(false);
-      setPendingAvatarFile(null); // clear file picker
+      setPendingAvatarFile(null);
 
       await refreshProfile();
       toast.success("Profile updated successfully!");
@@ -136,10 +164,8 @@ export function ProfileForm() {
     }
   };
 
-  // Button that toggles edit/view mode
   const handleEdit = () => setEditMode(true);
   const handleCancel = () => {
-    // Rollback changes, reset fields to last saved values
     if (profile) {
       setFormData({
         first_name: profile.first_name || "",
@@ -157,7 +183,7 @@ export function ProfileForm() {
     setEditMode(false);
   };
 
-  if (loading && !profile) {
+  if (loading) {
     return (
       <Card>
         <CardHeader>
@@ -166,6 +192,31 @@ export function ProfileForm() {
         <CardContent className="h-[400px] flex items-center justify-center">
           <div className="text-center">
             <p className="text-muted-foreground">Loading profile data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[400px] flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-destructive">{error}</p>
+            <Button 
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                refreshProfile().finally(() => setLoading(false));
+              }}
+              className="mt-4"
+            >
+              Retry Loading
+            </Button>
           </div>
         </CardContent>
       </Card>
