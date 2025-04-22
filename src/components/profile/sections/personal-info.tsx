@@ -32,6 +32,14 @@ export function PersonalInfo({
     }
   };
 
+  // Handle date selection with validation
+  const handleDateSelect = (date: Date | undefined) => {
+    console.log("Date selected in DatePicker:", date);
+    if (editMode) {
+      onFieldChange("birthdate", date);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Personal Information</h3>
@@ -85,9 +93,7 @@ export function PersonalInfo({
         <Label htmlFor="birthdate">Date of Birth</Label>
         <DatePicker
           date={birthdate}
-          onSelect={(date) => {
-            if (editMode) onFieldChange("birthdate", date)
-          }}
+          onSelect={handleDateSelect}
           disabled={!editMode}
         />
       </div>

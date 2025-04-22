@@ -29,8 +29,14 @@ export function ProfileFormContainer() {
     return <ProfileFormError error={error} onRetry={retry} />;
   }
 
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Submitting profile form with data:", formData);
+    handleSave(e);
+  };
+
   return (
-    <form onSubmit={handleSave}>
+    <form onSubmit={onSubmit}>
       <ProfileFormCard>
         <ProfileFormSections
           formData={formData}

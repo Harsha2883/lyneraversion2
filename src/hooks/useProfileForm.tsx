@@ -30,6 +30,7 @@ export function useProfileForm() {
         await checkAvatarBucket();
         
         if (profile && mounted) {
+          console.log("Loading profile data:", profile);
           setState(prev => ({
             ...prev,
             formData: mapProfileToFormData(profile),
@@ -43,6 +44,7 @@ export function useProfileForm() {
           }));
         }
       } catch (err: any) {
+        console.error("Profile form initialization error:", err);
         if (mounted) {
           setState(prev => ({
             ...prev,
@@ -61,6 +63,7 @@ export function useProfileForm() {
   }, [profile, user]);
 
   const handleFieldChange = (field: string, value: any) => {
+    console.log(`Updating field: ${field} with value:`, value);
     setState(prev => ({
       ...prev,
       formData: {
@@ -76,6 +79,8 @@ export function useProfileForm() {
     setState(prev => ({ ...prev, saving: true }));
 
     try {
+      console.log("Starting profile save with user:", user?.id);
+      
       if (!profile?.id) {
         throw new Error("Profile ID is missing. Cannot save changes.");
       }
@@ -84,19 +89,26 @@ export function useProfileForm() {
 
       // Handle avatar upload if there's a pending file
       if (state.pendingAvatarFile && user) {
+        console.log("Uploading avatar...");
         const uploadedUrl = await uploadAvatar(state.pendingAvatarFile, user.id);
         if (uploadedUrl) {
           avatar_url = uploadedUrl;
+          console.log("Avatar uploaded successfully:", avatar_url);
         } else {
+          console.error("Avatar upload failed");
           toast.error("Error uploading avatar");
         }
       }
+
+      // Format birthdate properly for database storage
+      const formattedBirthdate = formatBirthdate(state.formData.birthdate);
+      console.log("Formatted birthdate for save:", formattedBirthdate);
 
       const dataToSubmit = {
         first_name: state.formData.first_name,
         last_name: state.formData.last_name,
         gender: state.formData.gender,
-        birthdate: formatBirthdate(state.formData.birthdate),
+        birthdate: formattedBirthdate,
         profession: state.formData.profession,
         education: state.formData.education,
         aspiration: state.formData.aspiration,
@@ -104,12 +116,20 @@ export function useProfileForm() {
         avatar_url,
       };
 
-      const { error } = await supabase
+      console.log("Submitting profile data to database:", dataToSubmit);
+
+      const { error, data } = await supabase
         .from("profiles")
         .update(dataToSubmit)
-        .eq("id", profile.id);
+        .eq("id", profile.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Profile update error:", error);
+        throw error;
+      }
+
+      console.log("Profile updated successfully:", data);
 
       setState(prev => ({
         ...prev,
@@ -125,6 +145,7 @@ export function useProfileForm() {
       await refreshProfile();
       toast.success("Profile updated successfully!");
     } catch (error: any) {
+      console.error("Error saving profile:", error);
       toast.error(`Error saving profile: ${error.message}`);
       setState(prev => ({ ...prev, saving: false }));
     }
