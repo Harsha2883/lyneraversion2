@@ -9,6 +9,7 @@ interface PersonalInfoProps {
   gender: string;
   birthdate: Date | undefined;
   onFieldChange: (field: string, value: any) => void;
+  editMode: boolean;
 }
 
 export function PersonalInfo({ 
@@ -16,7 +17,8 @@ export function PersonalInfo({
   lastName, 
   gender, 
   birthdate, 
-  onFieldChange 
+  onFieldChange,
+  editMode
 }: PersonalInfoProps) {
   return (
     <div className="space-y-4">
@@ -27,7 +29,8 @@ export function PersonalInfo({
           <Input
             id="firstName"
             value={firstName}
-            onChange={(e) => onFieldChange('firstName', e.target.value)}
+            onChange={(e) => onFieldChange("first_name", e.target.value)}
+            disabled={!editMode}
           />
         </div>
         <div className="space-y-2">
@@ -35,7 +38,8 @@ export function PersonalInfo({
           <Input
             id="lastName"
             value={lastName}
-            onChange={(e) => onFieldChange('lastName', e.target.value)}
+            onChange={(e) => onFieldChange("last_name", e.target.value)}
+            disabled={!editMode}
           />
         </div>
       </div>
@@ -44,16 +48,20 @@ export function PersonalInfo({
         <Input
           id="gender"
           value={gender}
-          onChange={(e) => onFieldChange('gender', e.target.value)}
+          onChange={(e) => onFieldChange("gender", e.target.value)}
+          disabled={!editMode}
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="birthdate">Date of Birth</Label>
         <DatePicker
           date={birthdate}
-          onSelect={(date) => onFieldChange('birthdate', date)}
+          onSelect={(date) => {
+            if (editMode) onFieldChange("birthdate", date)
+          }}
         />
       </div>
     </div>
   );
 }
+

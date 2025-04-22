@@ -9,9 +9,10 @@ interface SocialMediaProps {
     github?: string;
   };
   onFieldChange: (field: string, value: any) => void;
+  editMode: boolean;
 }
 
-export function SocialMedia({ socialMedia, onFieldChange }: SocialMediaProps) {
+export function SocialMedia({ socialMedia, onFieldChange, editMode }: SocialMediaProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Social Media Links</h3>
@@ -26,6 +27,7 @@ export function SocialMedia({ socialMedia, onFieldChange }: SocialMediaProps) {
               linkedin: e.target.value 
             })
           }
+          disabled={!editMode}
         />
       </div>
       <div className="space-y-2">
@@ -39,6 +41,7 @@ export function SocialMedia({ socialMedia, onFieldChange }: SocialMediaProps) {
               twitter: e.target.value 
             })
           }
+          disabled={!editMode}
         />
       </div>
       <div className="space-y-2">
@@ -52,8 +55,10 @@ export function SocialMedia({ socialMedia, onFieldChange }: SocialMediaProps) {
               github: e.target.value 
             })
           }
+          disabled={!editMode}
         />
       </div>
     </div>
   );
 }
+
