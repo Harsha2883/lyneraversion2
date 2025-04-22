@@ -25,7 +25,8 @@ export function EBookConversation({ book, onBack }: EBookConversationProps) {
     {
       id: "1",
       role: "assistant",
-      content: `Hello! I'm your AI assistant for "${book.title}". What would you like to discuss about this book?`
+      content: `Hello! I'm your AI assistant for "${book.title}". What would you like to discuss about this book?`,
+      timestamp: new Date().toISOString(),
     }
   ]);
 
@@ -59,7 +60,8 @@ export function EBookConversation({ book, onBack }: EBookConversationProps) {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: message
+      content: message,
+      timestamp: new Date().toISOString(),
     };
     
     setMessages(prev => [...prev, userMessage]);
@@ -71,7 +73,8 @@ export function EBookConversation({ book, onBack }: EBookConversationProps) {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `This is a simulated response about "${book.title}". In a real implementation, this would connect to an AI service to discuss the book content.`
+        content: `This is a simulated response about "${book.title}". In a real implementation, this would connect to an AI service to discuss the book content.`,
+        timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, assistantMessage]);
       setIsLoading(false);

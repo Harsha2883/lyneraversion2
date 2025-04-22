@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +9,15 @@ export interface Profile {
   user_type: "learner" | "creator" | "admin";
   first_name: string | null;
   last_name: string | null;
+  avatar_url: string | null;
+  gender: string | null;
+  birthdate: string | null;
+  profession: string | null;
+  education: string | null;
+  aspiration: string | null;
+  social_media: any;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export function useAuth() {
@@ -35,6 +43,12 @@ export function useAuth() {
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load user profile");
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
     }
   };
 
@@ -133,5 +147,5 @@ export function useAuth() {
     }
   };
 
-  return { user, profile, session, loading, signOut };
+  return { user, profile, session, loading, signOut, refreshProfile };
 }

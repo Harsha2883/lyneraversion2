@@ -30,22 +30,38 @@ export interface AssessmentListProps {
 }
 
 export interface AssessmentModeSelectorProps {
-  selectedMode: AssessmentMode;
-  onModeChange: (mode: AssessmentMode) => void;
+  onModeSelect: (mode: AssessmentMode) => void;
+  onBack: () => void;
+  title: string;
 }
 
-export type AssessmentMode = "written" | "voice";
+export type AssessmentMode = "write" | "voice";
 
 export interface WrittenAssessmentProps {
-  assessment: Assessment;
-  onComplete: (results: AssessmentResult) => void;
-  onCancel: () => void;
+  question: Question;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  answer: string | number;
+  onAnswerChange: (questionId: number, answer: string | number) => void;
+  onBack: () => void;
+  onSubmit: () => void;
+  title: string;
 }
 
 export interface VoiceAssessmentProps {
-  assessment: Assessment;
-  onComplete: (results: AssessmentResult) => void;
-  onCancel: () => void;
+  question: Question;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  answer: string | number;
+  isPlaying: boolean;
+  isRecording: boolean;
+  editingAnswer: boolean;
+  onAnswerChange: (questionId: number, answer: string | number) => void;
+  onBack: () => void;
+  onTogglePlayback: () => void;
+  onToggleRecording: () => void;
+  onSubmit: () => void;
+  title: string;
 }
 
 export interface AssessmentResult {

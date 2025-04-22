@@ -36,9 +36,15 @@ export function ProfileForm() {
     setSaving(true);
 
     try {
+      // Convert Date object to ISO string for database storage
+      const dataToSubmit = {
+        ...formData,
+        birthdate: formData.birthdate?.toISOString().split('T')[0] // Format as YYYY-MM-DD
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update(formData)
+        .update(dataToSubmit)
         .eq('id', profile?.id);
 
       if (error) throw error;
