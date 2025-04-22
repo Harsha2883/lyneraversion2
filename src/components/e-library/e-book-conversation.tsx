@@ -24,12 +24,12 @@ export function EBookConversation({ book, initialMessages = [], onBack }: EBookC
     if (!msg.trim()) return;
     setIsLoading(true);
     
-    // Create a message with the required timestamp property
+    // Create a message with the timestamp as a Date object instead of a string
     const newUserMessage: Message = { 
       id: Date.now().toString(), 
       content: msg, 
       role: "user",
-      timestamp: new Date().toISOString() 
+      timestamp: new Date() // Changed from string to Date object
     };
     
     setMessages((prev) => [...prev, newUserMessage]);
@@ -40,7 +40,7 @@ export function EBookConversation({ book, initialMessages = [], onBack }: EBookC
         id: (Date.now() + 1).toString(), 
         content: "AI response...", 
         role: "assistant",
-        timestamp: new Date().toISOString()
+        timestamp: new Date() // Changed from string to Date object
       };
       
       setMessages((prev) => [...prev, aiMessage]);
