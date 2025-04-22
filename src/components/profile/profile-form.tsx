@@ -46,7 +46,6 @@ export function ProfileForm() {
   }, []);
 
   useEffect(() => {
-    console.log("Profile data:", profile);
     setLoading(true);
     setError(null);
     
@@ -56,7 +55,11 @@ export function ProfileForm() {
           first_name: profile.first_name || "",
           last_name: profile.last_name || "",
           gender: profile.gender || "",
-          birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
+          birthdate: profile.birthdate
+            ? (profile.birthdate instanceof Date
+              ? profile.birthdate
+              : new Date(profile.birthdate))
+            : undefined,
           profession: profile.profession || "",
           education: profile.education || "",
           aspiration: profile.aspiration || "",
@@ -65,15 +68,12 @@ export function ProfileForm() {
         });
         setLoading(false);
       } catch (err: any) {
-        console.error("Error parsing profile data:", err);
         setError("Error loading profile: " + err.message);
         setLoading(false);
       }
     } else if (!user) {
       setError("Please sign in to view your profile");
       setLoading(false);
-    } else {
-      console.log("User signed in but profile not loaded yet");
     }
   }, [profile, user]);
 
@@ -112,16 +112,14 @@ export function ProfileForm() {
           
           avatar_url = publicUrl;
         } catch (uploadError: any) {
-          console.error("Avatar upload error:", uploadError);
           toast.error(`Error uploading avatar: ${uploadError.message}`);
-          // Continue with the profile update even if the avatar upload fails
         }
       }
 
       const formattedBirthdate = formData.birthdate
         ? (formData.birthdate instanceof Date
-            ? formData.birthdate.toISOString().split("T")[0]
-            : formData.birthdate)
+          ? formData.birthdate.toISOString().split("T")[0]
+          : formData.birthdate)
         : null;
 
       const dataToSubmit = {
@@ -135,9 +133,6 @@ export function ProfileForm() {
         social_media: formData.social_media,
         avatar_url,
       };
-
-      console.log("Updating profile with ID:", profile.id);
-      console.log("Data to submit:", dataToSubmit);
 
       const { error } = await supabase
         .from("profiles")
@@ -157,7 +152,6 @@ export function ProfileForm() {
       await refreshProfile();
       toast.success("Profile updated successfully!");
     } catch (error: any) {
-      console.error("Error saving profile:", error);
       toast.error(`Error saving profile: ${error.message}`);
     } finally {
       setSaving(false);
@@ -171,7 +165,11 @@ export function ProfileForm() {
         first_name: profile.first_name || "",
         last_name: profile.last_name || "",
         gender: profile.gender || "",
-        birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
+        birthdate: profile.birthdate
+          ? (profile.birthdate instanceof Date
+            ? profile.birthdate
+            : new Date(profile.birthdate))
+          : undefined,
         profession: profile.profession || "",
         education: profile.education || "",
         aspiration: profile.aspiration || "",
