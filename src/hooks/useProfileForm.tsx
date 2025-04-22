@@ -42,6 +42,8 @@ export function useProfileForm() {
             error: "Please sign in to view your profile",
             loading: false,
           }));
+        } else if (mounted) {
+          setState(prev => ({ ...prev, loading: false }));
         }
       } catch (err: any) {
         console.error("Profile form initialization error:", err);
@@ -81,6 +83,10 @@ export function useProfileForm() {
     try {
       console.log("Starting profile save with user:", user?.id);
       
+      if (!user?.id) {
+        throw new Error("User ID is missing. Please sign in again.");
+      }
+
       if (!profile?.id) {
         throw new Error("Profile ID is missing. Cannot save changes.");
       }

@@ -32,6 +32,15 @@ export function ProfileFormContainer() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitting profile form with data:", formData);
+    
+    // Client-side validation
+    if (editMode) {
+      if (!formData.first_name || !formData.last_name) {
+        console.error("First name and last name are required");
+        return;
+      }
+    }
+    
     handleSave(e);
   };
 

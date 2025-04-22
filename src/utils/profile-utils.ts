@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const mapProfileToFormData = (profile: Profile | null): ProfileFormData => {
   if (!profile) {
+    console.log("No profile data provided for mapping");
     return {
       first_name: "",
       last_name: "",
