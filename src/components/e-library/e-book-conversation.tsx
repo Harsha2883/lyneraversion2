@@ -9,9 +9,10 @@ import { EBookPlayerControls } from "./conversation/EBookPlayerControls";
 interface EBookConversationProps {
   book: EBook;
   initialMessages?: Message[];
+  onBack?: () => void;
 }
 
-export function EBookConversation({ book, initialMessages = [] }: EBookConversationProps) {
+export function EBookConversation({ book, initialMessages = [], onBack }: EBookConversationProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputMessage, setInputMessage] = useState("");
@@ -22,15 +23,30 @@ export function EBookConversation({ book, initialMessages = [] }: EBookConversat
   const sendMessage = (msg: string) => {
     if (!msg.trim()) return;
     setIsLoading(true);
-    setMessages((prev) => [...prev, { id: Date.now().toString(), content: msg, role: "user" }]);
+    
+    // Create a message with the required timestamp property
+    const newUserMessage: Message = { 
+      id: Date.now().toString(), 
+      content: msg, 
+      role: "user",
+      timestamp: new Date().toISOString() 
+    };
+    
+    setMessages((prev) => [...prev, newUserMessage]);
+    
     // Simulate AI reply (replace with real API)
     setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { id: (Date.now() + 1).toString(), content: "AI response...", role: "assistant" },
-      ]);
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(), 
+        content: "AI response...", 
+        role: "assistant",
+        timestamp: new Date().toISOString()
+      };
+      
+      setMessages((prev) => [...prev, aiMessage]);
       setIsLoading(false);
     }, 1000);
+    
     setInputMessage("");
   };
 
@@ -47,6 +63,16 @@ export function EBookConversation({ book, initialMessages = [] }: EBookConversat
           sendMessage={sendMessage}
         />
       </div>
+      {onBack && (
+        <div className="p-4 border-t">
+          <button 
+            onClick={onBack}
+            className="text-primary hover:underline"
+          >
+            ← Back to Books
+          </button>
+        </div>
+      )}
     </div>
   );
 }
