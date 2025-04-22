@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -52,6 +53,7 @@ export function DatePicker({ date, onSelect, disabled = false }: DatePickerProps
     }
   };
 
+  // Generate a range of years from 1920 to current year
   const years = Array.from({ length: new Date().getFullYear() - 1920 + 1 }, (_, i) => 1920 + i).reverse();
   
   const months = [
@@ -110,7 +112,7 @@ export function DatePicker({ date, onSelect, disabled = false }: DatePickerProps
             <SelectTrigger className="w-[90px]">
               <SelectValue placeholder="Year" />
             </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
+            <SelectContent className="max-h-[200px] overflow-y-auto">
               {years.map(year => (
                 <SelectItem key={year} value={year.toString()}>
                   {year}

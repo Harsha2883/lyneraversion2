@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PersonalInfoProps {
   firstName: string;
@@ -45,12 +46,29 @@ export function PersonalInfo({
       </div>
       <div className="space-y-2">
         <Label htmlFor="gender">Gender</Label>
-        <Input
-          id="gender"
-          value={gender}
-          onChange={(e) => onFieldChange("gender", e.target.value)}
-          disabled={!editMode}
-        />
+        {editMode ? (
+          <Select
+            value={gender}
+            onValueChange={(value) => onFieldChange("gender", value)}
+            disabled={!editMode}
+          >
+            <SelectTrigger id="gender" className="w-full">
+              <SelectValue placeholder="Select gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            id="gender"
+            value={gender}
+            disabled={true}
+          />
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="birthdate">Date of Birth</Label>

@@ -1,5 +1,5 @@
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -13,39 +13,38 @@ import { AvatarUpload } from "./avatar-upload";
 export function ProfileForm() {
   const { profile, refreshProfile, user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
-
-  // Set initial form data (convert dates as required)
   const [formData, setFormData] = useState({
-    first_name: profile?.first_name || "",
-    last_name: profile?.last_name || "",
-    gender: profile?.gender || "",
-    birthdate: profile?.birthdate ? new Date(profile.birthdate) : undefined,
-    profession: profile?.profession || "",
-    education: profile?.education || "",
-    aspiration: profile?.aspiration || "",
-    social_media: profile?.social_media || {},
-    avatar_url: profile?.avatar_url || "",
+    first_name: "",
+    last_name: "",
+    gender: "",
+    birthdate: undefined as Date | undefined,
+    profession: "",
+    education: "",
+    aspiration: "",
+    social_media: {} as Record<string, string>,
+    avatar_url: "",
   });
 
-  // Update form data when profile changes in case of refresh
-  // (Prevents stale data after update)
-  const prevProfileId = useRef(profile?.id);
-  if (profile && prevProfileId.current !== profile?.id) {
-    setFormData({
-      first_name: profile.first_name || "",
-      last_name: profile.last_name || "",
-      gender: profile.gender || "",
-      birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
-      profession: profile.profession || "",
-      education: profile.education || "",
-      aspiration: profile.aspiration || "",
-      social_media: profile.social_media || {},
-      avatar_url: profile.avatar_url || "",
-    });
-    prevProfileId.current = profile.id;
-  }
+  // Initialize form data when profile is loaded
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        gender: profile.gender || "",
+        birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
+        profession: profile.profession || "",
+        education: profile.education || "",
+        aspiration: profile.aspiration || "",
+        social_media: profile.social_media || {},
+        avatar_url: profile.avatar_url || "",
+      });
+      setLoading(false);
+    }
+  }, [profile]);
 
   const handleFieldChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -71,15 +70,25 @@ export function ProfileForm() {
       if (pendingAvatarFile && user) {
         const fileExt = pendingAvatarFile.name.split('.').pop();
         const filePath = `${user.id}/avatar.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from("avatars")
-          .upload(filePath, pendingAvatarFile, { upsert: true });
-        if (uploadError) throw uploadError;
-        // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from("avatars")
-          .getPublicUrl(filePath);
-        avatar_url = publicUrl;
+        
+        try {
+          const { error: uploadError } = await supabase.storage
+            .from("avatars")
+            .upload(filePath, pendingAvatarFile, { upsert: true });
+          
+          if (uploadError) throw uploadError;
+          
+          // Get the public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from("avatars")
+            .getPublicUrl(filePath);
+          
+          avatar_url = publicUrl;
+        } catch (uploadError: any) {
+          console.error("Avatar upload error:", uploadError);
+          toast.error(`Error uploading avatar: ${uploadError.message}`);
+          // Continue with the profile update even if the avatar upload fails
+        }
       }
 
       // Prepare payload for update
@@ -121,7 +130,7 @@ export function ProfileForm() {
       toast.success("Profile updated successfully!");
     } catch (error: any) {
       console.error("Error saving profile:", error);
-      toast.error(error.message || "Error saving profile");
+      toast.error(`Error saving profile: ${error.message}`);
     } finally {
       setSaving(false);
     }
@@ -131,20 +140,37 @@ export function ProfileForm() {
   const handleEdit = () => setEditMode(true);
   const handleCancel = () => {
     // Rollback changes, reset fields to last saved values
-    setFormData({
-      first_name: profile?.first_name || "",
-      last_name: profile?.last_name || "",
-      gender: profile?.gender || "",
-      birthdate: profile?.birthdate ? new Date(profile.birthdate) : undefined,
-      profession: profile?.profession || "",
-      education: profile?.education || "",
-      aspiration: profile?.aspiration || "",
-      social_media: profile?.social_media || {},
-      avatar_url: profile?.avatar_url || "",
-    });
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        gender: profile.gender || "",
+        birthdate: profile.birthdate ? new Date(profile.birthdate) : undefined,
+        profession: profile.profession || "",
+        education: profile.education || "",
+        aspiration: profile.aspiration || "",
+        social_media: profile.social_media || {},
+        avatar_url: profile.avatar_url || "",
+      });
+    }
     setPendingAvatarFile(null);
     setEditMode(false);
   };
+
+  if (loading && !profile) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[400px] flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading profile data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <form onSubmit={handleSave}>
