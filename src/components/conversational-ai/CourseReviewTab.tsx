@@ -6,13 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ReviewForm } from "./reviews/ReviewForm";
 import { ShareButtons } from "./reviews/ShareButtons";
-
-interface CourseReview {
-  id: string;
-  rating: number;
-  review_text: string | null;
-  created_at: string;
-}
+import { CourseReview } from "./types/review-types";
 
 interface CourseReviewTabProps {
   courseId: string;
@@ -36,7 +30,7 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
         .select('*')
         .eq('course_id', courseId)
         .eq('reviewer_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (data) {

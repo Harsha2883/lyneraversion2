@@ -1,18 +1,11 @@
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { StarRating } from "@/components/profile/reviews/StarRating";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
-interface CourseReview {
-  id: string;
-  rating: number;
-  review_text: string | null;
-  created_at: string;
-}
+import { CourseReview } from "../types/review-types";
 
 interface ReviewFormProps {
   courseId: string;
