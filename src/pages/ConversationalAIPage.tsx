@@ -1,10 +1,10 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LearnTab } from "@/components/conversational-ai/learn-tab";
 import { NotesTab } from "@/components/conversational-ai/notes-tab";
 import { AssessmentsTab } from "@/components/conversational-ai/assessments-tab";
 import { CertificatesTab } from "@/components/conversational-ai/certificates-tab";
 import { TokensTab } from "@/components/conversational-ai/tokens-tab";
+import { CourseReviewTab } from "@/components/conversational-ai/CourseReviewTab";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { LearnerDashboard } from "@/components/dashboard/learner-dashboard";
 
@@ -25,6 +25,7 @@ export default function ConversationalAIPage() {
               <TabsTrigger value="assessments">Assessments</TabsTrigger>
               <TabsTrigger value="certificates">Certificates</TabsTrigger>
               <TabsTrigger value="tokens">Tokens</TabsTrigger>
+              <TabsTrigger value="review">Review</TabsTrigger>
             </TabsList>
             <TabsContent value="learn">
               <LearnTab />
@@ -40,6 +41,9 @@ export default function ConversationalAIPage() {
             </TabsContent>
             <TabsContent value="tokens">
               <TokensTab />
+            </TabsContent>
+            <TabsContent value="review">
+              <CourseReviewTab courseId="sample-course-id" creatorId="sample-creator-id" />
             </TabsContent>
           </Tabs>
         </div>
