@@ -1,20 +1,24 @@
 
 import { useState, useEffect } from "react";
-import { useAuth, Profile } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ProfileFormData, ProfileFormState } from "@/types/profile";
-import { mapProfileToFormData, formatBirthdate, checkAvatarBucket, uploadAvatar } from "@/utils/profile-utils";
+import { mapProfileToFormData, formatBirthdate } from "@/utils/profile-utils";
+import { useProfileAvatar } from "./useProfileAvatar";
+import { useProfileValidation } from "./useProfileValidation";
 
 export function useProfileForm() {
   const { profile, refreshProfile, user, session } = useAuth();
-  const [state, setState] = useState<ProfileFormState>({
+  const { pendingAvatarFile, setPendingAvatarFile, handleAvatarUpload } = useProfileAvatar();
+  const { validateProfile } = useProfileValidation();
+
+  const [state, setState] = useState<Omit<ProfileFormState, 'pendingAvatarFile'>>({
     formData: mapProfileToFormData(profile),
     saving: false,
     loading: true,
     error: null,
     editMode: false,
-    pendingAvatarFile: null,
   });
 
   useEffect(() => {
@@ -22,11 +26,9 @@ export function useProfileForm() {
     
     const initializeForm = async () => {
       try {
-        if (mounted) {
-          setState(prev => ({ ...prev, loading: true, error: null }));
-        }
+        if (!mounted) return;
+        setState(prev => ({ ...prev, loading: true, error: null }));
         
-        // Check for authentication first
         if (!session) {
           console.log("No active session found in useProfileForm");
           if (mounted) {
@@ -39,14 +41,6 @@ export function useProfileForm() {
           return;
         }
 
-        // Only try to access avatar bucket if we have an active session
-        try {
-          await checkAvatarBucket();
-        } catch (bucketError) {
-          console.warn("Avatar bucket check failed, but continuing:", bucketError);
-          // Continue anyway - this shouldn't block profile loading
-        }
-        
         if (profile && mounted) {
           console.log("Loading profile data:", profile);
           setState(prev => ({
@@ -55,15 +49,12 @@ export function useProfileForm() {
             loading: false,
           }));
         } else if (!user && mounted) {
-          console.log("No user found but session exists");
           setState(prev => ({
             ...prev,
             error: "Please sign in to view your profile",
             loading: false,
           }));
         } else if (mounted) {
-          // We have a user but no profile yet
-          console.log("User exists but no profile data found");
           setState(prev => ({ ...prev, loading: false }));
         }
       } catch (err: any) {
@@ -79,10 +70,7 @@ export function useProfileForm() {
     };
     
     initializeForm();
-    
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [profile, user, session]);
 
   const handleFieldChange = (field: string, value: any) => {
@@ -99,47 +87,17 @@ export function useProfileForm() {
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     
+    if (!validateProfile(state.formData)) return;
+    
     setState(prev => ({ ...prev, saving: true }));
 
     try {
-      console.log("Starting profile save with user:", user?.id);
-      
-      if (!session) {
-        throw new Error("No active session. Please sign in again.");
-      }
-      
-      if (!user?.id) {
-        throw new Error("User ID is missing. Please sign in again.");
-      }
+      if (!session) throw new Error("No active session. Please sign in again.");
+      if (!user?.id) throw new Error("User ID is missing. Please sign in again.");
+      if (!profile?.id) throw new Error("Profile ID is missing. Cannot save changes.");
 
-      if (!profile?.id) {
-        throw new Error("Profile ID is missing. Cannot save changes.");
-      }
-
-      let avatar_url = state.formData.avatar_url;
-
-      // Handle avatar upload if there's a pending file
-      if (state.pendingAvatarFile && user) {
-        console.log("Uploading avatar...");
-        try {
-          const uploadedUrl = await uploadAvatar(state.pendingAvatarFile, user.id);
-          if (uploadedUrl) {
-            avatar_url = uploadedUrl;
-            console.log("Avatar uploaded successfully:", avatar_url);
-          } else {
-            console.error("Avatar upload failed");
-            toast.error("Error uploading avatar");
-          }
-        } catch (avatarError) {
-          console.error("Avatar upload error:", avatarError);
-          toast.error("Failed to upload avatar image");
-          // Continue with profile update even if avatar upload fails
-        }
-      }
-
-      // Format birthdate properly for database storage
+      const avatar_url = await handleAvatarUpload(user.id) || state.formData.avatar_url;
       const formattedBirthdate = formatBirthdate(state.formData.birthdate);
-      console.log("Formatted birthdate for save:", formattedBirthdate);
 
       const dataToSubmit = {
         first_name: state.formData.first_name,
@@ -153,29 +111,21 @@ export function useProfileForm() {
         avatar_url,
       };
 
-      console.log("Submitting profile data to database:", dataToSubmit);
-
       const { error, data } = await supabase
         .from("profiles")
         .update(dataToSubmit)
         .eq("id", profile.id)
         .select();
 
-      if (error) {
-        console.error("Profile update error:", error);
-        throw error;
-      }
-
-      console.log("Profile updated successfully:", data);
+      if (error) throw error;
 
       setState(prev => ({
         ...prev,
         formData: {
           ...prev.formData,
-          avatar_url,
+          avatar_url: avatar_url || prev.formData.avatar_url,
         },
         editMode: false,
-        pendingAvatarFile: null,
         saving: false,
       }));
 
@@ -197,12 +147,8 @@ export function useProfileForm() {
       ...prev,
       formData: mapProfileToFormData(profile),
       editMode: false,
-      pendingAvatarFile: null,
     }));
-  };
-
-  const setAvatarFile = (file: File | null) => {
-    setState(prev => ({ ...prev, pendingAvatarFile: file }));
+    setPendingAvatarFile(null);
   };
 
   const retry = () => {
@@ -212,11 +158,12 @@ export function useProfileForm() {
 
   return {
     ...state,
+    pendingAvatarFile,
     handleFieldChange,
     handleSave,
     handleEdit,
     handleCancel,
-    setAvatarFile,
+    setAvatarFile: setPendingAvatarFile,
     retry,
   };
 }
