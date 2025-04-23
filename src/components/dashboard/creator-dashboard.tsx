@@ -3,15 +3,17 @@ import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import {
   LayoutDashboard,
   PlusCircle,
-  Compass,
+  Rocket,
   Library,
+  Leaf,
   User,
   Settings,
-  LogOut // Add LogOut icon
+  LogOut
 } from "lucide-react";
 import { NavItem } from "@/types/navigation";
-import { useAuth } from "@/hooks/useAuth"; // Import useAuth
+import { useAuth } from "@/hooks/useAuth";
 
+// Updated sidebar nav items with correct icons and all required links
 const sidebarNavItems: NavItem[] = [
   {
     title: "Dashboard",
@@ -26,12 +28,17 @@ const sidebarNavItems: NavItem[] = [
   {
     title: "Creator Journey",
     href: "/dashboard/creator-journey",
-    icon: Compass,
+    icon: Rocket,
   },
   {
     title: "E-Library",
     href: "/dashboard/library",
     icon: Library,
+  },
+  {
+    title: "Carbon footprint",
+    href: "/dashboard/carbon",
+    icon: Leaf,
   },
   {
     title: "Profile",
@@ -43,23 +50,22 @@ const sidebarNavItems: NavItem[] = [
     href: "/dashboard/settings",
     icon: Settings,
   },
-  // Add logout nav item
   {
     title: "Logout",
     href: "#logout",
     icon: LogOut,
-    isLogout: true // Custom prop to differentiate logout item
+    isLogout: true
   }
 ];
 
 export function CreatorDashboard() {
-  const { signOut } = useAuth(); // Get signOut method
+  const { signOut } = useAuth();
 
   return (
     <div className="flex min-h-screen">
       <SidebarNav 
         items={sidebarNavItems} 
-        onLogout={signOut} // Pass signOut method
+        onLogout={signOut}
       />
       <main className="flex-1 p-8">
         <h1 className="text-2xl font-bold">Welcome to your Creator Dashboard</h1>
