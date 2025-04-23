@@ -1,13 +1,12 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Pen, Mic } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { AssessmentQuestion } from "./types/assessment-types";
 import QuestionTypeSelector from "./components/question-editor/QuestionTypeSelector";
 import ObjectiveQuestionOptions from "./components/question-editor/ObjectiveQuestionOptions";
 import SubjectiveQuestionEditor from "./components/question-editor/SubjectiveQuestionEditor";
+import QuestionInput from "./components/question-editor/QuestionInput";
 
 interface Props {
   question: AssessmentQuestion;
@@ -22,8 +21,6 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
   onRemove,
   objectiveOptionsLimit = 5
 }) => {
-  const MAX_OPTIONS = objectiveOptionsLimit;
-
   // Handle question type change
   const handleTypeChange = (type: "objective" | "subjective") => {
     if (type === "objective") {
@@ -49,6 +46,11 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
     }
   };
 
+  // Handle question text change
+  const handleQuestionChange = (text: string) => {
+    onChange({ ...question, question: text });
+  };
+
   // Option handling functions
   const handleOptionTextChange = (idx: number, value: string) => {
     if (question.options) {
@@ -62,7 +64,6 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
     if (question.options) {
       let options = [...question.options];
       if (!question.allowMultiple) {
-        // Only allow one correct
         options = options.map((opt, i) => ({ ...opt, isCorrect: i === idx ? checked : false }));
       } else {
         options[idx].isCorrect = checked;
@@ -73,7 +74,7 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
 
   const handleAddOption = () => {
     const options = [...(question.options || [])];
-    if (options.length < MAX_OPTIONS) {
+    if (options.length < objectiveOptionsLimit) {
       options.push({ text: "", isCorrect: false });
       onChange({ ...question, options });
     }
@@ -104,24 +105,11 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
       />
       
       {/* Question input */}
-      <div>
-        <div className="flex items-center gap-2">
-          <Pen className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium">
-            {question.type === "objective" ? "Objective Question" : "Subjective Question"}
-          </span>
-        </div>
-        <Textarea
-          placeholder="Type your question here or use the mic..."
-          className="my-2"
-          value={question.question}
-          onChange={e => onChange({ ...question, question: e.target.value })}
-        />
-        {/* Microphone (stub, not implemented yet) */}
-        <Button variant="ghost" size="icon" type="button" disabled title="Voice input coming soon">
-          <Mic className="h-4 w-4" />
-        </Button>
-      </div>
+      <QuestionInput 
+        question={question.question}
+        onChange={handleQuestionChange}
+        type={question.type}
+      />
       
       {/* Objective Options */}
       {question.type === "objective" && (
@@ -134,7 +122,6 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
                 onChange({
                   ...question,
                   allowMultiple: checked,
-                  // Reset options' isCorrect if toggled off
                   options: checked
                     ? question.options
                     : question.options?.map(opt => ({ ...opt, isCorrect: false })),
@@ -151,7 +138,7 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
               onOptionCorrectChange={handleOptionCorrectChange}
               onAddOption={handleAddOption}
               onRemoveOption={handleRemoveOption}
-              optionsLimit={MAX_OPTIONS}
+              optionsLimit={objectiveOptionsLimit}
             />
           )}
         </>
