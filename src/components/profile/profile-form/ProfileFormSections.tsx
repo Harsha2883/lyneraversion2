@@ -1,80 +1,83 @@
+
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AvatarSection } from "../sections/AvatarSection";
 import { PersonalInfoSection } from "../sections/PersonalInfoSection";
 import { ProfessionalInfoSection } from "../sections/ProfessionalInfoSection";
 import { SocialMediaSection } from "../sections/SocialMediaSection";
 import { ReviewsList } from "../reviews/ReviewsList";
-import { StarRating } from "../reviews/StarRating";
-import { ProfileFormData } from "@/types/profile";
-import { useAuth } from "@/hooks/useAuth";
+import { FormActionsFooter } from "../form-actions";
+import { useProfileForm } from "@/hooks/useProfileForm";
+import { CourseReview } from "@/components/conversational-ai/types/review-types";
 
 interface ProfileFormSectionsProps {
-  formData: ProfileFormData;
-  editMode: boolean;
-  pendingAvatarFile: File | null;
-  setAvatarFile: (file: File | null) => void;
-  handleFieldChange: (field: string, value: any) => void;
+  isOwnProfile: boolean;
 }
 
-export function ProfileFormSections({
-  formData,
-  editMode,
-  pendingAvatarFile,
-  setAvatarFile,
-  handleFieldChange,
-}: ProfileFormSectionsProps) {
-  const { profile } = useAuth();
-  
+export function ProfileFormSections({ isOwnProfile }: ProfileFormSectionsProps) {
+  const [currentTab, setCurrentTab] = useState("personal");
+  const { formState, handleSaveChanges, handleCancelChanges } = useProfileForm();
+
+  // Mock reviews data for the profile
+  const mockReviews: CourseReview[] = [
+    {
+      id: "1",
+      course_id: "course-1",
+      reviewer_id: "user-1",
+      creator_id: "creator-1",
+      rating: 5,
+      review_text: "This was an amazing course with great content!",
+      created_at: new Date().toISOString(),
+      is_public: true
+    },
+    {
+      id: "2",
+      course_id: "course-2",
+      reviewer_id: "user-2",
+      creator_id: "creator-1",
+      rating: 4,
+      review_text: "Very informative and well-structured course.",
+      created_at: new Date().toISOString(),
+      is_public: true
+    }
+  ];
+
   return (
-    <>
-      <div className="flex items-center gap-4 mb-6">
-        <h2 className="text-2xl font-semibold">{formData.first_name} {formData.last_name}</h2>
-        {formData.average_rating && (
-          <div className="flex items-center gap-2">
-            <StarRating rating={formData.average_rating} readonly />
-            <span className="text-sm text-muted-foreground">
-              ({formData.total_reviews} reviews)
-            </span>
-          </div>
-        )}
-      </div>
-      
-      <AvatarSection
-        editMode={editMode}
-        avatarUrl={pendingAvatarFile ? URL.createObjectURL(pendingAvatarFile) : (formData.avatar_url || "")}
-        onSelectFile={file => {
-          if (editMode) setAvatarFile(file);
-        }}
-      />
-      <PersonalInfoSection
-        firstName={formData.first_name}
-        lastName={formData.last_name}
-        gender={formData.gender}
-        birthdate={formData.birthdate instanceof Date ? formData.birthdate : (formData.birthdate ? new Date(formData.birthdate) : undefined)}
-        editMode={editMode}
-        onFieldChange={handleFieldChange}
-      />
-      <ProfessionalInfoSection
-        profession={formData.profession}
-        education={formData.education}
-        aspiration={formData.aspiration}
-        editMode={editMode}
-        onFieldChange={handleFieldChange}
-      />
-      <SocialMediaSection
-        socialMedia={formData.social_media}
-        onFieldChange={handleFieldChange}
-        editMode={editMode}
-      />
-      
-      {profile?.id && (
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-4">Reviews</h3>
-          <ReviewsList 
-            creatorId={profile.id} 
-            isOwnProfile={true}
-          />
-        </div>
+    <div className="space-y-6">
+      <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="personal">Personal Info</TabsTrigger>
+          <TabsTrigger value="professional">Professional</TabsTrigger>
+          <TabsTrigger value="social">Social Media</TabsTrigger>
+          <TabsTrigger value="reviews">Reviews</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="personal" className="space-y-6 pt-6">
+          <AvatarSection isEditable={isOwnProfile} />
+          <PersonalInfoSection isEditable={isOwnProfile} />
+        </TabsContent>
+
+        <TabsContent value="professional" className="space-y-6 pt-6">
+          <ProfessionalInfoSection isEditable={isOwnProfile} />
+        </TabsContent>
+
+        <TabsContent value="social" className="space-y-6 pt-6">
+          <SocialMediaSection isEditable={isOwnProfile} />
+        </TabsContent>
+
+        <TabsContent value="reviews" className="space-y-6 pt-6">
+          <ReviewsList reviews={mockReviews} />
+        </TabsContent>
+      </Tabs>
+
+      {isOwnProfile && (
+        <FormActionsFooter
+          onSave={handleSaveChanges}
+          onCancel={handleCancelChanges}
+          isDirty={formState.isDirty}
+          isSubmitting={formState.isSubmitting}
+        />
       )}
-    </>
+    </div>
   );
 }

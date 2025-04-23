@@ -1,94 +1,111 @@
 
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { StarRating } from "@/components/profile/reviews/StarRating";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { CourseReview } from "../types/review-types";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Star } from 'lucide-react';
+import { toast } from 'sonner';
+import { ReviewFormData } from '../types/review-types';
 
 interface ReviewFormProps {
-  onSubmit: (reviewData: Omit<CourseReview, 'id'>) => Promise<void>;
-  isSubmitting: boolean;
+  onSubmitReview: (reviewData: ReviewFormData) => Promise<void>;
+  onCancel: () => void;
 }
 
-export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
+export function ReviewForm({ onSubmitReview, onCancel }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
-  const [reviewText, setReviewText] = useState("");
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
   const [isPublic, setIsPublic] = useState(true);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (rating === 0) {
-      alert("Please select a rating before submitting");
+      toast.error('Please select a rating');
       return;
     }
     
+    if (reviewText.trim().length < 10) {
+      toast.error('Please write a review with at least 10 characters');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        alert("You must be logged in to submit a review");
-        return;
-      }
-      
-      // Replace this with the actual course ID and creator ID when integrated with real course data
-      const courseId = "sample-course-id";
-      const creatorId = "sample-creator-id";
-      
-      // Create the review data
-      const reviewData = {
-        course_id: courseId,
-        reviewer_id: user.id,
-        creator_id: creatorId,
+      await onSubmitReview({
         rating,
-        review_text: reviewText,
-        is_public: isPublic
-      };
-      
-      await onSubmit(reviewData as unknown as Omit<CourseReview, 'id'>);
-      
+        reviewText,
+        isPublic,
+      });
+      toast.success('Review submitted successfully');
     } catch (error) {
-      console.error('Error in review form submit:', error);
-      alert("There was an error submitting your review");
+      console.error('Error submitting review:', error);
+      toast.error('Failed to submit review. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <h3 className="text-lg font-medium mb-2">Rate this course</h3>
-        <StarRating 
-          rating={rating}
-          onChange={setRating}
-          size="large"
-        />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label>Rating</Label>
+        <div className="flex gap-1">
+          {[...Array(5)].map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setRating(i + 1)}
+              onMouseEnter={() => setHoverRating(i + 1)}
+              onMouseLeave={() => setHoverRating(0)}
+              className="focus:outline-none"
+            >
+              <Star
+                size="lg"
+                className={`h-8 w-8 transition-all ${
+                  (hoverRating || rating) > i
+                    ? 'fill-yellow-400 text-yellow-400'
+                    : 'text-gray-300'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
       </div>
-      
-      <div>
-        <h3 className="text-lg font-medium mb-2">Write your review</h3>
+
+      <div className="space-y-2">
+        <Label htmlFor="review-text">Your Review</Label>
         <Textarea
-          placeholder="Share your experience with this course..."
+          id="review-text"
+          placeholder="Write your review here..."
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}
-          required
-          rows={5}
+          rows={4}
+          className="resize-none"
         />
       </div>
-      
+
       <div className="flex items-center space-x-2">
-        <Switch 
-          id="public-review" 
+        <Switch
+          id="public-review"
           checked={isPublic}
           onCheckedChange={setIsPublic}
         />
         <Label htmlFor="public-review">Make this review public</Label>
       </div>
-      
-      <Button type="submit" disabled={isSubmitting || rating === 0}>
-        {isSubmitting ? "Submitting..." : "Submit Review"}
-      </Button>
+
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit Review'}
+        </Button>
+      </div>
     </form>
   );
 }

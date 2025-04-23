@@ -8,6 +8,30 @@ import { ResourcesList } from "./resources-list";
 export type ResourceType = "audio" | "video" | "document";
 export type ResourceCategory = "CSR" | "ESG" | "AI" | "Carbon market" | "Sustainability" | "Other";
 
+// Mock data for resources
+const mockResources = [
+  {
+    id: "1",
+    title: "Introduction to ESG",
+    type: "document" as ResourceType,
+    category: "ESG" as ResourceCategory,
+    description: "A comprehensive guide to Environmental, Social, and Governance",
+    isPremium: false,
+    createdAt: new Date(),
+    creatorId: "user123"
+  },
+  {
+    id: "2",
+    title: "AI in Sustainability",
+    type: "video" as ResourceType,
+    category: "AI" as ResourceCategory,
+    description: "How AI is transforming sustainability practices",
+    isPremium: true,
+    createdAt: new Date(),
+    creatorId: "user123"
+  }
+];
+
 export function CreatorELibraryContent() {
   const [selectedType, setSelectedType] = useState<ResourceType | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory | null>(null);
@@ -46,7 +70,7 @@ export function CreatorELibraryContent() {
       )}
 
       <div className="mt-8">
-        <ResourcesList />
+        <ResourcesList resources={mockResources} />
       </div>
     </div>
   );

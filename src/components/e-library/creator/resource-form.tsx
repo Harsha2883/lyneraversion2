@@ -1,197 +1,158 @@
 
-import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { ChevronLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Resource, ResourceCategory, ResourceType } from "./creator-e-library-content";
-import { ShareResourceModal } from "./share-resource-modal";
+import { ResourceType, ResourceCategory } from "./creator-e-library-content";
 
-interface ResourceFormProps {
+export interface ResourceFormProps {
   resourceType: ResourceType;
-  resourceCategory: ResourceCategory;
-  onResourceAdded: (resource: Resource) => void;
-  onBack: () => void;
+  category: ResourceCategory;
+  onSubmitted: () => void;
+  onCancel: () => void;
 }
 
-const formSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  url: z.string().url("Please enter a valid URL"),
-  isPremium: z.boolean().default(false),
-  courseId: z.string().optional(),
-});
+export function ResourceForm({ resourceType, category, onSubmitted, onCancel }: ResourceFormProps) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-export function ResourceForm({ 
-  resourceType, 
-  resourceCategory, 
-  onResourceAdded,
-  onBack 
-}: ResourceFormProps) {
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [currentResource, setCurrentResource] = useState<Resource | null>(null);
-  
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      url: "",
-      isPremium: false,
-      courseId: "",
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title) {
+      toast.error("Please enter a title");
+      return;
+    }
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Create a new resource
-    const newResource: Resource = {
-      id: Date.now().toString(),
-      type: resourceType,
-      category: resourceCategory,
-      title: values.title,
-      url: values.url,
-      isPremium: values.isPremium,
-      courseId: values.courseId || null,
-      createdAt: new Date(),
-    };
-    
-    // Pass to parent component
-    onResourceAdded(newResource);
-    
-    // Store for sharing
-    setCurrentResource(newResource);
-    
-    // Show success toast
-    toast.success(`${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)} resource added successfully!`);
-    
-    // Open share modal
-    setIsShareModalOpen(true);
+    if (!file) {
+      toast.error("Please upload a file");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Mock API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success("Resource created successfully");
+      onSubmitted();
+    } catch (error) {
+      toast.error("Failed to create resource");
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const typeLabel = 
-    resourceType === "audio" ? "Audio" :
-    resourceType === "video" ? "Video" : "Document";
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
 
   return (
-    <>
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onBack} 
-            className="h-8 w-8"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h2 className="text-xl font-semibold">Add {typeLabel} Resource</h2>
-            <p className="text-muted-foreground">
-              Category: {resourceCategory} | Type: {typeLabel}
-            </p>
-          </div>
-        </div>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter resource title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Resource URL</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder={`Enter ${resourceType} URL`}
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="courseId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Link to Course (Optional)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Course ID or leave empty" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="isPremium"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Premium Content</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Mark this resource as premium content for paid subscribers only
-                    </p>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={onBack}>
-                Cancel
-              </Button>
-              <Button type="submit">
-                Add Resource
-              </Button>
-            </div>
-          </form>
-        </Form>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={onCancel}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-xl font-semibold">Create {resourceType} resource in {category}</h2>
       </div>
 
-      {currentResource && (
-        <ShareResourceModal
-          resource={currentResource}
-          open={isShareModalOpen}
-          onOpenChange={setIsShareModalOpen}
-        />
-      )}
-    </>
+      <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-6">
+        <div className="space-y-2">
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={`Enter ${resourceType} title`}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe this resource"
+            rows={4}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="file">Upload {resourceType}</Label>
+          <Input
+            id="file"
+            type="file"
+            onChange={handleFileChange}
+            accept={getAcceptTypes(resourceType)}
+          />
+          <p className="text-sm text-muted-foreground">
+            {getFileTypeHelp(resourceType)}
+          </p>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="premium"
+            checked={isPremium}
+            onCheckedChange={setIsPremium}
+          />
+          <Label htmlFor="premium">Premium resource</Label>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating..." : "Create Resource"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
+}
+
+// Helper functions for file upload
+function getAcceptTypes(type: ResourceType): string {
+  switch (type) {
+    case "audio":
+      return ".mp3,.wav,.ogg,.flac";
+    case "video":
+      return ".mp4,.webm,.mov";
+    case "document":
+      return ".pdf,.doc,.docx,.ppt,.pptx";
+    default:
+      return "*/*";
+  }
+}
+
+function getFileTypeHelp(type: ResourceType): string {
+  switch (type) {
+    case "audio":
+      return "Supported formats: MP3, WAV, OGG, FLAC";
+    case "video":
+      return "Supported formats: MP4, WebM, MOV";
+    case "document":
+      return "Supported formats: PDF, DOC, DOCX, PPT, PPTX";
+    default:
+      return "Upload your file";
+  }
 }

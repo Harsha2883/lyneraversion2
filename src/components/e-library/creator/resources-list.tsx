@@ -12,14 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileAudio, FileText, Video, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Resource } from "./creator-e-library-content";
+import { ResourceType } from "./creator-e-library-content";
+import { Resource } from "./types/resource-types";
 import { ShareResourceModal } from "./share-resource-modal";
 
 interface ResourcesListProps {
   resources: Resource[];
 }
 
-export function ResourcesList({ resources }: ResourcesListProps) {
+export function ResourcesList({ resources = [] }: ResourcesListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [resourceToShare, setResourceToShare] = useState<Resource | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -43,6 +44,8 @@ export function ResourcesList({ resources }: ResourcesListProps) {
       case "video":
         return <Video className="h-4 w-4" />;
       case "document":
+        return <FileText className="h-4 w-4" />;
+      default:
         return <FileText className="h-4 w-4" />;
     }
   };
