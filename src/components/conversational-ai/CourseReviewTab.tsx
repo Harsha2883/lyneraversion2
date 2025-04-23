@@ -24,7 +24,6 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
   const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
-    // Just set mock data for now as course_reviews table doesn't exist yet
     const mockReviews: CourseReview[] = [
       {
         id: "1",
@@ -67,7 +66,6 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
         return;
       }
 
-      // Just simulate saving review since course_reviews table doesn't exist yet
       toast.success("Your review has been submitted");
       setShowReviewForm(false);
       
