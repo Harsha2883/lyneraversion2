@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -30,9 +29,6 @@ interface ModuleEditorProps {
 
 export default function ModuleEditor({ module, onChange, onRemove }: ModuleEditorProps) {
   const [local, setLocal] = useState(module);
-
-  // Sync local state to prop changes
-  // (in this code, omitted for brevity - assume modules are not externally updated)
 
   return (
     <div className="rounded-lg border p-4 shadow-md bg-background space-y-3 relative">
