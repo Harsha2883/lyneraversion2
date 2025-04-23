@@ -1,6 +1,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseDetailsForm } from "./course-details-form";
+import { Certificate } from "lucide-react";
 
 export function CreateCourseContent() {
   return (
@@ -13,12 +14,13 @@ export function CreateCourseContent() {
       </div>
       
       <Tabs defaultValue="details" className="w-full">
-        <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-5 lg:w-3/4">
+        <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-6 lg:w-full overflow-x-auto">
           <TabsTrigger value="details">Course Details</TabsTrigger>
           <TabsTrigger value="content" disabled>Content</TabsTrigger>
           <TabsTrigger value="assessment" disabled>Assessment</TabsTrigger>
-          <TabsTrigger value="requirements" disabled>Requirements</TabsTrigger>
-          <TabsTrigger value="publish" disabled>Publish</TabsTrigger>
+          <TabsTrigger value="check-assessment" disabled>Check Assessment</TabsTrigger>
+          <TabsTrigger value="certificates" disabled>Certificates</TabsTrigger>
+          <TabsTrigger value="tokens" disabled>Tokens</TabsTrigger>
         </TabsList>
         <TabsContent value="details">
           <CourseDetailsForm />
@@ -33,12 +35,17 @@ export function CreateCourseContent() {
             <p className="text-muted-foreground">Complete the content section first.</p>
           </div>
         </TabsContent>
-        <TabsContent value="requirements">
+        <TabsContent value="check-assessment">
           <div className="rounded-md border p-10 text-center">
             <p className="text-muted-foreground">Complete the assessment section first.</p>
           </div>
         </TabsContent>
-        <TabsContent value="publish">
+        <TabsContent value="certificates">
+          <div className="rounded-md border p-10 text-center">
+            <p className="text-muted-foreground">Complete all previous sections first.</p>
+          </div>
+        </TabsContent>
+        <TabsContent value="tokens">
           <div className="rounded-md border p-10 text-center">
             <p className="text-muted-foreground">Complete all previous sections first.</p>
           </div>
