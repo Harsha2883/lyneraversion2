@@ -1,14 +1,11 @@
-
 import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
-// These would typically come from your backend or AI service
 const getSEORecommendations = (input: string): string[] => {
-  // This is a mock implementation. In a real application, this would make an API call
-  // to get AI-powered recommendations based on the input and course content
   const recommendations = [
     "sustainable development",
     "environmental impact",
