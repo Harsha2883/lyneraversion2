@@ -5,9 +5,9 @@ import { CourseDetailsForm } from "./course-details-form";
 import { PricingTab } from "./PricingTab";
 import CourseContentTab from "./CourseContentTab";
 import AssessmentTab from "./AssessmentTab";
-import CheckAssessmentTab from "./CheckAssessmentTab";
 import { CertificatesTab } from "./CertificatesTab";
 import { TokenManagementTab } from "./TokenManagementTab";
+import CheckAssessmentTab from "./CheckAssessmentTab";
 
 export function CreateCourseContent() {
   const [activeTab, setActiveTab] = useState("details");
@@ -25,20 +25,17 @@ export function CreateCourseContent() {
         <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-7 lg:w-full overflow-x-auto">
           <TabsTrigger value="details">Course Details</TabsTrigger>
           <TabsTrigger value="content">Course Content</TabsTrigger>
-          <TabsTrigger value="pricing">Pricing</TabsTrigger>
           <TabsTrigger value="assessment">Assessment</TabsTrigger>
           <TabsTrigger value="check-assessment">Check Assessment</TabsTrigger>
           <TabsTrigger value="certificates">Certificates</TabsTrigger>
           <TabsTrigger value="tokens">Tokens</TabsTrigger>
+          <TabsTrigger value="pricing">Pricing</TabsTrigger>
         </TabsList>
         <TabsContent value="details">
           <CourseDetailsForm />
         </TabsContent>
         <TabsContent value="content">
           <CourseContentTab />
-        </TabsContent>
-        <TabsContent value="pricing">
-          <PricingTab />
         </TabsContent>
         <TabsContent value="assessment">
           <AssessmentTab />
@@ -51,6 +48,9 @@ export function CreateCourseContent() {
         </TabsContent>
         <TabsContent value="tokens">
           <TokenManagementTab />
+        </TabsContent>
+        <TabsContent value="pricing">
+          <PricingTab />
         </TabsContent>
       </Tabs>
     </div>

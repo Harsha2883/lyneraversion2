@@ -17,8 +17,9 @@ const sidebarNavItems: NavItem[] = [
   { title: "Create Course", href: "/dashboard/create-course", icon: PlusCircle },
   { title: "Courses Published", href: "/dashboard/courses-published", icon: Book },
   { title: "Creator Journey", href: "/dashboard/creator-journey", icon: Rocket },
-  { title: "E-Library", href: "/dashboard/creator-e-library", icon: Library },
   { title: "Carbon footprint", href: "/dashboard/carbon", icon: Leaf },
+  { title: "E-Library", href: "/dashboard/creator-e-library", icon: Library },
+  { title: "Explore Courses", href: "/marketplace", icon: Rocket },
   { title: "Profile", href: "/dashboard/profile", icon: User },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
   { title: "Logout", href: "#logout", icon: LogOut, isLogout: true }

@@ -7,6 +7,8 @@ import { CourseDetailsForm } from "@/components/create-course/course-details-for
 import CourseContentTab from "@/components/create-course/CourseContentTab";
 import AssessmentTab from "@/components/create-course/AssessmentTab";
 import { CertificatesTab } from "@/components/create-course/CertificatesTab";
+import { TokenManagementTab } from "@/components/create-course/TokenManagementTab";
+import { PricingTab } from "@/components/create-course/PricingTab";
 
 export function PublishedCoursesContent() {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
@@ -26,12 +28,13 @@ export function PublishedCoursesContent() {
         <Card>
           <CardContent className="p-6">
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 md:grid-cols-5">
+              <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
                 <TabsTrigger value="details">Course Details</TabsTrigger>
                 <TabsTrigger value="content">Course Content</TabsTrigger>
                 <TabsTrigger value="assessments">Assessments</TabsTrigger>
                 <TabsTrigger value="certificates">Certificates</TabsTrigger>
                 <TabsTrigger value="tokens">Tokens</TabsTrigger>
+                <TabsTrigger value="pricing">Pricing</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details">
@@ -51,9 +54,11 @@ export function PublishedCoursesContent() {
               </TabsContent>
 
               <TabsContent value="tokens">
-                <div className="p-4 text-center text-muted-foreground">
-                  Token management will be displayed here
-                </div>
+                <TokenManagementTab />
+              </TabsContent>
+
+              <TabsContent value="pricing">
+                <PricingTab />
               </TabsContent>
             </Tabs>
           </CardContent>
