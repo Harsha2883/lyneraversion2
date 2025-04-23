@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, User } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface CourseCardEnhancedProps {
   id: string;
@@ -39,12 +39,14 @@ export function CourseCardEnhanced({
   rating,
   isForMembers,
 }: CourseCardEnhancedProps) {
-  const handleEnroll = () => {
-    toast.success(`Enrolled in "${title}"`);
+  const navigate = useNavigate();
+  
+  const handleLearnMore = () => {
+    navigate(`/course/${id}`);
   };
   
-  const handleLearnMode = () => {
-    toast.success(`Started Learn Mode for "${title}"`);
+  const handleEnroll = () => {
+    toast.success(`Enrolled in "${title}"`);
   };
 
   return (
@@ -104,9 +106,9 @@ export function CourseCardEnhanced({
           variant="outline" 
           size="sm" 
           className="flex-1"
-          onClick={handleLearnMode}
+          onClick={handleLearnMore}
         >
-          Learn Mode
+          Learn More
         </Button>
         <Button
           variant="default"

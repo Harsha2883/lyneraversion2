@@ -18,7 +18,8 @@ import CreateCoursePage from "./pages/CreateCoursePage";
 import CoursesPublishedPage from "./pages/CoursesPublishedPage";
 import CreatorJourneyPage from "./pages/CreatorJourneyPage";
 import CreatorELibraryPage from "./pages/CreatorELibraryPage";
-import MarketplacePage from "./pages/MarketplacePage";
+import MarketplacePage from "./pages/Marketplace";
+import CourseDetailsPage from "./pages/CourseDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/dashboard/creator-journey" element={<CreatorJourneyPage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/course/:courseId" element={<CourseDetailsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
