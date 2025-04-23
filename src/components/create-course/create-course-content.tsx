@@ -1,7 +1,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseDetailsForm } from "./course-details-form";
-import { Certificate } from "lucide-react";
+import CourseContentTab from "./CourseContentTab";
 
 export function CreateCourseContent() {
   return (
@@ -16,7 +16,7 @@ export function CreateCourseContent() {
       <Tabs defaultValue="details" className="w-full">
         <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-6 lg:w-full overflow-x-auto">
           <TabsTrigger value="details">Course Details</TabsTrigger>
-          <TabsTrigger value="content" disabled>Content</TabsTrigger>
+          <TabsTrigger value="content">Course Content</TabsTrigger>
           <TabsTrigger value="assessment" disabled>Assessment</TabsTrigger>
           <TabsTrigger value="check-assessment" disabled>Check Assessment</TabsTrigger>
           <TabsTrigger value="certificates" disabled>Certificates</TabsTrigger>
@@ -26,9 +26,7 @@ export function CreateCourseContent() {
           <CourseDetailsForm />
         </TabsContent>
         <TabsContent value="content">
-          <div className="rounded-md border p-10 text-center">
-            <p className="text-muted-foreground">Complete the course details first.</p>
-          </div>
+          <CourseContentTab />
         </TabsContent>
         <TabsContent value="assessment">
           <div className="rounded-md border p-10 text-center">
