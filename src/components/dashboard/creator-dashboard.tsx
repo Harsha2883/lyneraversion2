@@ -1,6 +1,6 @@
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
-import { LayoutDashboard, PlusCircle, Rocket, Library, Leaf, User, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Book, Rocket, Library, Leaf, User, Settings, LogOut } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { ReactNode } from "react";
 const sidebarNavItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Create Course", href: "/dashboard/create-course", icon: PlusCircle },
+  { title: "Courses Published", href: "/dashboard/courses-published", icon: Book },
   { title: "Creator Journey", href: "/dashboard/creator-journey", icon: Rocket },
   { title: "E-Library", href: "/dashboard/library", icon: Library },
   { title: "Carbon footprint", href: "/dashboard/carbon", icon: Leaf },
