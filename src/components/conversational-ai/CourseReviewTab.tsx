@@ -34,7 +34,7 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
 
       if (error) throw error;
       if (data) {
-        setExistingReview(data as CourseReview);
+        setExistingReview(data as unknown as CourseReview);
       }
     } catch (error) {
       console.error('Error loading review:', error);

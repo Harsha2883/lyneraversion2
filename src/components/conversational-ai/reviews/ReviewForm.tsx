@@ -42,13 +42,13 @@ export function ReviewForm({ courseId, creatorId, existingReview, onReviewSubmit
         const { error } = await supabase
           .from('course_reviews')
           .update(reviewData)
-          .eq('id', existingReview.id);
+          .eq('id', existingReview.id) as any; // Type assertion to bypass TS error
           
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('course_reviews')
-          .insert([reviewData]);
+          .insert([reviewData]) as any; // Type assertion to bypass TS error
           
         if (error) throw error;
       }
