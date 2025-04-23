@@ -57,9 +57,10 @@ export function CourseHistory({ courses }: CourseHistoryProps) {
                     </div>
                     <Badge 
                       variant={
-                        course.status === "completed" ? "success" : 
+                        course.status === "completed" ? "secondary" : 
                         course.status === "in-progress" ? "default" : "outline"
                       }
+                      className={course.status === "completed" ? "bg-green-100 text-green-700 hover:bg-green-200 border-green-200" : ""}
                     >
                       {course.status === "completed" ? "Completed" : 
                        course.status === "in-progress" ? "In Progress" : "Not Started"}

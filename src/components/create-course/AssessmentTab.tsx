@@ -1,55 +1,22 @@
 
-import React, { useState } from "react";
-import AssessmentQuestionEditor, { AssessmentQuestion } from "./AssessmentQuestionEditor";
+import React from "react";
+import AssessmentQuestionEditor from "./AssessmentQuestionEditor";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-
-const MAX_QUESTIONS = 10;
+import { useAssessmentQuestionState } from "./hooks/useAssessmentQuestionState";
 
 export default function AssessmentTab() {
-  const [questions, setQuestions] = useState<AssessmentQuestion[]>([]);
-
-  // Add question
-  const addQuestion = () => {
-    if (questions.length >= MAX_QUESTIONS) return;
-    setQuestions([
-      ...questions,
-      {
-        id: Date.now() + Math.random(),
-        type: "objective",
-        question: "",
-        questionAudio: "",
-        options: [{ text: "", isCorrect: false }],
-        allowMultiple: false,
-      }
-    ]);
-  };
-
-  // Remove question
-  const removeQuestion = (idx: number) => {
-    setQuestions(questions.filter((_, i) => i !== idx));
-  };
-
-  // Update question
-  const updateQuestion = (idx: number, updated: AssessmentQuestion) => {
-    setQuestions(questions.map((q, i) => (i === idx ? updated : q)));
-  };
-
-  // Drag/Drop ordering
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-
-  const handleDragStart = (idx: number) => {
-    setDragIndex(idx);
-  };
-  const handleDragOver = (idx: number) => {
-    if (dragIndex === null || dragIndex === idx) return;
-    const updated = [...questions];
-    const [dragged] = updated.splice(dragIndex, 1);
-    updated.splice(idx, 0, dragged);
-    setQuestions(updated);
-    setDragIndex(idx);
-  };
-  const handleDragEnd = () => setDragIndex(null);
+  const {
+    questions,
+    dragIndex,
+    addQuestion,
+    removeQuestion,
+    updateQuestion,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    MAX_QUESTIONS
+  } = useAssessmentQuestionState();
 
   return (
     <div className="py-2">
