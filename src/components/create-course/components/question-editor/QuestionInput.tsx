@@ -30,7 +30,7 @@ export default function QuestionInput({ question, onChange, type }: QuestionInpu
       <Textarea
         placeholder="Type your question here or use the mic..."
         className="my-2"
-        value={question}
+        value={question || ""}
         onChange={handleChange}
       />
       <Button 
