@@ -102,6 +102,42 @@ export type Database = {
         }
         Relationships: []
       }
+      course_token_configs: {
+        Row: {
+          base_tokens: number
+          course_id: string
+          created_at: string | null
+          creator_id: string
+          high_score_threshold: number
+          id: string
+          min_score_percentage: number
+          performance_bonus_tokens: number
+          updated_at: string | null
+        }
+        Insert: {
+          base_tokens: number
+          course_id: string
+          created_at?: string | null
+          creator_id: string
+          high_score_threshold: number
+          id?: string
+          min_score_percentage: number
+          performance_bonus_tokens: number
+          updated_at?: string | null
+        }
+        Update: {
+          base_tokens?: number
+          course_id?: string
+          created_at?: string | null
+          creator_id?: string
+          high_score_threshold?: number
+          id?: string
+          min_score_percentage?: number
+          performance_bonus_tokens?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           aspiration: string | null
@@ -147,6 +183,69 @@ export type Database = {
           social_media?: Json | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      token_earnings_rules: {
+        Row: {
+          achievement_type: string
+          conditions: Json | null
+          course_id: string
+          created_at: string | null
+          created_by: string
+          description: string
+          id: string
+          tokens_awarded: number
+        }
+        Insert: {
+          achievement_type: string
+          conditions?: Json | null
+          course_id: string
+          created_at?: string | null
+          created_by: string
+          description: string
+          id?: string
+          tokens_awarded: number
+        }
+        Update: {
+          achievement_type?: string
+          conditions?: Json | null
+          course_id?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string
+          id?: string
+          tokens_awarded?: number
+        }
+        Relationships: []
+      }
+      token_issuances: {
+        Row: {
+          achievement_type: string
+          assessment_score: number | null
+          course_id: string
+          id: string
+          issued_at: string | null
+          tokens_earned: number
+          user_id: string
+        }
+        Insert: {
+          achievement_type: string
+          assessment_score?: number | null
+          course_id: string
+          id?: string
+          issued_at?: string | null
+          tokens_earned: number
+          user_id: string
+        }
+        Update: {
+          achievement_type?: string
+          assessment_score?: number | null
+          course_id?: string
+          id?: string
+          issued_at?: string | null
+          tokens_earned?: number
+          user_id?: string
         }
         Relationships: []
       }

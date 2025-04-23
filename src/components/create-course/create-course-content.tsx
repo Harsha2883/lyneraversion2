@@ -5,6 +5,7 @@ import CourseContentTab from "./CourseContentTab";
 import AssessmentTab from "./AssessmentTab";
 import CheckAssessmentTab from "./CheckAssessmentTab";
 import { CertificatesTab } from "./CertificatesTab";
+import { TokenManagementTab } from "./TokenManagementTab";
 
 export function CreateCourseContent() {
   return (
@@ -23,7 +24,7 @@ export function CreateCourseContent() {
           <TabsTrigger value="assessment">Assessment</TabsTrigger>
           <TabsTrigger value="check-assessment">Check Assessment</TabsTrigger>
           <TabsTrigger value="certificates">Certificates</TabsTrigger>
-          <TabsTrigger value="tokens" disabled>Tokens</TabsTrigger>
+          <TabsTrigger value="tokens">Tokens</TabsTrigger>
         </TabsList>
         <TabsContent value="details">
           <CourseDetailsForm />
@@ -41,9 +42,7 @@ export function CreateCourseContent() {
           <CertificatesTab />
         </TabsContent>
         <TabsContent value="tokens">
-          <div className="rounded-md border p-10 text-center">
-            <p className="text-muted-foreground">Complete all previous sections first.</p>
-          </div>
+          <TokenManagementTab />
         </TabsContent>
       </Tabs>
     </div>
