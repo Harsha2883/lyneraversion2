@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,6 +19,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { CategorySelector } from "./components/category/CategorySelector";
+import { TagSelector } from "./components/tags/TagSelector";
 
 const courseFormSchema = z.object({
   name: z.string().min(3, {
@@ -27,6 +28,9 @@ const courseFormSchema = z.object({
   }),
   description: z.string().min(10, {
     message: "Course description must be at least 10 characters.",
+  }),
+  category: z.string().min(1, {
+    message: "Please select a category.",
   }),
   outcomes: z.string().min(10, {
     message: "Course outcomes must be at least 10 characters.",
@@ -40,7 +44,7 @@ const courseFormSchema = z.object({
   visibility: z.enum(["public", "invite-only"], {
     required_error: "You must select a visibility option.",
   }),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()),
 });
 
 type CourseFormValues = z.infer<typeof courseFormSchema>;
@@ -62,6 +66,7 @@ export function CourseDetailsForm() {
   const defaultValues: Partial<CourseFormValues> = {
     name: "",
     description: "",
+    category: "",
     outcomes: "",
     audience: "",
     level: "beginner",
@@ -103,6 +108,26 @@ export function CourseDetailsForm() {
                   </FormControl>
                   <FormDescription>
                     A clear, concise title for your course.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <CategorySelector
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Select a category for your course or suggest a new one
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -274,49 +299,19 @@ export function CourseDetailsForm() {
             <FormField
               control={form.control}
               name="tags"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="flex items-center gap-2">
-                      <Tags className="h-4 w-4" /> Tags for SEO
-                    </FormLabel>
-                    <FormDescription>
-                      Select relevant tags to improve discoverability.
-                    </FormDescription>
-                  </div>
-                  {tagOptions.map((tag) => (
-                    <FormField
-                      key={tag.id}
-                      control={form.control}
-                      name="tags"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={tag.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(tag.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...(field.value || []), tag.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== tag.id
-                                        )
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {tag.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
+                  <FormLabel>SEO Tags</FormLabel>
+                  <FormControl>
+                    <TagSelector
+                      tags={field.value}
+                      onChange={field.onChange}
+                      maxTags={10}
                     />
-                  ))}
+                  </FormControl>
+                  <FormDescription>
+                    Add up to 10 tags to improve your course's visibility (press Enter or click + to add)
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
