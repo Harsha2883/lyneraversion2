@@ -7,7 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TemplateSelection } from "./certificate/template-selection";
 import { CertificateBranding } from "./certificate/certificate-branding";
 import { CertificateSettings } from "./certificate/certificate-settings";
+import { CertificatePreview } from "./certificate/certificate-preview";
 import { certificateFormSchema, type CertificateFormValues } from "./certificate/types";
+import { toast } from "sonner";
 
 export function CertificatesTab() {
   const [selectedTemplate, setSelectedTemplate] = useState<"standard" | "premium">("standard");
@@ -41,6 +43,7 @@ export function CertificatesTab() {
 
   const onSubmit = (data: CertificateFormValues) => {
     console.log("Certificate data:", data, { logoFile, signatureFile });
+    toast.success("Certificate settings saved successfully");
   };
 
   return (
@@ -54,28 +57,40 @@ export function CertificatesTab() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <TemplateSelection
-            selectedTemplate={selectedTemplate}
-            setSelectedTemplate={(template) => {
-              setSelectedTemplate(template);
-              form.setValue("templateType", template);
-            }}
-            control={form.control}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <TemplateSelection
+                selectedTemplate={selectedTemplate}
+                setSelectedTemplate={(template) => {
+                  setSelectedTemplate(template);
+                  form.setValue("templateType", template);
+                }}
+                control={form.control}
+              />
 
-          <CertificateBranding
-            logoFile={logoFile}
-            signatureFile={signatureFile}
-            onLogoUpload={handleLogoUpload}
-            onSignatureUpload={handleSignatureUpload}
-            control={form.control}
-          />
+              <CertificateBranding
+                logoFile={logoFile}
+                signatureFile={signatureFile}
+                onLogoUpload={handleLogoUpload}
+                onSignatureUpload={handleSignatureUpload}
+                control={form.control}
+              />
 
-          <CertificateSettings control={form.control} />
+              <CertificateSettings control={form.control} />
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" type="button">Cancel</Button>
-            <Button type="submit">Save Certificate Settings</Button>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" type="button">Cancel</Button>
+                <Button type="submit">Save Certificate Settings</Button>
+              </div>
+            </div>
+
+            <div className="lg:sticky lg:top-6">
+              <CertificatePreview 
+                values={form.getValues()} 
+                logoFile={logoFile}
+                signatureFile={signatureFile}
+              />
+            </div>
           </div>
         </form>
       </Form>
