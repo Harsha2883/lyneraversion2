@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Accordion,
@@ -23,13 +22,14 @@ const categories = ["CSR", "ESG", "Climate", "Carbon"];
 const certifications = ["ACTD", "EAHEA", "MEPSC", "Lynera", "Others"];
 
 export function CourseFilters({ filters, setFilters }: CourseFiltersProps) {
-  const [priceRange, setPriceRange] = useState([0, 25000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 25000]);
   
   const handlePriceRangeChange = (values: number[]) => {
-    setPriceRange(values as [number, number]);
+    const priceTuple: [number, number] = [values[0], values[1]];
+    setPriceRange(priceTuple);
     setFilters(prev => ({
       ...prev,
-      priceRange: values as [number, number]
+      priceRange: priceTuple
     }));
   };
   
@@ -46,7 +46,7 @@ export function CourseFilters({ filters, setFilters }: CourseFiltersProps) {
     }));
   };
   
-  const toggleCategory = (category: string) => {
+  function toggleCategory(category: string) {
     setFilters(prev => {
       const isSelected = prev.categories.includes(category);
       return {
@@ -56,9 +56,9 @@ export function CourseFilters({ filters, setFilters }: CourseFiltersProps) {
           : [...prev.categories, category]
       };
     });
-  };
+  }
   
-  const toggleCertification = (cert: string) => {
+  function toggleCertification(cert: string) {
     setFilters(prev => {
       const isSelected = prev.certifications.includes(cert);
       return {
@@ -68,7 +68,7 @@ export function CourseFilters({ filters, setFilters }: CourseFiltersProps) {
           : [...prev.certifications, cert]
       };
     });
-  };
+  }
 
   return (
     <div className="bg-card rounded-lg border p-4 space-y-4">
