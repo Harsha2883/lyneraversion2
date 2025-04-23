@@ -15,6 +15,7 @@ import ELibraryPage from "./pages/ELibraryPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import CarbonFootprintPage from "./pages/CarbonFootprintPage";
+import CreateCoursePage from "./pages/CreateCoursePage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/dashboard/library" element={<ELibraryPage />} />
           <Route path="/dashboard/profile" element={<ProfilePage />} />
           <Route path="/dashboard/settings" element={<SettingsPage />} />
+          <Route path="/dashboard/create-course" element={<CreateCoursePage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
