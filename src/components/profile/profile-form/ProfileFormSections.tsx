@@ -6,17 +6,26 @@ import { PersonalInfoSection } from "../sections/PersonalInfoSection";
 import { ProfessionalInfoSection } from "../sections/ProfessionalInfoSection";
 import { SocialMediaSection } from "../sections/SocialMediaSection";
 import { ReviewsList } from "../reviews/ReviewsList";
-import { FormActionsFooter } from "../form-actions";
-import { useProfileForm } from "@/hooks/useProfileForm";
+import { FormActions } from "../form-actions";
+import { ProfileFormData } from "@/types/profile";
 import { CourseReview } from "@/components/conversational-ai/types/review-types";
 
 interface ProfileFormSectionsProps {
-  isOwnProfile: boolean;
+  formData: ProfileFormData;
+  editMode: boolean;
+  pendingAvatarFile: File | null;
+  setAvatarFile: (file: File) => void;
+  handleFieldChange: (field: string, value: any) => void;
 }
 
-export function ProfileFormSections({ isOwnProfile }: ProfileFormSectionsProps) {
+export function ProfileFormSections({ 
+  formData, 
+  editMode, 
+  pendingAvatarFile, 
+  setAvatarFile, 
+  handleFieldChange 
+}: ProfileFormSectionsProps) {
   const [currentTab, setCurrentTab] = useState("personal");
-  const { formState, handleSaveChanges, handleCancelChanges } = useProfileForm();
 
   // Mock reviews data for the profile
   const mockReviews: CourseReview[] = [
@@ -53,16 +62,37 @@ export function ProfileFormSections({ isOwnProfile }: ProfileFormSectionsProps) 
         </TabsList>
 
         <TabsContent value="personal" className="space-y-6 pt-6">
-          <AvatarSection isEditable={isOwnProfile} />
-          <PersonalInfoSection isEditable={isOwnProfile} />
+          <AvatarSection 
+            editMode={editMode} 
+            avatarUrl={formData.avatar_url || ""} 
+            onSelectFile={setAvatarFile} 
+          />
+          <PersonalInfoSection
+            firstName={formData.first_name || ""}
+            lastName={formData.last_name || ""}
+            gender={formData.gender || ""}
+            birthdate={formData.birthdate ? new Date(formData.birthdate) : undefined}
+            editMode={editMode}
+            onFieldChange={handleFieldChange}
+          />
         </TabsContent>
 
         <TabsContent value="professional" className="space-y-6 pt-6">
-          <ProfessionalInfoSection isEditable={isOwnProfile} />
+          <ProfessionalInfoSection
+            profession={formData.profession || ""}
+            education={formData.education || ""}
+            aspiration={formData.aspiration || ""}
+            editMode={editMode}
+            onFieldChange={handleFieldChange}
+          />
         </TabsContent>
 
         <TabsContent value="social" className="space-y-6 pt-6">
-          <SocialMediaSection isEditable={isOwnProfile} />
+          <SocialMediaSection
+            socialMedia={formData.social_media || {}}
+            editMode={editMode}
+            onFieldChange={handleFieldChange}
+          />
         </TabsContent>
 
         <TabsContent value="reviews" className="space-y-6 pt-6">
@@ -70,14 +100,7 @@ export function ProfileFormSections({ isOwnProfile }: ProfileFormSectionsProps) 
         </TabsContent>
       </Tabs>
 
-      {isOwnProfile && (
-        <FormActionsFooter
-          onSave={handleSaveChanges}
-          onCancel={handleCancelChanges}
-          isDirty={formState.isDirty}
-          isSubmitting={formState.isSubmitting}
-        />
-      )}
+      {/* Form actions are now managed in the parent component */}
     </div>
   );
 }
