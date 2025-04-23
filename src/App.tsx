@@ -16,6 +16,7 @@ import SettingsPage from "./pages/SettingsPage";
 import CarbonFootprintPage from "./pages/CarbonFootprintPage";
 import CreateCoursePage from "./pages/CreateCoursePage";
 import CoursesPublishedPage from "./pages/CoursesPublishedPage";
+import CreatorJourneyPage from "./pages/CreatorJourneyPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/dashboard/create-course" element={<CreateCoursePage />} />
           <Route path="/dashboard/courses-published" element={<CoursesPublishedPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard/creator-journey" element={<CreatorJourneyPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

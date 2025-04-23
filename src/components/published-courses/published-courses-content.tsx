@@ -2,7 +2,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { edit, save } from "lucide-react";
+import { Edit, Save } from "lucide-react";
+import { CourseDetailsForm } from "@/components/create-course/course-details-form";
+import CourseContentTab from "@/components/create-course/CourseContentTab";
+import AssessmentTab from "@/components/create-course/AssessmentTab";
+import CheckAssessmentTab from "@/components/create-course/CheckAssessmentTab";
+import { CertificatesTab } from "@/components/create-course/CertificatesTab";
 
 interface PublishedCourse {
   id: string;
@@ -41,11 +46,11 @@ export function PublishedCoursesContent() {
               <CardTitle className="text-2xl font-bold">{course.title}</CardTitle>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm">
-                  <edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
                 <Button variant="default" size="sm">
-                  <save className="h-4 w-4 mr-2" />
+                  <Save className="h-4 w-4 mr-2" />
                   Save
                 </Button>
               </div>
@@ -60,32 +65,20 @@ export function PublishedCoursesContent() {
                   <TabsTrigger value="tokens">Tokens</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="details" className="mt-4">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Course Information</h3>
-                    <p className="text-muted-foreground">{course.description}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Last updated: {course.lastUpdated}
-                    </p>
-                  </div>
+                <TabsContent value="details">
+                  <CourseDetailsForm />
                 </TabsContent>
 
                 <TabsContent value="content">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Course content editor will be displayed here
-                  </div>
+                  <CourseContentTab />
                 </TabsContent>
 
                 <TabsContent value="assessments">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Assessment editor will be displayed here
-                  </div>
+                  <AssessmentTab />
                 </TabsContent>
 
                 <TabsContent value="certificates">
-                  <div className="p-4 text-center text-muted-foreground">
-                    Certificate management will be displayed here
-                  </div>
+                  <CertificatesTab />
                 </TabsContent>
 
                 <TabsContent value="tokens">
@@ -101,3 +94,4 @@ export function PublishedCoursesContent() {
     </div>
   );
 }
+
