@@ -1,94 +1,59 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EBookCategories } from "./e-book-categories";
-import { EBooksList } from "./e-books-list";
-import { EBookReader } from "./e-book-reader";
-import { EBookConversation } from "./e-book-conversation";
 import { getAllCategories, getBooksByCategory } from "./data/e-library-data";
 import { EBook } from "./types/e-library-types";
+import { ELibrarySidebar } from "./elibrary-sidebar";
+import { EBooksList } from "./e-books-list";
 
 export function ELibraryContent() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedBook, setSelectedBook] = useState<EBook | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "reader" | "conversation">("list");
-  
+  const [tab, setTab] = useState("all");
+  const [search, setSearch] = useState("");
   const categories = getAllCategories();
-  const books = selectedCategory ? getBooksByCategory(selectedCategory) : [];
-  
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setSelectedBook(null);
-    setViewMode("list");
-  };
-  
-  const handleBookSelect = (book: EBook) => {
-    setSelectedBook(book);
-  };
-  
-  const handleViewBook = () => {
-    if (selectedBook) {
-      setViewMode("reader");
-    }
-  };
-  
-  const handleDownloadBook = () => {
-    if (selectedBook) {
-      // In a real app, this would trigger a download
-      window.open(selectedBook.downloadUrl, "_blank");
-    }
-  };
-  
-  const handleConversationalBook = () => {
-    if (selectedBook) {
-      setViewMode("conversation");
-    }
-  };
-  
-  const handleBackToList = () => {
-    if (viewMode === "reader" || viewMode === "conversation") {
-      setViewMode("list");
-    } else {
-      setSelectedBook(null);
-    }
-  };
-  
+  // For now, get all books matching selectedCategory
+  const allBooks = selectedCategory ? getBooksByCategory(selectedCategory) : categories.length > 0 ? categories.flatMap(cat => getBooksByCategory(cat.id)) : [];
+  const books = allBooks.filter(book =>
+    book.title.toLowerCase().includes(search.toLowerCase()) ||
+    book.author.toLowerCase().includes(search.toLowerCase()) ||
+    book.description.toLowerCase().includes(search.toLowerCase())
+  );
+  // For demo, sorting is not implemented
+
   return (
-    <div className="space-y-6">
-      {viewMode === "list" && (
-        <>
-          <EBookCategories 
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
-          />
-          
-          {selectedCategory && (
-            <EBooksList 
-              books={books}
-              selectedBook={selectedBook}
-              onSelectBook={handleBookSelect}
-              onViewBook={handleViewBook}
-              onDownloadBook={handleDownloadBook}
-              onConversationalBook={handleConversationalBook}
-            />
-          )}
-        </>
-      )}
-      
-      {viewMode === "reader" && selectedBook && (
-        <EBookReader 
-          book={selectedBook}
-          onBack={handleBackToList}
+    <div className="flex flex-col md:flex-row gap-8 w-full">
+      {/* Sidebar */}
+      <div className="w-full md:max-w-xs flex-shrink-0">
+        <ELibrarySidebar
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          search={search}
+          setSearch={setSearch}
         />
-      )}
-      
-      {viewMode === "conversation" && selectedBook && (
-        <EBookConversation 
-          book={selectedBook}
-          onBack={handleBackToList}
-        />
-      )}
+      </div>
+      {/* Main content with tabs and resource rows */}
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-col gap-4">
+          <Tabs value={tab} onValueChange={setTab}>
+            <TabsList className="bg-transparent p-0 mb-2 border-b border-border w-full rounded-none flex">
+              <TabsTrigger value="all" className="rounded-none px-4 py-2 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-background">
+                All Resources
+              </TabsTrigger>
+              <TabsTrigger value="recent" className="rounded-none px-4 py-2 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-background">
+                Recent Additions
+              </TabsTrigger>
+              <TabsTrigger value="popular" className="rounded-none px-4 py-2 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-background">
+                Most Popular
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value={tab}>
+              <EBooksList books={books} />
+            </TabsContent>
+            {/* Could add different sorting/filtering for recent/popular */}
+          </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
