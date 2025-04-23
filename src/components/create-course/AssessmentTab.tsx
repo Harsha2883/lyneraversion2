@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import AssessmentQuestionEditor from "./AssessmentQuestionEditor";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useAssessmentQuestionState } from "./hooks/useAssessmentQuestionState";
+import { MAX_QUESTIONS, RECOMMENDED_QUESTIONS_COUNT } from "./constants/assessment-constants";
 
 export default function AssessmentTab() {
   const {
@@ -14,9 +15,11 @@ export default function AssessmentTab() {
     updateQuestion,
     handleDragStart,
     handleDragOver,
-    handleDragEnd,
-    MAX_QUESTIONS
+    handleDragEnd
   } = useAssessmentQuestionState();
+
+  // Memoize the remaining questions count to prevent re-renders
+  const remainingQuestions = useMemo(() => MAX_QUESTIONS - questions.length, [questions.length]);
 
   return (
     <div className="py-2">
@@ -26,14 +29,14 @@ export default function AssessmentTab() {
           size="lg"
           className="mb-2 flex items-center gap-2 text-base px-8 py-3"
           onClick={addQuestion}
-          disabled={questions.length >= MAX_QUESTIONS}
+          disabled={remainingQuestions <= 0}
         >
           <Plus className="mr-1" />
           Add Question
         </Button>
         <span className="text-xs text-muted-foreground">
           {questions.length}/{MAX_QUESTIONS} questions added.&nbsp;
-          <span>We recommend creating 10 questions.</span>
+          <span>We recommend creating {RECOMMENDED_QUESTIONS_COUNT} questions.</span>
         </span>
       </div>
       {questions.length === 0 ? (

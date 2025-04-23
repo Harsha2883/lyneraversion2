@@ -7,6 +7,7 @@ import QuestionTypeSelector from "./components/question-editor/QuestionTypeSelec
 import ObjectiveQuestionOptions from "./components/question-editor/ObjectiveQuestionOptions";
 import SubjectiveQuestionEditor from "./components/question-editor/SubjectiveQuestionEditor";
 import QuestionInput from "./components/question-editor/QuestionInput";
+import { QUESTION_TYPES, DEFAULT_OPTIONS_LIMIT } from "./constants/assessment-constants";
 
 interface Props {
   question: AssessmentQuestion;
@@ -19,14 +20,14 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
   question,
   onChange,
   onRemove,
-  objectiveOptionsLimit = 5
+  objectiveOptionsLimit = DEFAULT_OPTIONS_LIMIT
 }) => {
   // Handle question type change
   const handleTypeChange = (type: "objective" | "subjective") => {
-    if (type === "objective") {
+    if (type === QUESTION_TYPES.OBJECTIVE) {
       onChange({
         ...question,
-        type: "objective",
+        type: QUESTION_TYPES.OBJECTIVE,
         options: question.options && question.options.length ? question.options : [
           { text: "", isCorrect: false }
         ],
@@ -37,7 +38,7 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
     } else {
       onChange({
         ...question,
-        type: "subjective",
+        type: QUESTION_TYPES.SUBJECTIVE,
         options: undefined,
         allowMultiple: false,
         answer: "",
@@ -47,20 +48,20 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
   };
 
   // Handle question text change
-  const handleQuestionChange = (text: string) => {
+  const handleQuestionChange = React.useCallback((text: string) => {
     onChange({ ...question, question: text });
-  };
+  }, [question, onChange]);
 
   // Option handling functions
-  const handleOptionTextChange = (idx: number, value: string) => {
+  const handleOptionTextChange = React.useCallback((idx: number, value: string) => {
     if (question.options) {
       const options = [...question.options];
       options[idx].text = value;
       onChange({ ...question, options });
     }
-  };
+  }, [question, onChange]);
 
-  const handleOptionCorrectChange = (idx: number, checked: boolean) => {
+  const handleOptionCorrectChange = React.useCallback((idx: number, checked: boolean) => {
     if (question.options) {
       let options = [...question.options];
       if (!question.allowMultiple) {
@@ -70,22 +71,32 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
       }
       onChange({ ...question, options });
     }
-  };
+  }, [question, onChange]);
 
-  const handleAddOption = () => {
+  const handleAddOption = React.useCallback(() => {
     const options = [...(question.options || [])];
     if (options.length < objectiveOptionsLimit) {
       options.push({ text: "", isCorrect: false });
       onChange({ ...question, options });
     }
-  };
+  }, [question, onChange, objectiveOptionsLimit]);
 
-  const handleRemoveOption = (idx: number) => {
+  const handleRemoveOption = React.useCallback((idx: number) => {
     if (question.options) {
       const options = question.options.filter((_, i) => i !== idx);
       onChange({ ...question, options });
     }
-  };
+  }, [question, onChange]);
+
+  const handleMultipleAnswersChange = React.useCallback((checked: boolean) => {
+    onChange({
+      ...question,
+      allowMultiple: checked,
+      options: checked
+        ? question.options
+        : question.options?.map(opt => ({ ...opt, isCorrect: false })),
+    });
+  }, [question, onChange]);
 
   return (
     <div className="relative border rounded-lg p-4 mb-4 bg-background shadow-sm space-y-3">
@@ -112,21 +123,13 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
       />
       
       {/* Objective Options */}
-      {question.type === "objective" && (
+      {question.type === QUESTION_TYPES.OBJECTIVE && (
         <>
           <div className="flex gap-2 items-center mb-2">
             <span className="text-sm font-semibold">Allow Multiple Answers:</span>
             <Switch
               checked={!!question.allowMultiple}
-              onCheckedChange={checked =>
-                onChange({
-                  ...question,
-                  allowMultiple: checked,
-                  options: checked
-                    ? question.options
-                    : question.options?.map(opt => ({ ...opt, isCorrect: false })),
-                })
-              }
+              onCheckedChange={handleMultipleAnswersChange}
             />
           </div>
           
@@ -145,7 +148,7 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
       )}
       
       {/* Subjective Model Answer & Upload */}
-      {question.type === "subjective" && (
+      {question.type === QUESTION_TYPES.SUBJECTIVE && (
         <SubjectiveQuestionEditor
           answer={question.answer}
           answerDocumentUrl={question.answerDocumentUrl}
@@ -157,4 +160,4 @@ const AssessmentQuestionEditor: React.FC<Props> = ({
   );
 };
 
-export default AssessmentQuestionEditor;
+export default React.memo(AssessmentQuestionEditor);

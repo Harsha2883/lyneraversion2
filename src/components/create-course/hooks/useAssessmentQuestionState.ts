@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { AssessmentQuestion } from "../types/assessment-types";
+import { MAX_QUESTIONS } from "../constants/assessment-constants";
 
 export interface UseAssessmentQuestionStateProps {
   objectiveOptionsLimit?: number;
@@ -10,13 +11,12 @@ export function useAssessmentQuestionState({ objectiveOptionsLimit = 5 }: UseAss
   const [questions, setQuestions] = useState<AssessmentQuestion[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  const MAX_QUESTIONS = 10;
-
   // Add question
-  const addQuestion = () => {
+  const addQuestion = useCallback(() => {
     if (questions.length >= MAX_QUESTIONS) return;
-    setQuestions([
-      ...questions,
+    
+    setQuestions(prevQuestions => [
+      ...prevQuestions,
       {
         id: Date.now() + Math.random(),
         type: "objective",
@@ -26,33 +26,37 @@ export function useAssessmentQuestionState({ objectiveOptionsLimit = 5 }: UseAss
         allowMultiple: false,
       }
     ]);
-  };
+  }, [questions.length]);
 
   // Remove question
-  const removeQuestion = (idx: number) => {
-    setQuestions(questions.filter((_, i) => i !== idx));
-  };
+  const removeQuestion = useCallback((idx: number) => {
+    setQuestions(prevQuestions => prevQuestions.filter((_, i) => i !== idx));
+  }, []);
 
   // Update question
-  const updateQuestion = (idx: number, updated: AssessmentQuestion) => {
-    setQuestions(questions.map((q, i) => (i === idx ? updated : q)));
-  };
+  const updateQuestion = useCallback((idx: number, updated: AssessmentQuestion) => {
+    setQuestions(prevQuestions => prevQuestions.map((q, i) => (i === idx ? updated : q)));
+  }, []);
 
   // Handle drag events
-  const handleDragStart = (idx: number) => {
+  const handleDragStart = useCallback((idx: number) => {
     setDragIndex(idx);
-  };
+  }, []);
 
-  const handleDragOver = (idx: number) => {
+  const handleDragOver = useCallback((idx: number) => {
     if (dragIndex === null || dragIndex === idx) return;
-    const updated = [...questions];
-    const [dragged] = updated.splice(dragIndex, 1);
-    updated.splice(idx, 0, dragged);
-    setQuestions(updated);
+    
+    setQuestions(prevQuestions => {
+      const updated = [...prevQuestions];
+      const [dragged] = updated.splice(dragIndex, 1);
+      updated.splice(idx, 0, dragged);
+      return updated;
+    });
+    
     setDragIndex(idx);
-  };
+  }, [dragIndex]);
 
-  const handleDragEnd = () => setDragIndex(null);
+  const handleDragEnd = useCallback(() => setDragIndex(null), []);
 
   return {
     questions,

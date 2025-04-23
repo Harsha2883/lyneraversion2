@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Pen, Mic } from "lucide-react";
@@ -11,6 +11,14 @@ interface QuestionInputProps {
 }
 
 export default function QuestionInput({ question, onChange, type }: QuestionInputProps) {
+  // Memoize the onChange handler to prevent unnecessary re-renders
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      onChange(e.target.value);
+    },
+    [onChange]
+  );
+
   return (
     <div>
       <div className="flex items-center gap-2">
@@ -23,9 +31,16 @@ export default function QuestionInput({ question, onChange, type }: QuestionInpu
         placeholder="Type your question here or use the mic..."
         className="my-2"
         value={question}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleChange}
       />
-      <Button variant="ghost" size="icon" type="button" disabled title="Voice input coming soon">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        type="button" 
+        disabled 
+        title="Voice input coming soon"
+        aria-label="Record voice input (coming soon)"
+      >
         <Mic className="h-4 w-4" />
       </Button>
     </div>
