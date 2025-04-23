@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,7 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
   const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
+    setIsLoading(true);
     const mockReviews: CourseReview[] = [
       {
         id: "1",
@@ -80,12 +82,12 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
         is_public: reviewData.isPublic
       };
       
-      setReviews(prev => [...prev, newReview]);
+      const updatedReviews = [...reviews, newReview];
+      setReviews(updatedReviews);
       setUserHasReviewed(true);
       
-      const newReviews = [...reviews, newReview];
-      const total = newReviews.reduce((sum, review) => sum + review.rating, 0);
-      setAverageRating(Math.round((total / newReviews.length) * 10) / 10);
+      const total = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
+      setAverageRating(Math.round((total / updatedReviews.length) * 10) / 10);
     } catch (error) {
       console.error("Error submitting review:", error);
       toast.error("Failed to submit review");
@@ -101,7 +103,10 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6 pt-4">
-          <RatingStatistics reviews={reviews} averageRating={averageRating} />
+          <RatingStatistics 
+            reviews={reviews} 
+            averageRating={averageRating} 
+          />
           
           <Card>
             <CardHeader>

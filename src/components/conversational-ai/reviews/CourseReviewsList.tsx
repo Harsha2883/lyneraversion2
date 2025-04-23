@@ -7,6 +7,14 @@ interface CourseReviewsListProps {
 }
 
 export function CourseReviewsList({ reviews }: CourseReviewsListProps) {
+  if (!reviews || reviews.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No reviews available.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {reviews.map((review) => (
@@ -14,9 +22,11 @@ export function CourseReviewsList({ reviews }: CourseReviewsListProps) {
           <CardHeader className="pb-2">
             <div className="flex justify-between">
               <div>
-                <CardTitle className="text-sm">User {review.reviewer_id.substring(0, 8)}</CardTitle>
+                <CardTitle className="text-sm">
+                  {review.reviewer_id ? `User ${review.reviewer_id.substring(0, 8)}` : 'Anonymous'}
+                </CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(review.created_at || "").toLocaleDateString()}
+                  {review.created_at ? new Date(review.created_at).toLocaleDateString() : 'Unknown date'}
                 </p>
               </div>
               <div className="flex">
