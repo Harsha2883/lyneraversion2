@@ -1,9 +1,11 @@
-
 import { AvatarSection } from "../sections/AvatarSection";
 import { PersonalInfoSection } from "../sections/PersonalInfoSection";
 import { ProfessionalInfoSection } from "../sections/ProfessionalInfoSection";
 import { SocialMediaSection } from "../sections/SocialMediaSection";
+import { ReviewsList } from "../reviews/ReviewsList";
+import { StarRating } from "../reviews/StarRating";
 import { ProfileFormData } from "@/types/profile";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProfileFormSectionsProps {
   formData: ProfileFormData;
@@ -20,8 +22,22 @@ export function ProfileFormSections({
   setAvatarFile,
   handleFieldChange,
 }: ProfileFormSectionsProps) {
+  const { profile } = useAuth();
+  
   return (
     <>
+      <div className="flex items-center gap-4 mb-6">
+        <h2 className="text-2xl font-semibold">{formData.first_name} {formData.last_name}</h2>
+        {formData.average_rating && (
+          <div className="flex items-center gap-2">
+            <StarRating rating={formData.average_rating} readonly />
+            <span className="text-sm text-muted-foreground">
+              ({formData.total_reviews} reviews)
+            </span>
+          </div>
+        )}
+      </div>
+      
       <AvatarSection
         editMode={editMode}
         avatarUrl={pendingAvatarFile ? URL.createObjectURL(pendingAvatarFile) : (formData.avatar_url || "")}
@@ -49,6 +65,16 @@ export function ProfileFormSections({
         onFieldChange={handleFieldChange}
         editMode={editMode}
       />
+      
+      {profile?.id && (
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-4">Reviews</h3>
+          <ReviewsList 
+            creatorId={profile.id} 
+            isOwnProfile={true}
+          />
+        </div>
+      )}
     </>
   );
 }

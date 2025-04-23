@@ -1,4 +1,3 @@
-
 export interface ProfileFormData {
   first_name: string;
   last_name: string;
@@ -9,6 +8,8 @@ export interface ProfileFormData {
   aspiration: string;
   social_media: Record<string, string>;
   avatar_url: string;
+  average_rating?: number;
+  total_reviews?: number;
 }
 
 export interface ProfileFormState {
