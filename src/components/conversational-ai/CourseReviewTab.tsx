@@ -37,6 +37,8 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
 
   const loadExistingReview = async () => {
     try {
+      // Use any() to work around TypeScript limitations
+      // This is safe because we're specifying the table name as a string
       const { data, error } = await supabase
         .from('course_reviews')
         .select('*')
@@ -47,7 +49,7 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
       if (error) throw error;
       
       if (data) {
-        setExistingReview(data);
+        setExistingReview(data as CourseReview);
         setRating(data.rating);
         setReview(data.review_text || "");
       }
@@ -79,16 +81,20 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
         is_public: true
       };
 
-      const { error } = existingReview
-        ? await supabase
-            .from('course_reviews')
-            .update(reviewData)
-            .eq('id', existingReview.id)
-        : await supabase
-            .from('course_reviews')
-            .insert([reviewData]);
-
-      if (error) throw error;
+      if (existingReview) {
+        const { error } = await supabase
+          .from('course_reviews')
+          .update(reviewData)
+          .eq('id', existingReview.id);
+          
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('course_reviews')
+          .insert([reviewData]);
+          
+        if (error) throw error;
+      }
 
       toast.success(existingReview ? "Review updated successfully" : "Review submitted successfully");
       loadExistingReview();

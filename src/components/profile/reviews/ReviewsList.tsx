@@ -109,4 +109,3 @@ export function ReviewsList({ creatorId, isOwnProfile }: ReviewsListProps) {
     </div>
   );
 }
-
