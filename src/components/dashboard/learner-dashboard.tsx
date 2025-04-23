@@ -8,7 +8,8 @@ import {
   User,
   Settings,
   LogOut,
-  Leaf
+  Leaf,
+  BookOpen  // Adding this import for the new "Explore Courses" icon
 } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -43,6 +44,11 @@ const sidebarNavItems: NavItem[] = [
     title: "E-Library",
     href: "/dashboard/library",
     icon: Library,
+  },
+  {
+    title: "Explore Courses",
+    href: "/marketplace",  // Added new navigation item
+    icon: BookOpen,
   },
   {
     title: "Profile",
