@@ -2,7 +2,7 @@
 import { Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
 import { Control } from "react-hook-form";
 import { CertificateFormValues } from "./types";
 
@@ -29,6 +29,7 @@ export function CertificateSettings({ control }: CertificateSettingsProps) {
                   max="100"
                   {...field}
                   className="w-20"
+                  aria-describedby="grade-error"
                 />
                 <span className="ml-2">%</span>
               </div>
@@ -36,6 +37,7 @@ export function CertificateSettings({ control }: CertificateSettingsProps) {
             <FormDescription>
               Learners must achieve this minimum grade to receive a certificate
             </FormDescription>
+            <FormMessage />
           </FormItem>
         )}
       />
