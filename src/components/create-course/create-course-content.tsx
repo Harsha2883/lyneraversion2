@@ -1,7 +1,9 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseDetailsForm } from "./course-details-form";
 import CourseContentTab from "./CourseContentTab";
 import AssessmentTab from "./AssessmentTab";
+import CheckAssessmentTab from "./CheckAssessmentTab";
 
 export function CreateCourseContent() {
   return (
@@ -18,7 +20,7 @@ export function CreateCourseContent() {
           <TabsTrigger value="details">Course Details</TabsTrigger>
           <TabsTrigger value="content">Course Content</TabsTrigger>
           <TabsTrigger value="assessment">Assessment</TabsTrigger>
-          <TabsTrigger value="check-assessment" disabled>Check Assessment</TabsTrigger>
+          <TabsTrigger value="check-assessment">Check Assessment</TabsTrigger>
           <TabsTrigger value="certificates" disabled>Certificates</TabsTrigger>
           <TabsTrigger value="tokens" disabled>Tokens</TabsTrigger>
         </TabsList>
@@ -32,9 +34,7 @@ export function CreateCourseContent() {
           <AssessmentTab />
         </TabsContent>
         <TabsContent value="check-assessment">
-          <div className="rounded-md border p-10 text-center">
-            <p className="text-muted-foreground">Complete the assessment section first.</p>
-          </div>
+          <CheckAssessmentTab />
         </TabsContent>
         <TabsContent value="certificates">
           <div className="rounded-md border p-10 text-center">
