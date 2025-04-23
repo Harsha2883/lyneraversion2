@@ -1,10 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReviewForm } from "./reviews/ReviewForm";
 import { ShareButtons } from "./reviews/ShareButtons";
+import { RatingStatistics } from "./reviews/RatingStatistics";
+import { CourseReviewsList } from "./reviews/CourseReviewsList";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CourseReview, ReviewFormData } from "./types/review-types";
@@ -49,13 +50,12 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
     
     setReviews(mockReviews);
     
-    // Calculate average rating
     if (mockReviews.length) {
       const total = mockReviews.reduce((sum, review) => sum + review.rating, 0);
       setAverageRating(Math.round((total / mockReviews.length) * 10) / 10);
     }
     
-    setUserHasReviewed(false); // For demonstration, assume user hasn't reviewed
+    setUserHasReviewed(false);
     setIsLoading(false);
   }, [courseId, creatorId]);
 
@@ -71,7 +71,6 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
       toast.success("Your review has been submitted");
       setShowReviewForm(false);
       
-      // Add the new review to the mock reviews
       const newReview: CourseReview = {
         id: `mock-${Date.now()}`,
         course_id: courseId,
@@ -86,7 +85,6 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
       setReviews(prev => [...prev, newReview]);
       setUserHasReviewed(true);
       
-      // Recalculate average
       const newReviews = [...reviews, newReview];
       const total = newReviews.reduce((sum, review) => sum + review.rating, 0);
       setAverageRating(Math.round((total / newReviews.length) * 10) / 10);
@@ -95,11 +93,6 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
       toast.error("Failed to submit review");
     }
   };
-
-  const ratingDistribution = reviews.reduce((acc, review) => {
-    acc[review.rating] = (acc[review.rating] || 0) + 1;
-    return acc;
-  }, {} as Record<number, number>);
 
   return (
     <div className="space-y-6">
@@ -110,37 +103,7 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6 pt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Rating</CardTitle>
-              <CardDescription>Average rating from all students</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center mb-4">
-                <div className="text-4xl font-bold mr-2">{averageRating}</div>
-                <div className="text-muted-foreground">out of 5</div>
-              </div>
-              
-              <div className="space-y-2">
-                {[5, 4, 3, 2, 1].map(rating => (
-                  <div key={rating} className="flex items-center">
-                    <div className="w-12">{rating} stars</div>
-                    <div className="flex-1 mx-2 bg-muted rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="bg-primary h-full" 
-                        style={{ 
-                          width: `${reviews.length ? (ratingDistribution[rating] || 0) / reviews.length * 100 : 0}%` 
-                        }} 
-                      />
-                    </div>
-                    <div className="w-12 text-right text-muted-foreground text-sm">
-                      {ratingDistribution[rating] || 0}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <RatingStatistics reviews={reviews} averageRating={averageRating} />
           
           <Card>
             <CardHeader>
@@ -198,43 +161,7 @@ export function CourseReviewTab({ courseId, creatorId }: CourseReviewTabProps) {
                   )}
                 </div>
               ) : (
-                <>
-                  {reviews.map((review) => (
-                    <Card key={review.id}>
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between">
-                          <div>
-                            <CardTitle className="text-sm">User {review.reviewer_id.substring(0, 8)}</CardTitle>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(review.created_at || "").toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <svg
-                                key={i}
-                                className={`h-5 w-5 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                                />
-                              </svg>
-                            ))}
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p>{review.review_text}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </>
+                <CourseReviewsList reviews={reviews} />
               )}
             </div>
           )}
