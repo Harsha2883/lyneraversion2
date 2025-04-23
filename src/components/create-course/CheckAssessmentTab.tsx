@@ -3,154 +3,142 @@ import React, { useState } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, FileCheck } from "lucide-react";
+import { Check } from "lucide-react";
 
 // Mock data for demonstration
 const mockSubmissions = [
   {
     id: 1,
+    studentId: "stu001",
+    courseName: "GHG Fundamentals",
     learnerName: "John Doe",
     submittedAt: "2023-04-20T14:30:00",
     questions: 10,
-    objectiveScore: "7/8",
+    objectiveScore: 8,
+    objectiveMax: 8,
+    subjectiveScore: null,
     subjectiveReviewed: false,
+    subjectiveAnswer: "GHG accounting is the process of measuring and reporting greenhouse gas emissions...",
   },
   {
     id: 2,
+    studentId: "stu002",
+    courseName: "GHG Fundamentals",
     learnerName: "Alice Smith",
     submittedAt: "2023-04-21T09:15:00",
     questions: 10,
-    objectiveScore: "8/8",
+    objectiveScore: 7,
+    objectiveMax: 8,
+    subjectiveScore: 9,
     subjectiveReviewed: true,
-  },
-  {
-    id: 3,
-    learnerName: "Bob Johnson",
-    submittedAt: "2023-04-21T16:45:00",
-    questions: 10,
-    objectiveScore: "6/8",
-    subjectiveReviewed: false,
+    subjectiveAnswer: "GHG accounting involves collecting and quantifying direct and indirect emissions...",
   },
 ];
 
-interface SubmissionReviewProps {
-  submission: {
-    id: number;
-    learnerName: string;
-    submittedAt: string;
-    questions: number;
-    objectiveScore: string;
-    subjectiveReviewed: boolean;
-  };
-  onClose: () => void;
+function subjectiveMaxScore() {
+  // For demo, subjective out of 10 (can be dynamic)
+  return 10;
 }
 
-const SubmissionReview: React.FC<SubmissionReviewProps> = ({ submission, onClose }) => {
-  const [subjectiveScores, setSubjectiveScores] = useState<{[key: number]: number}>({
-    1: 0,
-    2: 0
-  });
+interface SubmissionReviewProps {
+  submission: typeof mockSubmissions[0];
+  onClose: () => void;
+  onSaveScore: (id: number, subjectiveScore: number) => void;
+}
 
-  const handleScoreChange = (questionId: number, score: number) => {
-    setSubjectiveScores(prev => ({
-      ...prev,
-      [questionId]: score
-    }));
+const SubmissionReview: React.FC<SubmissionReviewProps> = ({ submission, onClose, onSaveScore }) => {
+  const [editScore, setEditScore] = useState<number | null>(submission.subjectiveScore);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    if (value >= 0 && value <= subjectiveMaxScore()) {
+      setEditScore(value);
+    }
   };
-  
+
+  const handleSave = () => {
+    if (editScore !== null) {
+      onSaveScore(submission.id, editScore);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 800);
+    }
+  };
+
   return (
-    <div className="border rounded-md p-6 bg-background">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Submission Review: {submission.learnerName}</h3>
-        <span className="text-sm text-muted-foreground">
-          Submitted: {new Date(submission.submittedAt).toLocaleString()}
-        </span>
-      </div>
-      
-      <div className="space-y-8">
-        <div>
-          <h4 className="font-medium mb-2">Objective Questions</h4>
-          <div className="bg-muted/50 p-4 rounded-md">
-            <p>Score: {submission.objectiveScore}</p>
-            <p className="text-sm text-muted-foreground">
-              Automatically graded based on correct answers
-            </p>
-          </div>
-        </div>
-        
-        <div>
-          <h4 className="font-medium mb-2">Subjective Questions</h4>
-          <div className="space-y-4">
-            <div className="border rounded-md p-4">
-              <div className="mb-2">
-                <span className="font-medium">Question 1:</span> Explain the process of GHG accounting.
-              </div>
-              <div className="p-3 bg-muted/30 rounded-md mb-3">
-                <p className="text-sm">
-                  GHG accounting is the process of measuring and reporting greenhouse gas emissions. 
-                  It involves quantifying direct emissions from owned sources, indirect emissions from 
-                  purchased energy, and other indirect emissions from the value chain.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Score:</span>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((score) => (
-                    <button 
-                      key={score}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        subjectiveScores[1] === score ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-accent'
-                      }`}
-                      onClick={() => handleScoreChange(1, score)}
-                    >
-                      {score}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <div className="border rounded-md p-4">
-              <div className="mb-2">
-                <span className="font-medium">Question 2:</span> Describe the impact of carbon trading on climate change.
-              </div>
-              <div className="p-3 bg-muted/30 rounded-md mb-3">
-                <p className="text-sm">
-                  Carbon trading creates economic incentives for reducing emissions by establishing a price on carbon.
-                  Companies that reduce emissions can sell excess allowances to those who find it more expensive to reduce emissions.
-                  This market-based approach helps achieve emission reductions at the lowest cost.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Score:</span>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((score) => (
-                    <button 
-                      key={score}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        subjectiveScores[2] === score ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-accent'
-                      }`}
-                      onClick={() => handleScoreChange(2, score)}
-                    >
-                      {score}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="border rounded-md p-6 bg-background max-w-2xl mx-auto">
+      <div className="flex flex-col gap-2 mb-4">
+        <h3 className="text-xl font-semibold mb-1">Review Submission</h3>
+        <div className="flex gap-6 text-sm text-muted-foreground">
+          <span>
+            <span className="font-medium text-foreground">Student ID:</span> {submission.studentId}
+          </span>
+          <span>
+            <span className="font-medium text-foreground">Course:</span> {submission.courseName}
+          </span>
+          <span>
+            <span className="font-medium text-foreground">Submission Date:</span> {new Date(submission.submittedAt).toLocaleDateString()}
+          </span>
         </div>
       </div>
-      
-      <div className="flex justify-end gap-2 mt-8">
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button 
-          disabled={Object.values(subjectiveScores).some(score => score === 0)}
-          onClick={onClose}
-        >
-          <Check className="mr-2 h-4 w-4" />
-          Submit Review
+
+      <div className="mb-5">
+        <div className="mb-2">
+          <span className="font-medium">Objective Questions</span>
+        </div>
+        <div className="bg-muted/50 p-4 rounded-md flex flex-col md:flex-row md:items-center gap-3">
+          <span>
+            <span className="font-semibold text-foreground">Score: </span>
+            {submission.objectiveScore} / {submission.objectiveMax}
+          </span>
+          <span className="text-xs text-muted-foreground">Automatically graded</span>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <div className="mb-2">
+          <span className="font-medium">Subjective Question</span>
+        </div>
+        <div className="bg-muted/40 p-3 rounded mb-2 text-sm leading-relaxed">
+          <span className="block mb-1 font-medium text-foreground">Learner's Answer:</span>
+          {submission.subjectiveAnswer}
+        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-2">
+          <label className="text-sm font-medium min-w-[120px] text-foreground">
+            Subjective Marks:
+          </label>
+          <input
+            type="number"
+            min={0}
+            max={subjectiveMaxScore()}
+            className="border rounded px-4 py-2 w-32"
+            value={editScore !== null ? editScore : ""}
+            onChange={handleScoreChange}
+            aria-label="Subjective Marks"
+          />
+          <span className="text-xs text-muted-foreground">
+            Max: {subjectiveMaxScore()}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" type="button" onClick={onClose}>
+          Cancel
         </Button>
+        <Button disabled={editScore === null || submitted} onClick={handleSave}>
+          <Check className="mr-2 h-4 w-4" />
+          {submission.subjectiveReviewed ? "Update Score" : "Submit Review"}
+        </Button>
+      </div>
+      {submitted && (
+        <p className="mt-2 text-green-600 text-sm font-semibold">Score submitted!</p>
+      )}
+      <div className="mt-4 rounded bg-muted/50 p-3 text-xs text-muted-foreground">
+        Marks are converted to tokens after review. Tokens are automatically credited to learners and can be used for in-app purchases.
       </div>
     </div>
   );
@@ -158,38 +146,52 @@ const SubmissionReview: React.FC<SubmissionReviewProps> = ({ submission, onClose
 
 export default function CheckAssessmentTab() {
   const [selectedSubmission, setSelectedSubmission] = useState<number | null>(null);
+  const [submissions, setSubmissions] = useState(mockSubmissions);
+
   const [filters, setFilters] = useState({
     reviewed: false,
     pending: true
   });
 
-  const filteredSubmissions = mockSubmissions.filter(submission => {
+  // Save subjective score logic (would persist in DB in prod)
+  const handleSaveScore = (id: number, subjectiveScore: number) => {
+    setSubmissions(submissions =>
+      submissions.map(sub =>
+        sub.id === id
+          ? { ...sub, subjectiveScore, subjectiveReviewed: true }
+          : sub
+      )
+    );
+  };
+
+  const filteredSubmissions = submissions.filter(submission => {
     if (filters.reviewed && submission.subjectiveReviewed) return true;
     if (filters.pending && !submission.subjectiveReviewed) return true;
     return false;
   });
-  
+
   return (
     <div className="space-y-6">
       {selectedSubmission !== null ? (
-        <SubmissionReview 
-          submission={mockSubmissions.find(s => s.id === selectedSubmission)!}
-          onClose={() => setSelectedSubmission(null)} 
+        <SubmissionReview
+          submission={submissions.find(s => s.id === selectedSubmission)!}
+          onClose={() => setSelectedSubmission(null)}
+          onSaveScore={handleSaveScore}
         />
       ) : (
         <>
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">Assessment Submissions</h2>
             <div className="flex gap-2">
-              <Button 
-                variant={filters.pending ? "default" : "outline"} 
+              <Button
+                variant={filters.pending ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilters(prev => ({ ...prev, pending: !prev.pending }))}
               >
                 Pending Review
               </Button>
-              <Button 
-                variant={filters.reviewed ? "default" : "outline"} 
+              <Button
+                variant={filters.reviewed ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilters(prev => ({ ...prev, reviewed: !prev.reviewed }))}
               >
@@ -197,10 +199,9 @@ export default function CheckAssessmentTab() {
               </Button>
             </div>
           </div>
-          
+          <div className="mb-2 text-xs text-muted-foreground">Marks are converted to tokens automatically on review. Tokens can be redeemed for in-app purchases.</div>
           {filteredSubmissions.length === 0 ? (
             <div className="text-center py-10 border rounded-md">
-              <FileCheck className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="mt-4 text-xl font-medium">No submissions to review</h3>
               <p className="mt-2 text-muted-foreground">
                 When learners submit their assessments, they will appear here for review.
@@ -210,10 +211,13 @@ export default function CheckAssessmentTab() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Student ID</TableHead>
                   <TableHead>Learner</TableHead>
-                  <TableHead>Submitted</TableHead>
+                  <TableHead>Course Name</TableHead>
+                  <TableHead>Submission Date</TableHead>
                   <TableHead>Questions</TableHead>
-                  <TableHead>Objective Score</TableHead>
+                  <TableHead>Objective Marks</TableHead>
+                  <TableHead>Subjective Marks</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Action</TableHead>
                 </TableRow>
@@ -221,10 +225,17 @@ export default function CheckAssessmentTab() {
               <TableBody>
                 {filteredSubmissions.map((submission) => (
                   <TableRow key={submission.id}>
+                    <TableCell className="font-mono text-xs">{submission.studentId}</TableCell>
                     <TableCell className="font-medium">{submission.learnerName}</TableCell>
+                    <TableCell>{submission.courseName}</TableCell>
                     <TableCell>{new Date(submission.submittedAt).toLocaleDateString()}</TableCell>
                     <TableCell>{submission.questions}</TableCell>
-                    <TableCell>{submission.objectiveScore}</TableCell>
+                    <TableCell>{submission.objectiveScore} / {submission.objectiveMax}</TableCell>
+                    <TableCell>
+                      {submission.subjectiveReviewed && submission.subjectiveScore !== null
+                        ? `${submission.subjectiveScore} / ${subjectiveMaxScore()}`
+                        : <span className="text-muted-foreground">—</span>}
+                    </TableCell>
                     <TableCell>
                       {submission.subjectiveReviewed ? (
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -237,12 +248,12 @@ export default function CheckAssessmentTab() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => setSelectedSubmission(submission.id)}
                       >
-                        {submission.subjectiveReviewed ? "View" : "Review"}
+                        {submission.subjectiveReviewed ? "Edit" : "Review"}
                       </Button>
                     </TableCell>
                   </TableRow>
