@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +18,8 @@ export interface Profile {
   social_media: any;
   created_at?: string;
   updated_at?: string;
+  average_rating?: number;
+  total_reviews?: number;
 }
 
 export function useAuth() {

@@ -3,14 +3,13 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StarRating } from "./StarRating";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 interface Review {
   id: string;
   rating: number;
-  review_text: string;
+  review_text: string | null;
   reviewer_id: string;
   is_public: boolean;
   created_at: string;
@@ -38,7 +37,12 @@ export function ReviewsList({ creatorId, isOwnProfile }: ReviewsListProps) {
       const { data, error } = await supabase
         .from('creator_reviews')
         .select(`
-          *,
+          id,
+          rating,
+          review_text,
+          reviewer_id,
+          is_public,
+          created_at,
           reviewer:profiles!reviewer_id(first_name, last_name)
         `)
         .eq('creator_id', creatorId)
@@ -105,3 +109,4 @@ export function ReviewsList({ creatorId, isOwnProfile }: ReviewsListProps) {
     </div>
   );
 }
+
