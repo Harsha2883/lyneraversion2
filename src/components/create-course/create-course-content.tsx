@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseDetailsForm } from "./course-details-form";
 import CourseContentTab from "./CourseContentTab";
@@ -8,6 +9,9 @@ import { CertificatesTab } from "./CertificatesTab";
 import { TokenManagementTab } from "./TokenManagementTab";
 
 export function CreateCourseContent() {
+  // Use state to track the currently active tab
+  const [activeTab, setActiveTab] = useState("details");
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-col space-y-2">
@@ -17,7 +21,7 @@ export function CreateCourseContent() {
         </p>
       </div>
       
-      <Tabs defaultValue="details" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-6 lg:w-full overflow-x-auto">
           <TabsTrigger value="details">Course Details</TabsTrigger>
           <TabsTrigger value="content">Course Content</TabsTrigger>

@@ -1,114 +1,94 @@
 
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { StarRating } from "@/components/profile/reviews/StarRating";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { CourseReview } from "../types/review-types";
 
 interface ReviewFormProps {
-  courseId: string;
-  creatorId: string;
-  existingReview: CourseReview | null;
-  onReviewSubmitted: () => void;
+  onSubmit: (reviewData: Omit<CourseReview, 'id'>) => Promise<void>;
+  isSubmitting: boolean;
 }
 
-export function ReviewForm({ courseId, creatorId, existingReview, onReviewSubmitted }: ReviewFormProps) {
-  const [rating, setRating] = useState(existingReview?.rating || 0);
-  const [review, setReview] = useState(existingReview?.review_text || "");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isEditing, setIsEditing] = useState(!existingReview);
-
-  const handleSubmitReview = async () => {
-    if (!rating) {
-      toast.error("Please select a rating");
+export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (rating === 0) {
+      alert("Please select a rating before submitting");
       return;
     }
-
-    setIsSubmitting(true);
-
+    
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("You must be logged in to submit a review");
+        return;
+      }
+      
+      // Replace this with the actual course ID and creator ID when integrated with real course data
+      const courseId = "sample-course-id";
+      const creatorId = "sample-creator-id";
+      
+      // Create the review data
       const reviewData = {
         course_id: courseId,
-        reviewer_id: (await supabase.auth.getUser()).data.user?.id,
+        reviewer_id: user.id,
         creator_id: creatorId,
         rating,
-        review_text: review.trim() || null,
-        is_public: true
+        review_text: reviewText,
+        is_public: isPublic
       };
-
-      if (existingReview) {
-        const { error } = await supabase
-          .from('course_reviews')
-          .update(reviewData)
-          .eq('id', existingReview.id) as any; // Type assertion to bypass TS error
-          
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('course_reviews')
-          .insert([reviewData]) as any; // Type assertion to bypass TS error
-          
-        if (error) throw error;
-      }
-
-      toast.success(existingReview ? "Review updated successfully" : "Review submitted successfully");
-      onReviewSubmitted();
-      setIsEditing(false);
+      
+      await onSubmit(reviewData as unknown as Omit<CourseReview, 'id'>);
+      
     } catch (error) {
-      console.error('Error submitting review:', error);
-      toast.error("Failed to submit review");
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error in review form submit:', error);
+      alert("There was an error submitting your review");
     }
   };
-
-  if (!isEditing && existingReview) {
-    return (
-      <div className="space-y-4">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Your Rating</label>
-          <StarRating rating={existingReview.rating} readonly size="lg" />
-        </div>
-        {existingReview.review_text && (
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Your Review</label>
-            <p className="text-sm text-muted-foreground">{existingReview.review_text}</p>
-          </div>
-        )}
-        <Button variant="outline" onClick={() => setIsEditing(true)}>
-          Edit Review
-        </Button>
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Your Rating</label>
-        <StarRating rating={rating} onRatingChange={setRating} size="lg" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Your Review</label>
-        <Textarea
-          value={review}
-          onChange={(e) => setReview(e.target.value)}
-          placeholder="Write your review here..."
-          className="min-h-[100px]"
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <h3 className="text-lg font-medium mb-2">Rate this course</h3>
+        <StarRating 
+          rating={rating}
+          onChange={setRating}
+          size="large"
         />
       </div>
-      <div className="flex gap-2">
-        <Button onClick={handleSubmitReview} disabled={isSubmitting}>
-          {existingReview ? "Update Review" : "Submit Review"}
-        </Button>
-        {isEditing && existingReview && (
-          <Button variant="outline" onClick={() => setIsEditing(false)}>
-            Cancel
-          </Button>
-        )}
+      
+      <div>
+        <h3 className="text-lg font-medium mb-2">Write your review</h3>
+        <Textarea
+          placeholder="Share your experience with this course..."
+          value={reviewText}
+          onChange={(e) => setReviewText(e.target.value)}
+          required
+          rows={5}
+        />
       </div>
-    </div>
+      
+      <div className="flex items-center space-x-2">
+        <Switch 
+          id="public-review" 
+          checked={isPublic}
+          onCheckedChange={setIsPublic}
+        />
+        <Label htmlFor="public-review">Make this review public</Label>
+      </div>
+      
+      <Button type="submit" disabled={isSubmitting || rating === 0}>
+        {isSubmitting ? "Submitting..." : "Submit Review"}
+      </Button>
+    </form>
   );
 }

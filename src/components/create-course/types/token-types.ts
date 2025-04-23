@@ -12,3 +12,14 @@ export interface TokenEarningsRule {
   description: string;
   conditions?: Record<string, any>;
 }
+
+// Interface for token issuance data
+export interface TokenIssuance {
+  id: string;
+  userId: string;
+  courseId: string;
+  tokensEarned: number;
+  assessmentScore?: number;
+  issuedAt: string;
+  achievementType: string;
+}

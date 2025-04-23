@@ -7,18 +7,22 @@ import { Button } from "@/components/ui/button";
 export default function CourseContentTab() {
   const [mode, setMode] = useState<"data" | "ai">("data");
 
+  const handleModeChange = (newMode: "data" | "ai") => {
+    setMode(newMode);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
         <Button
           variant={mode === "data" ? "default" : "outline"}
-          onClick={() => setMode("data")}
+          onClick={() => handleModeChange("data")}
         >
           Data-backed
         </Button>
         <Button
           variant={mode === "ai" ? "default" : "outline"}
-          onClick={() => setMode("ai")}
+          onClick={() => handleModeChange("ai")}
         >
           AI-backed
         </Button>

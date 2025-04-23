@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,10 +34,11 @@ export function TokenManagementTab() {
     }
   ]);
 
+  // Fixed to handle nullish or undefined values
   const handleTokenConfigChange = (key: keyof TokenConfig, value: number) => {
     setTokenConfig(prev => ({
       ...prev,
-      [key]: value
+      [key]: isNaN(value) ? 0 : value
     }));
   };
 
@@ -49,33 +50,45 @@ export function TokenManagementTab() {
         return;
       }
 
+      // Note: In a real implementation, you would get the actual course ID
+      // This is a placeholder that should be replaced with the real course ID
+      const courseId = 'placeholder-course-id';
+
       const { error } = await supabase
         .from('course_token_configs')
         .insert({
           creator_id: user.id,
-          course_id: 'TODO_REPLACE_WITH_CURRENT_COURSE_ID', // Replace with actual course ID
-          base_tokens: tokenConfig.baseTokens,
-          performance_bonus_tokens: tokenConfig.performanceBonusTokens,
-          min_score_percentage: tokenConfig.minScorePercentage,
-          high_score_threshold: tokenConfig.highScoreThreshold
+          course_id: courseId, // Replace with actual course ID
+          base_tokens: tokenConfig.baseTokens || 0,
+          performance_bonus_tokens: tokenConfig.performanceBonusTokens || 0,
+          min_score_percentage: tokenConfig.minScorePercentage || 0,
+          high_score_threshold: tokenConfig.highScoreThreshold || 0
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving token configurations:', error);
+        throw error;
+      }
 
-      // Save earning rules
-      const ruleInserts = earningRules.map(rule => ({
-        course_id: 'TODO_REPLACE_WITH_CURRENT_COURSE_ID', // Replace with actual course ID
-        created_by: user.id,
-        achievement_type: rule.achievementType,
-        tokens_awarded: rule.tokensAwarded,
-        description: rule.description
-      }));
+      // Save earning rules with null check
+      if (earningRules && earningRules.length > 0) {
+        const ruleInserts = earningRules.map(rule => ({
+          course_id: courseId, // Replace with actual course ID
+          created_by: user.id,
+          achievement_type: rule.achievementType,
+          tokens_awarded: rule.tokensAwarded || 0,
+          description: rule.description
+        }));
 
-      const { error: ruleError } = await supabase
-        .from('token_earnings_rules')
-        .insert(ruleInserts);
+        const { error: ruleError } = await supabase
+          .from('token_earnings_rules')
+          .insert(ruleInserts);
 
-      if (ruleError) throw ruleError;
+        if (ruleError) {
+          console.error('Error saving token earnings rules:', ruleError);
+          throw ruleError;
+        }
+      }
 
       toast.success("Token configurations saved successfully!");
     } catch (error) {

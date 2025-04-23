@@ -1,108 +1,116 @@
 
-import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { StarRating } from "./StarRating";
-import { supabase } from "@/integrations/supabase/client";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StarRating } from './StarRating';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Review {
   id: string;
   rating: number;
-  review_text: string | null;
+  review_text: string;
   reviewer_id: string;
-  is_public: boolean;
+  reviewer_name?: string;
   created_at: string;
-  reviewer?: {
-    first_name: string;
-    last_name: string;
-  };
 }
 
 interface ReviewsListProps {
-  creatorId: string;
-  isOwnProfile?: boolean;
+  userId: string;
+  maxReviews?: number;
 }
 
-export function ReviewsList({ creatorId, isOwnProfile }: ReviewsListProps) {
+export function ReviewsList({ userId, maxReviews = 3 }: ReviewsListProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadReviews();
-  }, [creatorId]);
+    async function fetchReviews() {
+      setLoading(true);
+      try {
+        // Use type assertion to avoid TypeScript errors
+        const { data, error } = await (supabase
+          .from('creator_reviews' as any)
+          .select('*')
+          .eq('creator_id', userId)
+          .limit(maxReviews) as any);
+          
+        if (error) throw error;
 
-  const loadReviews = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('creator_reviews')
-        .select(`
-          id,
-          rating,
-          review_text,
-          reviewer_id,
-          is_public,
-          created_at,
-          reviewer:profiles!reviewer_id(first_name, last_name)
-        `)
-        .eq('creator_id', creatorId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setReviews(data || []);
-    } catch (error) {
-      console.error('Error loading reviews:', error);
-    } finally {
-      setLoading(false);
+        // Add reviewer names
+        let reviewsWithNames: Review[] = [];
+        if (data) {
+          reviewsWithNames = data.map((review: any) => ({
+            ...review,
+            reviewer_name: 'Anonymous User'  // Default name
+          }));
+          
+          // Try to load reviewer names
+          for (const review of reviewsWithNames) {
+            try {
+              const { data: profileData } = await (supabase
+                .from('profiles')
+                .select('first_name, last_name')
+                .eq('id', review.reviewer_id)
+                .single());
+                
+              if (profileData) {
+                review.reviewer_name = `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || 'Anonymous User';
+              }
+            } catch (err) {
+              console.error('Error fetching reviewer profile:', err);
+            }
+          }
+        }
+        
+        setReviews(reviewsWithNames);
+      } catch (err) {
+        console.error('Error loading reviews:', err);
+        setError('Failed to load reviews');
+      } finally {
+        setLoading(false);
+      }
     }
-  };
 
-  const toggleReviewVisibility = async (reviewId: string, isPublic: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('creator_reviews')
-        .update({ is_public: isPublic })
-        .eq('id', reviewId);
-
-      if (error) throw error;
-      await loadReviews();
-    } catch (error) {
-      console.error('Error updating review visibility:', error);
-    }
-  };
+    fetchReviews();
+  }, [userId, maxReviews]);
 
   if (loading) {
-    return <div>Loading reviews...</div>;
+    return <div className="py-8 text-center">Loading reviews...</div>;
+  }
+
+  if (error) {
+    return <div className="py-8 text-center text-red-500">{error}</div>;
+  }
+
+  if (reviews.length === 0) {
+    return <div className="py-8 text-center text-muted-foreground">No reviews yet</div>;
   }
 
   return (
     <div className="space-y-4">
       {reviews.map((review) => (
-        <Card key={review.id}>
-          <CardContent className="pt-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <StarRating rating={review.rating} readonly size="sm" />
-                  <span className="text-sm text-muted-foreground">
-                    by {review.reviewer?.first_name} {review.reviewer?.last_name}
-                  </span>
+        <Card key={review.id} className="overflow-hidden">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-9 w-9">
+                  <AvatarFallback>{review.reviewer_name?.[0] || 'A'}</AvatarFallback>
+                  <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${review.reviewer_name}`} />
+                </Avatar>
+                <div>
+                  <div className="font-medium">{review.reviewer_name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {review.created_at && formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+                  </div>
                 </div>
-                <p className="text-sm">{review.review_text}</p>
               </div>
-              {isOwnProfile && (
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id={`visibility-${review.id}`}
-                    checked={review.is_public}
-                    onCheckedChange={(checked) => 
-                      toggleReviewVisibility(review.id, checked)
-                    }
-                  />
-                  <Label htmlFor={`visibility-${review.id}`}>Public</Label>
-                </div>
-              )}
+              <StarRating rating={review.rating} readOnly size="small" />
             </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm">{review.review_text}</p>
           </CardContent>
         </Card>
       ))}
