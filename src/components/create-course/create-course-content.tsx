@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CourseDetailsForm } from "./course-details-form";
+import { PricingTab } from "./PricingTab";
 import CourseContentTab from "./CourseContentTab";
 import AssessmentTab from "./AssessmentTab";
 import CheckAssessmentTab from "./CheckAssessmentTab";
@@ -9,7 +10,6 @@ import { CertificatesTab } from "./CertificatesTab";
 import { TokenManagementTab } from "./TokenManagementTab";
 
 export function CreateCourseContent() {
-  // Use state to track the currently active tab
   const [activeTab, setActiveTab] = useState("details");
 
   return (
@@ -22,9 +22,10 @@ export function CreateCourseContent() {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-6 lg:w-full overflow-x-auto">
+        <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-7 lg:w-full overflow-x-auto">
           <TabsTrigger value="details">Course Details</TabsTrigger>
           <TabsTrigger value="content">Course Content</TabsTrigger>
+          <TabsTrigger value="pricing">Pricing</TabsTrigger>
           <TabsTrigger value="assessment">Assessment</TabsTrigger>
           <TabsTrigger value="check-assessment">Check Assessment</TabsTrigger>
           <TabsTrigger value="certificates">Certificates</TabsTrigger>
@@ -35,6 +36,9 @@ export function CreateCourseContent() {
         </TabsContent>
         <TabsContent value="content">
           <CourseContentTab />
+        </TabsContent>
+        <TabsContent value="pricing">
+          <PricingTab />
         </TabsContent>
         <TabsContent value="assessment">
           <AssessmentTab />
