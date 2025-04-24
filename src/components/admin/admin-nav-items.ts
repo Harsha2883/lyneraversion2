@@ -1,4 +1,3 @@
-
 import { BarChart3, BookOpen, Layers, Settings, Shield, User, Users, Database, Coins } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -10,6 +9,7 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { name: "Dashboard", icon: BarChart3, href: "/admin" },
+  { name: "Creator Courses", icon: BookOpen, href: "/admin/creator-courses" },
   { name: "Creators", icon: User, href: "/admin/creators" },
   { name: "Learners", icon: Users, href: "/admin/learners" },
   { name: "Internal System", icon: Database, href: "/admin/system" },
