@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { ShareButtons } from "@/components/conversational-ai/reviews/ShareButton
 import { ReviewsList } from "@/components/profile/reviews/ReviewsList";
 import { LearnerDashboard } from "@/components/dashboard/learner-dashboard";
 import { MOCK_COURSES } from "@/components/marketplace/mock-data";
+import { Badge } from "@/components/ui/badge";
 
 export default function CourseDetailsPage() {
   const { courseId } = useParams();
