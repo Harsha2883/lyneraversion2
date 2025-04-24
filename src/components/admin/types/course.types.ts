@@ -16,3 +16,9 @@ export interface Course {
   rating?: number;
   thumbnail?: string;
 }
+
+export interface CourseFilters {
+  search: string;
+  status: string;
+  category: string;
+}

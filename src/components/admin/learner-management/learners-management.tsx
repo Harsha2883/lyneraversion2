@@ -1,36 +1,15 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Download, Eye, Trash, MoreHorizontal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Download } from "lucide-react";
 import { toast } from "sonner";
-import { Progress } from "@/components/ui/progress";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { LearnerDetails } from "./learner-details";
-
-interface Learner {
-  id: string;
-  name: string;
-  email: string;
-  enrolledCourses: number;
-  completedCourses: number;
-  status: "active" | "inactive";
-  joinedDate: string;
-  lastActive: string;
-  progress: number;
-  avatar?: string;
-}
+import { useFilters } from "../shared/hooks/useFilters";
+import { TableFilters } from "../shared/components/filters/TableFilters";
+import { TablePagination } from "../shared/components/pagination/TablePagination";
+import { LearnersList } from "./learners-list/LearnersList";
+import { LearnerDetails } from "./learner-details/LearnerDetails";
+import type { Learner, LearnerFilters } from "../types/learner.types";
 
 // Mock data for learners
 const mockLearners: Learner[] = [
@@ -45,20 +24,30 @@ const mockLearners: Learner[] = [
 ];
 
 export function LearnersManagement() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const [selectedLearnerId, setSelectedLearnerId] = useState<string | null>(null);
+  
+  const { filters, setFilter } = useFilters<LearnerFilters>({
+    search: "",
+    status: "all"
+  });
   
   // Filter learners based on search query and status filter
   const filteredLearners = mockLearners.filter(learner => {
     const matchesSearch = 
-      learner.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      learner.email.toLowerCase().includes(searchQuery.toLowerCase());
+      learner.name.toLowerCase().includes(filters.search.toLowerCase()) || 
+      learner.email.toLowerCase().includes(filters.search.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || learner.status === statusFilter;
+    const matchesStatus = filters.status === "all" || learner.status === filters.status;
     
     return matchesSearch && matchesStatus;
   });
+
+  // Pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedLearners = filteredLearners.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(filteredLearners.length / itemsPerPage);
 
   const handleViewLearner = (learnerId: string) => {
     setSelectedLearnerId(learnerId);
@@ -75,9 +64,24 @@ export function LearnersManagement() {
     toast.success("Exporting learner data");
   };
 
+  // Status options for filter
+  const statusOptions = [
+    { value: "all", label: "All Statuses" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" }
+  ];
+
   // If a learner is selected, show their detailed view
   if (selectedLearnerId) {
-    return <LearnerDetails learnerId={selectedLearnerId} onBack={() => setSelectedLearnerId(null)} />;
+    const learner = mockLearners.find(l => l.id === selectedLearnerId);
+    if (learner) {
+      return (
+        <LearnerDetails 
+          learnerId={selectedLearnerId} 
+          onBack={() => setSelectedLearnerId(null)} 
+        />
+      );
+    }
   }
 
   return (
@@ -93,127 +97,33 @@ export function LearnersManagement() {
           </div>
         </div>
         
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 mb-6">
-          <div className="flex items-center flex-1 space-x-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search learners..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <TableFilters
+          searchValue={filters.search}
+          onSearchChange={(value) => setFilter("search", value)}
+          filterOptions={[
+            {
+              name: "status",
+              value: filters.status,
+              options: statusOptions,
+              onChange: (value) => setFilter("status", value)
+            }
+          ]}
+          className="mb-6"
+        />
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Learner</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead>Courses</TableHead>
-                <TableHead>Last Active</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredLearners.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    No learners found matching your criteria
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredLearners.map((learner) => (
-                  <TableRow key={learner.id}>
-                    <TableCell className="font-medium">
-                      <div>
-                        <div>{learner.name}</div>
-                        <div className="text-xs text-muted-foreground">{learner.email}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={learner.status === "active" ? "default" : "outline"}
-                        className="capitalize"
-                      >
-                        {learner.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <Progress value={learner.progress} className="h-2" />
-                        <span className="text-xs text-muted-foreground">{learner.progress}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span>{learner.completedCourses}/{learner.enrolledCourses}</span>
-                    </TableCell>
-                    <TableCell>{new Date(learner.lastActive).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(learner.joinedDate).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleViewLearner(learner.id)}
-                          title="View learner details"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDeleteLearner(learner.id)}
-                          title="Delete learner"
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Reset Password</DropdownMenuItem>
-                            <DropdownMenuItem>Send Message</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <LearnersList 
+          learners={paginatedLearners}
+          onViewLearner={handleViewLearner}
+          onDeleteLearner={handleDeleteLearner}
+        />
 
-        <div className="flex items-center justify-between mt-4">
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredLearners.length} of {mockLearners.length} learners
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" disabled>Previous</Button>
-            <Button variant="outline" size="sm">Next</Button>
-          </div>
-        </div>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsShown={paginatedLearners.length}
+          totalItems={filteredLearners.length}
+        />
       </CardContent>
     </Card>
   );
