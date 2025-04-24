@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { DataTable } from "../../shared/components/data-table/DataTable";
+import { DataTable, DataTableColumn } from "../../shared/components/data-table/DataTable";
 import { formatDate } from "../../shared/utils/format-utils";
 import type { Certificate } from "../../types/learner.types";
 
@@ -16,14 +16,14 @@ export function LearnerCertificates({ certificates }: LearnerCertificatesProps) 
     console.log(`Downloading certificate ${id}`);
   };
 
-  const columns = [
+  const columns: DataTableColumn<Certificate>[] = [
     {
       header: "Certificate",
-      accessor: "name"
+      accessor: "name" as keyof Certificate
     },
     {
       header: "Course",
-      accessor: "courseName"
+      accessor: "courseName" as keyof Certificate
     },
     {
       header: "Issue Date",

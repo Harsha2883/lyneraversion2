@@ -1,10 +1,10 @@
 
+import React, { ReactNode } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
 
-interface DataTableColumn<T> {
+export interface DataTableColumn<T> {
   header: string;
-  accessor: keyof T | ((item: T) => React.ReactNode);
+  accessor: keyof T | ((item: T) => ReactNode);
   className?: string;
 }
 

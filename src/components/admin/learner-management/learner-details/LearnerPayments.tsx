@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "../../shared/utils/format-utils";
-import { DataTable } from "../../shared/components/data-table/DataTable";
+import { DataTable, DataTableColumn } from "../../shared/components/data-table/DataTable";
 import type { Payment } from "../../types/learner.types";
 
 interface LearnerPaymentsProps {
@@ -10,7 +10,7 @@ interface LearnerPaymentsProps {
 }
 
 export function LearnerPayments({ payments }: LearnerPaymentsProps) {
-  const columns = [
+  const columns: DataTableColumn<Payment>[] = [
     {
       header: "Date",
       accessor: (payment: Payment) => formatDate(payment.date)
@@ -25,7 +25,7 @@ export function LearnerPayments({ payments }: LearnerPaymentsProps) {
     },
     {
       header: "Payment Method",
-      accessor: "method"
+      accessor: "method" as keyof Payment
     },
     {
       header: "Status",

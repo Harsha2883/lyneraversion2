@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DataTable } from "../../shared/components/data-table/DataTable";
+import { DataTable, DataTableColumn } from "../../shared/components/data-table/DataTable";
 import { formatDate } from "../../shared/utils/format-utils";
 import type { Assessment } from "../../types/learner.types";
 
@@ -10,10 +10,10 @@ interface LearnerAssessmentsProps {
 }
 
 export function LearnerAssessments({ assessments }: LearnerAssessmentsProps) {
-  const columns = [
+  const columns: DataTableColumn<Assessment>[] = [
     {
       header: "Course",
-      accessor: "courseName"
+      accessor: "courseName" as keyof Assessment
     },
     {
       header: "Date",
@@ -43,7 +43,7 @@ export function LearnerAssessments({ assessments }: LearnerAssessmentsProps) {
     },
     {
       header: "Attempts",
-      accessor: "attempts"
+      accessor: "attempts" as keyof Assessment
     }
   ];
 

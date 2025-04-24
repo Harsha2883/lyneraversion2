@@ -2,10 +2,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { DataTable } from "../../shared/components/data-table/DataTable";
+import { DataTable, DataTableColumn } from "../../shared/components/data-table/DataTable";
 import { formatDate } from "../../shared/utils/format-utils";
 
-// Mock course data for the learner
+// Define the LearnerCourse interface
 interface LearnerCourse {
   id: string;
   name: string;
@@ -33,10 +33,10 @@ export function LearnerCourses({ learnerId }: LearnerCoursesProps) {
   // In a real app, this would fetch course data from an API
   const courses = mockLearnerCourses[learnerId] || [];
 
-  const columns = [
+  const columns: DataTableColumn<LearnerCourse>[] = [
     {
       header: "Course",
-      accessor: "name"
+      accessor: "name" as keyof LearnerCourse
     },
     {
       header: "Enrollment Date",
