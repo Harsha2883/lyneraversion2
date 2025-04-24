@@ -5,12 +5,13 @@ import { CourseGrid } from "@/components/marketplace/course-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MOCK_COURSES } from "@/components/marketplace/mock-data";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, LayoutDashboard } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import { CourseFilters as CourseFiltersType } from "@/components/marketplace/types";
+import { LearnerDashboard } from "@/components/dashboard/learner-dashboard";
 
 export default function MarketplacePage() {
   const [activeTab, setActiveTab] = useState("popular");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<CourseFiltersType>({
     rating: null,
     priceRange: null,
@@ -70,41 +71,82 @@ export default function MarketplacePage() {
     }
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
-  };
-
   return (
-    <div className="flex min-h-screen">
-      {isSidebarCollapsed ? (
-        <div className="w-16 border-r bg-background flex flex-col items-center py-6">
+    <>
+      {isSidebarOpen ? (
+        <LearnerDashboard>
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleSidebar}
-            className="mb-4"
+            onClick={() => setIsSidebarOpen(false)}
+            className="absolute top-6 right-6"
           >
             <LayoutDashboard className="h-6 w-6" />
           </Button>
-        </div>
+          <div className="container mx-auto py-6 px-4 md:px-6">
+            <div className="flex items-center gap-4 mb-6">
+              <DashboardHeader 
+                title="Explore Courses" 
+                description="Browse and enroll in new learning opportunities"
+              />
+            </div>
+            
+            <div className="flex flex-col lg:flex-row gap-6">
+              <aside className="w-full lg:w-64 shrink-0">
+                <CourseFilters filters={filters} setFilters={setFilters} />
+              </aside>
+              
+              <div className="flex-1">
+                <Tabs 
+                  defaultValue="popular" 
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                  className="w-full"
+                >
+                  <TabsList className="mb-6">
+                    <TabsTrigger value="popular">Most Popular</TabsTrigger>
+                    <TabsTrigger value="trending">Trending</TabsTrigger>
+                    <TabsTrigger value="latest">Latest</TabsTrigger>
+                    <TabsTrigger value="all">All Courses</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="popular" className="mt-0">
+                    <CourseGrid courses={getCoursesByTab()} />
+                  </TabsContent>
+                  
+                  <TabsContent value="trending" className="mt-0">
+                    <CourseGrid courses={getCoursesByTab()} />
+                  </TabsContent>
+                  
+                  <TabsContent value="latest" className="mt-0">
+                    <CourseGrid courses={getCoursesByTab()} />
+                  </TabsContent>
+                  
+                  <TabsContent value="all" className="mt-0">
+                    <CourseGrid courses={getCoursesByTab()} />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </div>
+          </div>
+        </LearnerDashboard>
       ) : (
-        <div className="container mx-auto py-6 px-4 md:px-6 flex-1">
-          <div className="flex justify-between items-center">
+        <div className="container mx-auto py-6 px-4 md:px-6">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <LayoutDashboard className="h-6 w-6" />
+            </Button>
             <DashboardHeader 
               title="Explore Courses" 
               description="Browse and enroll in new learning opportunities"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className="ml-4"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
           </div>
           
-          <div className="flex flex-col lg:flex-row gap-6 mt-6">
+          <div className="flex flex-col lg:flex-row gap-6">
             <aside className="w-full lg:w-64 shrink-0">
               <CourseFilters filters={filters} setFilters={setFilters} />
             </aside>
@@ -143,6 +185,6 @@ export default function MarketplacePage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
