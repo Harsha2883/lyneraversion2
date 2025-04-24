@@ -8,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import { LayoutDashboard } from "lucide-react";
 import { CourseFilters as CourseFiltersType } from "@/components/marketplace/types";
 import { LearnerDashboard } from "@/components/dashboard/learner-dashboard";
+import { CreatorDashboard } from "@/components/dashboard/creator-dashboard";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MarketplacePage() {
+  const { profile, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("popular");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<CourseFiltersType>({
@@ -71,10 +74,72 @@ export default function MarketplacePage() {
     }
   };
 
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  const DashboardComponent = profile?.user_type === 'creator' ? CreatorDashboard : LearnerDashboard;
+  
+  const courseContent = (
+    <>
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          <LayoutDashboard className="h-6 w-6" />
+        </Button>
+        <DashboardHeader 
+          title="Explore Courses" 
+          description="Browse and enroll in new learning opportunities"
+        />
+      </div>
+      
+      <div className="flex flex-col lg:flex-row gap-6">
+        <aside className="w-full lg:w-64 shrink-0">
+          <CourseFilters filters={filters} setFilters={setFilters} />
+        </aside>
+        
+        <div className="flex-1">
+          <Tabs 
+            defaultValue="popular" 
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="mb-6">
+              <TabsTrigger value="popular">Most Popular</TabsTrigger>
+              <TabsTrigger value="trending">Trending</TabsTrigger>
+              <TabsTrigger value="latest">Latest</TabsTrigger>
+              <TabsTrigger value="all">All Courses</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="popular" className="mt-0">
+              <CourseGrid courses={getCoursesByTab()} />
+            </TabsContent>
+            
+            <TabsContent value="trending" className="mt-0">
+              <CourseGrid courses={getCoursesByTab()} />
+            </TabsContent>
+            
+            <TabsContent value="latest" className="mt-0">
+              <CourseGrid courses={getCoursesByTab()} />
+            </TabsContent>
+            
+            <TabsContent value="all" className="mt-0">
+              <CourseGrid courses={getCoursesByTab()} />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <>
       {isSidebarOpen ? (
-        <LearnerDashboard>
+        <DashboardComponent>
           <Button
             variant="ghost"
             size="icon"
@@ -84,105 +149,12 @@ export default function MarketplacePage() {
             <LayoutDashboard className="h-6 w-6" />
           </Button>
           <div className="container mx-auto py-6 px-4 md:px-6">
-            <div className="flex items-center gap-4 mb-6">
-              <DashboardHeader 
-                title="Explore Courses" 
-                description="Browse and enroll in new learning opportunities"
-              />
-            </div>
-            
-            <div className="flex flex-col lg:flex-row gap-6">
-              <aside className="w-full lg:w-64 shrink-0">
-                <CourseFilters filters={filters} setFilters={setFilters} />
-              </aside>
-              
-              <div className="flex-1">
-                <Tabs 
-                  defaultValue="popular" 
-                  value={activeTab}
-                  onValueChange={setActiveTab}
-                  className="w-full"
-                >
-                  <TabsList className="mb-6">
-                    <TabsTrigger value="popular">Most Popular</TabsTrigger>
-                    <TabsTrigger value="trending">Trending</TabsTrigger>
-                    <TabsTrigger value="latest">Latest</TabsTrigger>
-                    <TabsTrigger value="all">All Courses</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="popular" className="mt-0">
-                    <CourseGrid courses={getCoursesByTab()} />
-                  </TabsContent>
-                  
-                  <TabsContent value="trending" className="mt-0">
-                    <CourseGrid courses={getCoursesByTab()} />
-                  </TabsContent>
-                  
-                  <TabsContent value="latest" className="mt-0">
-                    <CourseGrid courses={getCoursesByTab()} />
-                  </TabsContent>
-                  
-                  <TabsContent value="all" className="mt-0">
-                    <CourseGrid courses={getCoursesByTab()} />
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </div>
+            {courseContent}
           </div>
-        </LearnerDashboard>
+        </DashboardComponent>
       ) : (
         <div className="container mx-auto py-6 px-4 md:px-6">
-          <div className="flex items-center gap-4 mb-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSidebarOpen(true)}
-            >
-              <LayoutDashboard className="h-6 w-6" />
-            </Button>
-            <DashboardHeader 
-              title="Explore Courses" 
-              description="Browse and enroll in new learning opportunities"
-            />
-          </div>
-          
-          <div className="flex flex-col lg:flex-row gap-6">
-            <aside className="w-full lg:w-64 shrink-0">
-              <CourseFilters filters={filters} setFilters={setFilters} />
-            </aside>
-            
-            <div className="flex-1">
-              <Tabs 
-                defaultValue="popular" 
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-              >
-                <TabsList className="mb-6">
-                  <TabsTrigger value="popular">Most Popular</TabsTrigger>
-                  <TabsTrigger value="trending">Trending</TabsTrigger>
-                  <TabsTrigger value="latest">Latest</TabsTrigger>
-                  <TabsTrigger value="all">All Courses</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="popular" className="mt-0">
-                  <CourseGrid courses={getCoursesByTab()} />
-                </TabsContent>
-                
-                <TabsContent value="trending" className="mt-0">
-                  <CourseGrid courses={getCoursesByTab()} />
-                </TabsContent>
-                
-                <TabsContent value="latest" className="mt-0">
-                  <CourseGrid courses={getCoursesByTab()} />
-                </TabsContent>
-                
-                <TabsContent value="all" className="mt-0">
-                  <CourseGrid courses={getCoursesByTab()} />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
+          {courseContent}
         </div>
       )}
     </>
