@@ -9,7 +9,7 @@ export default function CarbonFootprintPage() {
       <div className="container mx-auto py-6 px-4 md:px-6">
         <DashboardHeader 
           title="Carbon Footprint"
-          description="Track and offset your learning carbon footprint"
+          description="Track, analyze, and offset the environmental impact of your learning journey"
         />
         <div className="mt-6">
           <CarbonFootprint />
