@@ -9,11 +9,10 @@ import {
   Settings,
   LogOut,
   Leaf,
-  BookOpen  // Adding this import for the new "Explore Courses" icon
+  BookOpen
 } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
 
 interface LearnerDashboardProps {
   children: React.ReactNode;
@@ -47,7 +46,7 @@ const sidebarNavItems: NavItem[] = [
   },
   {
     title: "Explore Courses",
-    href: "/marketplace",  // Added new navigation item
+    href: "/marketplace",
     icon: BookOpen,
   },
   {

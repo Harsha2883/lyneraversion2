@@ -13,13 +13,16 @@ export function SidebarNav({ items, onLogout }: SidebarNavProps) {
     <nav className="flex h-screen w-64 flex-col border-r bg-background">
       <div className="p-6">
         <Logo />
+        <div className="text-xs text-muted-foreground mt-1">
+          Your learning companion for sustainable life
+        </div>
       </div>
       <div className="flex-1 space-y-1 p-4">
         {items.map((item) => (
           <NavItem 
             key={item.href} 
             item={item} 
-            onLogout={onLogout} // Pass logout handler
+            onLogout={onLogout}
           />
         ))}
       </div>
