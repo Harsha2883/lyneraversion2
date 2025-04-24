@@ -1,3 +1,4 @@
+
 import { Logo } from "@/components/ui/logo";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -7,14 +8,24 @@ import { useState } from "react";
 import { UserNav } from "@/components/user-nav";
 import { AdminSidebarNav } from "./admin-sidebar-nav";
 import { Badge } from "@/components/ui/badge";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useSidebar } from "@/components/ui/sidebar";
+
 export function AdminHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
+  const { toggleSidebar } = useSidebar();
+
   return <header className="bg-background shadow-sm border-b sticky top-0 z-30">
       <div className="container mx-auto py-4 px-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hidden lg:flex"
+            onClick={toggleSidebar}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetTrigger asChild className="lg:hidden">
@@ -32,6 +43,7 @@ export function AdminHeader() {
               </div>
             </SheetContent>
           </Sheet>
+
           <Link to="/admin" className="flex items-center gap-2">
             <Logo />
             <Badge className="bg-red-500 text-white hidden sm:flex">Master Admin</Badge>
