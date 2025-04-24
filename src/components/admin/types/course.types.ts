@@ -10,4 +10,9 @@ export interface Course {
   earnings: number;
   enrollments: number;
   completions: number;
+  createdAt?: string;
+  description?: string;
+  price?: number;
+  rating?: number;
+  thumbnail?: string;
 }
