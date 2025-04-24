@@ -1,3 +1,6 @@
+
+import { Course } from "../types/course.types";
+
 export const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case "approved":
