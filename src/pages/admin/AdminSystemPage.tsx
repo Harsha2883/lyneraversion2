@@ -1,12 +1,12 @@
 
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { InternalSystemTab } from "@/components/admin/tabs/internal-system-tab";
+import { SystemManagement } from "@/components/admin/system-management/system-management";
 
 const AdminSystemPage = () => {
   return (
     <AdminLayout>
       <h1 className="text-2xl font-bold mb-6">Internal System Management</h1>
-      <InternalSystemTab />
+      <SystemManagement />
     </AdminLayout>
   );
 };
