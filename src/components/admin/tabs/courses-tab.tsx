@@ -93,6 +93,20 @@ const mockCourses: Course[] = [
   }
 ];
 
+// Helper function for badge variant selection moved outside components
+const getStatusBadgeVariant = (status: string) => {
+  switch (status) {
+    case "approved":
+      return "default";
+    case "pending":
+      return "outline";
+    case "rejected":
+      return "destructive";
+    default:
+      return "secondary";
+  }
+};
+
 export function CoursesTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -115,19 +129,6 @@ export function CoursesTab() {
   };
 
   const filteredCourses = filterCourses(mockCourses);
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "approved":
-        return "default";
-      case "pending":
-        return "outline";
-      case "rejected":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
 
   return (
     <Card>
