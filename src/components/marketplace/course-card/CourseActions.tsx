@@ -21,11 +21,11 @@ export function CourseActions({ id, title, price }: CourseActionsProps) {
   };
 
   return (
-    <div className="flex gap-2 pt-4">
+    <div className="flex gap-2 w-full">
       <Button 
         variant="outline" 
         size="sm" 
-        className="flex-1"
+        className="flex-1 whitespace-nowrap"
         onClick={handleLearnMore}
       >
         Learn More
@@ -33,7 +33,7 @@ export function CourseActions({ id, title, price }: CourseActionsProps) {
       <Button
         variant="default"
         size="sm"
-        className="flex-1"
+        className="flex-1 whitespace-nowrap"
         onClick={handleEnroll}
       >
         {price === "Free" ? "Enroll Now" : "Buy Now"}
