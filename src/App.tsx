@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,9 @@ import CreatorJourneyPage from "./pages/CreatorJourneyPage";
 import CreatorELibraryPage from "./pages/CreatorELibraryPage";
 import MarketplacePage from "./pages/Marketplace";
 import CourseDetailsPage from "./pages/CourseDetailsPage";
+import AdminCreatorsPage from "./pages/admin/AdminCreatorsPage";
+import AdminLearnersPage from "./pages/admin/AdminLearnersPage";
+import AdminSystemPage from "./pages/admin/AdminSystemPage";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +47,9 @@ const App = () => (
           <Route path="/dashboard/courses-published" element={<CoursesPublishedPage />} />
           <Route path="/dashboard/creator-e-library" element={<CreatorELibraryPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+          <Route path="/admin/learners" element={<AdminLearnersPage />} />
+          <Route path="/admin/system" element={<AdminSystemPage />} />
           <Route path="/dashboard/creator-journey" element={<CreatorJourneyPage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/course/:courseId" element={<CourseDetailsPage />} />

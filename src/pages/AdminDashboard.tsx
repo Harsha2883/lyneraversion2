@@ -1,13 +1,15 @@
+
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User } from "lucide-react";
+import { User, Users, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MasterAdminTabs } from "@/components/admin/master-admin-tabs";
 
 const AdminDashboard = () => {
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6">Master Admin Dashboard</h1>
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -49,112 +51,8 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Tabs for Different Admin Sections */}
-      <Tabs defaultValue="overview">
-        <TabsList className="mb-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="users">User Management</TabsTrigger>
-          <TabsTrigger value="courses">Course Management</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
-          <Card>
-            <CardHeader>
-              <CardTitle>Admin Team Access</CardTitle>
-              <CardDescription>
-                Manage access levels for your team of 10 administrators
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="border rounded-lg">
-                  <div className="grid grid-cols-4 gap-4 p-4 font-medium border-b bg-muted">
-                    <div>Administrator</div>
-                    <div>Role</div>
-                    <div>Last Active</div>
-                    <div>Actions</div>
-                  </div>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="grid grid-cols-4 gap-4 p-4 border-b last:border-0">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <User className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <div className="font-medium">Admin {i + 1}</div>
-                          <div className="text-xs text-muted-foreground">admin{i + 1}@lynera.ai</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="bg-accent/20 text-accent-foreground text-xs px-2 py-1 rounded-full">
-                          {i === 0 ? "Super Admin" : i === 1 ? "Content Manager" : i === 2 ? "User Manager" : i === 3 ? "Creator Approver" : "Read Only"}
-                        </div>
-                      </div>
-                      <div className="flex items-center text-sm">
-                        {i === 0 ? "Just now" : i === 1 ? "2 hours ago" : i === 2 ? "Yesterday" : i === 3 ? "3 days ago" : "1 week ago"}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button variant="ghost" size="sm">Manage</Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Button>Add Admin</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-              <CardDescription>
-                Manage user accounts, roles, and permissions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                User management content would go here
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="courses">
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Management</CardTitle>
-              <CardDescription>
-                Manage and moderate course content
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Course management content would go here
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics & Reports</CardTitle>
-              <CardDescription>
-                View platform analytics and generate reports
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Reports and analytics content would go here
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Master Admin Tabs */}
+      <MasterAdminTabs />
     </AdminLayout>
   );
 };

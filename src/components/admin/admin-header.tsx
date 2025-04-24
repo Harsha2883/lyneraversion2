@@ -3,10 +3,12 @@ import { Logo } from "@/components/ui/logo";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Bell } from "lucide-react";
 import { useState } from "react";
 import { UserNav } from "@/components/user-nav";
 import { AdminSidebarNav } from "./admin-sidebar-nav";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 export function AdminHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,22 +25,29 @@ export function AdminHeader() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="py-4">
-                <Logo />
+                <div className="flex items-center gap-2 mb-6">
+                  <Logo />
+                  <Badge className="bg-red-500 text-white">Master Admin</Badge>
+                </div>
                 <AdminSidebarNav mobile onNavClick={() => setSidebarOpen(false)} />
               </div>
             </SheetContent>
           </Sheet>
-          <Logo />
-          <div className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">
-            Admin
-          </div>
+          <Link to="/admin" className="flex items-center gap-2">
+            <Logo />
+            <Badge className="bg-red-500 text-white hidden sm:flex">Master Admin</Badge>
+          </Link>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Input 
             placeholder="Search..." 
             className="w-64 hidden md:flex h-9"
           />
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+          </Button>
           <UserNav />
         </div>
       </div>
