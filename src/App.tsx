@@ -24,6 +24,8 @@ import CourseDetailsPage from "./pages/CourseDetailsPage";
 import AdminCreatorsPage from "./pages/admin/AdminCreatorsPage";
 import AdminLearnersPage from "./pages/admin/AdminLearnersPage";
 import AdminSystemPage from "./pages/admin/AdminSystemPage";
+import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
+import TokenManagementPage from "./pages/admin/TokenManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +52,8 @@ const App = () => (
           <Route path="/admin/creators" element={<AdminCreatorsPage />} />
           <Route path="/admin/learners" element={<AdminLearnersPage />} />
           <Route path="/admin/system" element={<AdminSystemPage />} />
+          <Route path="/admin/courses" element={<AdminCoursesPage />} />
+          <Route path="/admin/tokens" element={<TokenManagementPage />} />
           <Route path="/dashboard/creator-journey" element={<CreatorJourneyPage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/course/:courseId" element={<CourseDetailsPage />} />
