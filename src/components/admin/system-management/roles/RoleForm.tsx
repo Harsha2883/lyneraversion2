@@ -9,11 +9,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import type { UserRole, RolePermission } from "../../types/system.types";
+import type { Role, RolePermission } from "../../types/system.types";
 
 interface RoleFormProps {
-  role?: UserRole | null;
-  onSave: (role: UserRole) => void;
+  role?: Role | null;
+  onSave: (role: Role) => void;
   onCancel: () => void;
 }
 
@@ -41,7 +41,7 @@ export function RoleForm({ role, onSave, onCancel }: RoleFormProps) {
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    const newRole: UserRole = {
+    const newRole: Role = {
       id: role?.id || `new-${Date.now()}`,
       name: data.name,
       description: data.description,

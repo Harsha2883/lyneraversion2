@@ -1,4 +1,5 @@
 
+// Define UserRole as a string union type
 export type UserRole = "admin" | "moderator" | "creator" | "learner";
 
 export interface SystemUser {
@@ -18,7 +19,8 @@ export interface RolePermission {
   enabled: boolean;
 }
 
-export interface UserRole {
+// Rename to avoid duplicate identifier with the type
+export interface Role {
   id: string;
   name: string;
   description: string;

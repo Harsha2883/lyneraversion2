@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SystemUsersManagement } from "./users/SystemUsersManagement";
-import { PaymentIntegration } from "./payment/PaymentIntegration";
-import { SystemAuditLogs } from "./audit/SystemAuditLogs";
+import { SystemUsersManagement } from "@/components/admin/system-management/system-users-management";
+import { PaymentIntegration } from "@/components/admin/system-management/payment-integration";
+import { SystemAuditLogs } from "@/components/admin/system-management/system-audit-logs";
 import { RoleManagement } from "./roles/RoleManagement";
 import { CarbonFootprintManagement } from "./carbon/CarbonFootprintManagement";
 

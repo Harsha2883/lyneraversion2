@@ -5,12 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Edit, Trash } from "lucide-react";
 import { TableFilters } from "../../shared/components/filters/TableFilters";
 import { DataTable } from "../../shared/components/data-table/DataTable";
-import { formatDate } from "../../shared/utils/format-utils";
 import { RoleForm } from "./RoleForm";
-import type { UserRole } from "../../types/system.types";
+import type { Role } from "../../types/system.types";
 
 // Mock data for roles
-const mockRoles: UserRole[] = [
+const mockRoles: Role[] = [
   {
     id: "1",
     name: "Admin",
@@ -56,14 +55,14 @@ const mockRoles: UserRole[] = [
 export function RoleManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddingRole, setIsAddingRole] = useState(false);
-  const [editingRole, setEditingRole] = useState<UserRole | null>(null);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
   
   const filteredRoles = mockRoles.filter(role => 
     role.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     role.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleEditRole = (role: UserRole) => {
+  const handleEditRole = (role: Role) => {
     setEditingRole(role);
     setIsAddingRole(true);
   };
@@ -73,7 +72,7 @@ export function RoleManagement() {
     console.log(`Deleting role ${roleId}`);
   };
 
-  const handleSaveRole = (role: UserRole) => {
+  const handleSaveRole = (role: Role) => {
     // In a real app, this would call an API to save the role
     console.log('Saving role:', role);
     setIsAddingRole(false);
@@ -83,7 +82,7 @@ export function RoleManagement() {
   const columns = [
     {
       header: "Role",
-      accessor: (role: UserRole) => (
+      accessor: (role: Role) => (
         <div>
           <div className="font-medium">{role.name}</div>
           <div className="text-sm text-muted-foreground">{role.description}</div>
@@ -92,13 +91,13 @@ export function RoleManagement() {
     },
     {
       header: "Permissions",
-      accessor: (role: UserRole) => (
+      accessor: (role: Role) => (
         <div>{role.permissions.filter(p => p.enabled).length} of {role.permissions.length}</div>
       )
     },
     {
       header: "Actions",
-      accessor: (role: UserRole) => (
+      accessor: (role: Role) => (
         <div className="flex justify-end space-x-2">
           <Button 
             variant="ghost" 
