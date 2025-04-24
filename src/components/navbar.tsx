@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const routes = [
   { name: "Home", path: "/" },
-  { name: "Courses", path: "/courses" },
+  { name: "Courses", path: "/marketplace" },  // Updated path to /marketplace
   { name: "For Creators", path: "/auth" },
   { name: "For Learners", path: "/auth" },
   { name: "About", path: "/about" },

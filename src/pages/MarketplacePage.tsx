@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { LearnerDashboard } from "@/components/dashboard/learner-dashboard";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -7,9 +6,8 @@ import { CourseGrid } from "@/components/marketplace/course-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MOCK_COURSES } from "@/components/marketplace/mock-data";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react";
 
-// Filter types
 export type CourseFilters = {
   rating: number | null;
   priceRange: [number, number] | null;
@@ -30,26 +28,21 @@ export default function MarketplacePage() {
     categories: [],
     certifications: [],
   });
-  
-  // Filter courses based on active filters
+
   const filterCourses = (courses: typeof MOCK_COURSES) => {
     return courses.filter(course => {
-      // Filter by rating
       if (filters.rating && course.rating < filters.rating) {
         return false;
       }
       
-      // Filter by price
       if (filters.isFree && course.price !== "Free") {
         return false;
       }
       
-      // Filter by members-only
       if (filters.isForMembers && !course.isForMembers) {
         return false;
       }
       
-      // Filter by price range
       if (filters.priceRange) {
         const coursePrice = course.price === "Free" ? 0 : parseFloat(course.price.replace(/[^\d.-]/g, ''));
         if (coursePrice < filters.priceRange[0] || coursePrice > filters.priceRange[1]) {
@@ -57,12 +50,10 @@ export default function MarketplacePage() {
         }
       }
       
-      // Filter by categories
       if (filters.categories.length > 0 && !filters.categories.includes(course.category)) {
         return false;
       }
       
-      // Filter by certifications
       if (filters.certifications.length > 0 && !filters.certifications.some(cert => course.certifications.includes(cert))) {
         return false;
       }
@@ -71,7 +62,6 @@ export default function MarketplacePage() {
     });
   };
 
-  // Get courses based on the active tab
   const getCoursesByTab = () => {
     const filteredCourses = filterCourses(MOCK_COURSES);
     
@@ -91,8 +81,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Collapsed Sidebar */}
-      {isSidebarCollapsed && (
+      {isSidebarCollapsed ? (
         <div className="w-16 border-r bg-background flex flex-col items-center py-6">
           <Button
             variant="ghost"
@@ -103,10 +92,7 @@ export default function MarketplacePage() {
             <LayoutDashboard className="h-6 w-6" />
           </Button>
         </div>
-      )}
-
-      {/* Full Dashboard */}
-      {!isSidebarCollapsed && (
+      ) : (
         <LearnerDashboard>
           <div className="container mx-auto py-6 px-4 md:px-6 flex-1">
             <div className="flex justify-between items-center">
@@ -125,12 +111,10 @@ export default function MarketplacePage() {
             </div>
             
             <div className="flex flex-col lg:flex-row gap-6 mt-6">
-              {/* Sidebar filters */}
               <aside className="w-full lg:w-64 shrink-0">
                 <CourseFilters filters={filters} setFilters={setFilters} />
               </aside>
               
-              {/* Main content */}
               <div className="flex-1">
                 <Tabs 
                   defaultValue="popular" 
