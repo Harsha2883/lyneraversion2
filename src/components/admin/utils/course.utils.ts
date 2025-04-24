@@ -12,7 +12,7 @@ export const getStatusBadgeVariant = (status: string) => {
 };
 
 // Mock data for courses - in a real app, this would come from an API
-export const mockCourses = [
+export const mockCourses: Course[] = [
   { 
     id: "1", 
     title: "Introduction to ESG Standards", 
@@ -73,4 +73,4 @@ export const mockCourses = [
     enrollments: 0,
     completions: 0
   }
-] as const;
+] as Course[];
