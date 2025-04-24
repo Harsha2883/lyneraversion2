@@ -4,6 +4,7 @@ import { SustainabilityMetrics } from "./carbon/sustainability-metrics";
 import { TravelMetrics } from "./carbon/travel-metrics";
 import { OffsetProjects } from "./carbon/offset-projects";
 import { SustainabilityTips } from "./carbon/sustainability-tips";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export function CarbonFootprint() {
   return (
@@ -17,8 +18,12 @@ export function CarbonFootprint() {
           Summary of your environmental impact through sustainable learning
         </p>
         
-        <SustainabilityMetrics />
-        <TravelMetrics />
+        <ErrorBoundary>
+          <SustainabilityMetrics />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <TravelMetrics />
+        </ErrorBoundary>
       </section>
 
       <section className="bg-white rounded-lg p-6">
@@ -47,7 +52,9 @@ export function CarbonFootprint() {
           </p>
         </div>
 
-        <OffsetProjects />
+        <ErrorBoundary>
+          <OffsetProjects />
+        </ErrorBoundary>
       </section>
 
       <section className="bg-green-50/50 rounded-lg p-6">
@@ -56,8 +63,11 @@ export function CarbonFootprint() {
           Sustainability Learning Tips
         </h2>
         
-        <SustainabilityTips />
+        <ErrorBoundary>
+          <SustainabilityTips />
+        </ErrorBoundary>
       </section>
     </div>
   );
 }
+
