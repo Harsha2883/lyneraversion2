@@ -5,9 +5,10 @@ import { navItems } from "./admin-nav-items";
 interface AdminSidebarNavProps {
   mobile?: boolean;
   onNavClick?: () => void;
+  collapsed?: boolean;
 }
 
-export function AdminSidebarNav({ mobile, onNavClick }: AdminSidebarNavProps) {
+export function AdminSidebarNav({ mobile, onNavClick, collapsed = false }: AdminSidebarNavProps) {
   const location = useLocation();
 
   const isRouteActive = (href: string) => {
@@ -27,9 +28,10 @@ export function AdminSidebarNav({ mobile, onNavClick }: AdminSidebarNavProps) {
             isRouteActive(item.href) ? 'bg-secondary' : ''
           }`}
           onClick={onNavClick}
+          title={collapsed ? item.name : undefined}
         >
           <item.icon className="h-4 w-4" />
-          {item.name}
+          {!collapsed && <span>{item.name}</span>}
         </Link>
       ))}
     </div>

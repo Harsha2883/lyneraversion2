@@ -13,7 +13,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 export function AdminHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, open } = useSidebar();
 
   return <header className="bg-background shadow-sm border-b sticky top-0 z-30">
       <div className="container mx-auto py-4 px-4 flex justify-between items-center">
@@ -23,8 +23,9 @@ export function AdminHeader() {
             size="icon" 
             className="hidden lg:flex"
             onClick={toggleSidebar}
+            aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className={`h-5 w-5 transition-transform duration-200 ${open ? '' : 'rotate-180'}`} />
           </Button>
           
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
