@@ -1,6 +1,19 @@
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
-import { PlusCircle, Book, Rocket, Leaf, User, Settings, LogOut, Library, BookOpen } from "lucide-react";
+import { 
+  PlusCircle, 
+  Book, 
+  Rocket, 
+  Leaf, 
+  User, 
+  Settings, 
+  LogOut, 
+  Library, 
+  BookOpen,
+  Car,
+  Plane,
+  Smartphone
+} from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
