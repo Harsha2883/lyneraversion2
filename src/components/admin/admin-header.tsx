@@ -1,4 +1,3 @@
-
 import { Logo } from "@/components/ui/logo";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -9,23 +8,13 @@ import { UserNav } from "@/components/user-nav";
 import { AdminSidebarNav } from "./admin-sidebar-nav";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
-
 export function AdminHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-
-  return (
-    <header className="bg-background shadow-sm border-b sticky top-0 z-30">
+  return <header className="bg-background shadow-sm border-b sticky top-0 z-30">
       <div className="container mx-auto py-4 px-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="mr-2"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          
           
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetTrigger asChild className="lg:hidden">
@@ -50,10 +39,7 @@ export function AdminHeader() {
         </div>
         
         <div className="flex items-center gap-4">
-          <Input 
-            placeholder="Search..." 
-            className="w-64 hidden md:flex h-9"
-          />
+          <Input placeholder="Search..." className="w-64 hidden md:flex h-9" />
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
@@ -61,6 +47,5 @@ export function AdminHeader() {
           <UserNav />
         </div>
       </div>
-    </header>
-  );
+    </header>;
 }
