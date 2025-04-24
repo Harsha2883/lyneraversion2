@@ -1,25 +1,21 @@
 
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
-import { LayoutDashboard, PlusCircle, Book, Rocket, Library, Leaf, User, Settings, LogOut } from "lucide-react";
+import { PlusCircle, Book, Rocket, Leaf, User, Settings, LogOut } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { CarbonFootprint } from "./carbon-footprint";
-import { SkillsProgress } from "./skills-progress";
 import { TokensDistributed } from "./tokens-distributed";
 import { RecentCourses } from "./recent-courses";
+import { SkillsProgress } from "./skills-progress";
 import { SocialMediaHandles } from "./social-media-handles";
 import { UpgradePlanCard } from "./upgrade-plan-card";
 import { ReactNode } from "react";
 
 const sidebarNavItems: NavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Dashboard", href: "/dashboard", icon: Rocket },
   { title: "Create Course", href: "/dashboard/create-course", icon: PlusCircle },
-  { title: "Courses Published", href: "/dashboard/courses-published", icon: Book },
-  { title: "Creator Journey", href: "/dashboard/creator-journey", icon: Rocket },
   { title: "Carbon footprint", href: "/dashboard/carbon", icon: Leaf },
-  { title: "E-Library", href: "/dashboard/creator-e-library", icon: Library },
-  { title: "Explore Courses", href: "/marketplace", icon: Rocket },
   { title: "Profile", href: "/dashboard/profile", icon: User },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
   { title: "Logout", href: "#logout", icon: LogOut, isLogout: true }
