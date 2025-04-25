@@ -1,7 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function PricingPage() {
   const navigate = useNavigate();
@@ -10,68 +12,143 @@ export default function PricingPage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       {/* Header Section */}
       <div className="container mx-auto px-4 pt-16 pb-12 text-center">
-        <h1 className="text-4xl font-bold mb-4">Choose Your Learning Journey</h1>
+        <h1 className="text-4xl font-bold mb-4">Choose Your Plan</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Select the plan that best fits your learning needs and goals.
+          Select the plan that best fits your needs, whether you're learning or creating.
         </p>
       </div>
 
-      {/* Pricing Cards Section */}
-      <div className="container mx-auto px-4 pb-24">
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Freemium Plan */}
-          <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md">
-            <div className="p-6">
-              <h3 className="text-2xl font-bold mb-1">Freemium Learner</h3>
-              <div className="text-3xl font-bold mb-4">$0 <span className="text-base font-normal text-muted-foreground">forever</span></div>
-              <p className="text-muted-foreground mb-6">Perfect for getting started on your learning journey.</p>
-              
-              <Button variant="outline" size="lg" className="w-full mb-6" onClick={() => navigate("/auth")}>
-                Sign Up Free
-              </Button>
+      {/* Pricing Tabs */}
+      <div className="container mx-auto px-4 pb-8">
+        <Tabs defaultValue="learner" className="max-w-5xl mx-auto">
+          <TabsList className="grid grid-cols-2 w-[300px] mx-auto mb-8">
+            <TabsTrigger value="learner">Learner</TabsTrigger>
+            <TabsTrigger value="creator">Creator</TabsTrigger>
+          </TabsList>
 
-              <div className="space-y-3">
-                <PricingFeature>All courses marked as free</PricingFeature>
-                <PricingFeature>Free certificates</PricingFeature>
-                <PricingFeature>Earn tokens for learning</PricingFeature>
-                <PricingFeature>E-library access to free content</PricingFeature>
-                <PricingFeature>Free data-backed learning resources</PricingFeature>
-                <PricingFeature>Standard Mentor AI agent and voice</PricingFeature>
+          {/* Learner Plans */}
+          <TabsContent value="learner">
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {/* Freemium Plan */}
+              <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md">
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-1">Freemium Learner</h3>
+                  <div className="text-3xl font-bold mb-4">$0 <span className="text-base font-normal text-muted-foreground">forever</span></div>
+                  <p className="text-muted-foreground mb-6">Perfect for getting started on your learning journey.</p>
+                  
+                  <Button variant="outline" size="lg" className="w-full mb-6" onClick={() => navigate("/auth")}>
+                    Sign Up Free
+                  </Button>
+
+                  <div className="space-y-3">
+                    <PricingFeature>All courses marked as free</PricingFeature>
+                    <PricingFeature>Free certificates</PricingFeature>
+                    <PricingFeature>Earn tokens for learning</PricingFeature>
+                    <PricingFeature>E-library access to free content</PricingFeature>
+                    <PricingFeature>Free data-backed learning resources</PricingFeature>
+                    <PricingFeature>Standard Mentor AI agent and voice</PricingFeature>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pro Plan */}
+              <div className="border rounded-lg overflow-hidden bg-card shadow-md transition-all duration-200 hover:shadow-lg relative border-primary">
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium rounded-bl-lg">
+                  RECOMMENDED
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-1">Pro Learner</h3>
+                  <div className="text-3xl font-bold mb-1">$20 <span className="text-base font-normal text-muted-foreground">per month</span></div>
+                  <div className="text-sm text-muted-foreground mb-4">or $200 billed annually (save $40)</div>
+                  <p className="text-muted-foreground mb-6">Full access to all premium features and content.</p>
+                  
+                  <Button size="lg" className="w-full mb-6" onClick={() => navigate("/auth")}>
+                    Get Started
+                  </Button>
+
+                  <div className="space-y-3">
+                    <PricingFeature>Access to ALL courses, including premium</PricingFeature>
+                    <PricingFeature>Premium AI-enabled and data-backed courses</PricingFeature>
+                    <PricingFeature>Premium certificates</PricingFeature>
+                    <PricingFeature>Full e-library access</PricingFeature>
+                    <PricingFeature>Premium Mentor AI agent and voice</PricingFeature>
+                    <PricingFeature>Priority support</PricingFeature>
+                    <PricingFeature>Advanced learning analytics</PricingFeature>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </TabsContent>
 
-          {/* Pro Plan */}
-          <div className="border rounded-lg overflow-hidden bg-card shadow-md transition-all duration-200 hover:shadow-lg relative border-primary">
-            <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium rounded-bl-lg">
-              RECOMMENDED
-            </div>
-            <div className="p-6">
-              <h3 className="text-2xl font-bold mb-1">Pro Learner</h3>
-              <div className="text-3xl font-bold mb-1">$20 <span className="text-base font-normal text-muted-foreground">per month</span></div>
-              <div className="text-sm text-muted-foreground mb-4">or $200 billed annually (save $40)</div>
-              <p className="text-muted-foreground mb-6">Full access to all premium features and content.</p>
-              
-              <Button size="lg" className="w-full mb-6" onClick={() => navigate("/auth")}>
-                Get Started
-              </Button>
+          {/* Creator Plans */}
+          <TabsContent value="creator">
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {/* Freemium Creator Plan */}
+              <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md">
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-1">Freemium Creator</h3>
+                  <div className="text-3xl font-bold mb-4">$0 <span className="text-base font-normal text-muted-foreground">forever</span></div>
+                  <p className="text-muted-foreground mb-6">Start creating and sharing your knowledge.</p>
+                  
+                  <Button variant="outline" size="lg" className="w-full mb-6" onClick={() => navigate("/auth")}>
+                    Sign Up Free
+                  </Button>
 
-              <div className="space-y-3">
-                <PricingFeature>Access to ALL courses, including premium</PricingFeature>
-                <PricingFeature>Premium AI-enabled and data-backed courses</PricingFeature>
-                <PricingFeature>Premium certificates</PricingFeature>
-                <PricingFeature>Full e-library access</PricingFeature>
-                <PricingFeature>Premium Mentor AI agent and voice</PricingFeature>
-                <PricingFeature>Priority support</PricingFeature>
-                <PricingFeature>Advanced learning analytics</PricingFeature>
+                  <div className="space-y-3">
+                    <PricingFeature>Conduct free courses - AI enabled and data enabled</PricingFeature>
+                    <PricingFeature>Issue certificates</PricingFeature>
+                    <PricingFeature>Issue tokens to learners</PricingFeature>
+                    <PricingFeature>Create e-library content</PricingFeature>
+                    <PricingFeatureWithTooltip 
+                      feature="Get 100 tokens on signing up" 
+                      tooltip="Tokens can be used to enhance your courses with AI features"
+                    />
+                    <PricingFeatureWithTooltip 
+                      feature="No roll-over of tokens" 
+                      tooltip="Tokens expire at the end of the month if unused"
+                      isNegative
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Pro Creator Plan */}
+              <div className="border rounded-lg overflow-hidden bg-card shadow-md transition-all duration-200 hover:shadow-lg relative border-primary">
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium rounded-bl-lg">
+                  RECOMMENDED
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-1">Pro Creator</h3>
+                  <div className="text-3xl font-bold mb-1">$20 <span className="text-base font-normal text-muted-foreground">per month</span></div>
+                  <div className="text-sm text-muted-foreground mb-4">or $200 billed annually (save $40)</div>
+                  <p className="text-muted-foreground mb-6">Unlock premium features to enhance your course creation.</p>
+                  
+                  <Button size="lg" className="w-full mb-6" onClick={() => navigate("/auth")}>
+                    Get Started
+                  </Button>
+
+                  <div className="space-y-3">
+                    <PricingFeature>Conduct premium courses - AI enabled and data enabled</PricingFeature>
+                    <PricingFeature>Issue premium and blockchain-enabled certificates</PricingFeature>
+                    <PricingFeature>Issue tokens to learners</PricingFeature>
+                    <PricingFeature>Create premium e-library content</PricingFeature>
+                    <PricingFeatureWithTooltip 
+                      feature="Get 500 tokens" 
+                      tooltip="5x more tokens than the free plan for advanced AI features"
+                    />
+                    <PricingFeature>Roll-over of unused tokens</PricingFeature>
+                    <PricingFeature>Priority support for creators</PricingFeature>
+                    <PricingFeature>Advanced analytics and insights</PricingFeature>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* FAQ Section */}
-      <div className="container mx-auto px-4 pb-24">
+      <div className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           <div>
@@ -80,11 +157,11 @@ export default function PricingPage() {
           </div>
           <div>
             <h3 className="font-semibold text-lg mb-2">How do tokens work?</h3>
-            <p className="text-muted-foreground">Tokens are earned by completing courses and engaging with content. They can be redeemed for additional premium content, certificates, or discounts on your subscription.</p>
+            <p className="text-muted-foreground">Tokens are earned by completing courses and engaging with content. They can be redeemed for additional premium content, certificates, or discounts on your subscription. Creators use tokens to enhance courses with AI features.</p>
           </div>
           <div>
-            <h3 className="font-semibold text-lg mb-2">What's the difference between standard and premium AI mentor?</h3>
-            <p className="text-muted-foreground">The premium AI mentor offers more personalized guidance, advanced topic expertise, and enhanced voice capabilities for a more natural and responsive learning experience.</p>
+            <h3 className="font-semibold text-lg mb-2">What are blockchain-enabled certificates?</h3>
+            <p className="text-muted-foreground">Blockchain-enabled certificates provide an immutable record of your achievement on a blockchain, offering enhanced security and verification capabilities that standard digital certificates don't have.</p>
           </div>
           <div>
             <h3 className="font-semibold text-lg mb-2">Is there a refund policy?</h3>
@@ -101,6 +178,33 @@ function PricingFeature({ children }: { children: React.ReactNode }) {
     <div className="flex items-center">
       <Check className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
       <span>{children}</span>
+    </div>
+  );
+}
+
+function PricingFeatureWithTooltip({ 
+  feature, 
+  tooltip,
+  isNegative = false
+}: { 
+  feature: string; 
+  tooltip: string;
+  isNegative?: boolean;
+}) {
+  return (
+    <div className="flex items-center">
+      <Check className={`h-4 w-4 mr-2 flex-shrink-0 ${isNegative ? "text-muted-foreground" : "text-primary"}`} />
+      <span>{feature}</span>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-4 w-4 ml-1.5 text-muted-foreground cursor-help" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-xs">{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 }
