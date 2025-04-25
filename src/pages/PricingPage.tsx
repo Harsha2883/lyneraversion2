@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Check, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +6,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  
+  const handleEnterpriseContact = () => {
+    // Replace with your actual Google Form URL
+    window.open('https://forms.gle/yourFormURL', '_blank');
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
@@ -28,7 +32,7 @@ export default function PricingPage() {
 
           {/* Learner Plans */}
           <TabsContent value="learner">
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {/* Freemium Plan */}
               <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md">
                 <div className="p-6">
@@ -77,12 +81,35 @@ export default function PricingPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Enterprise Plan */}
+              <div className="border rounded-lg overflow-hidden bg-card shadow-md transition-all duration-200 hover:shadow-lg">
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-1">Enterprise</h3>
+                  <div className="text-3xl font-bold mb-1">Custom</div>
+                  <div className="text-sm text-muted-foreground mb-4">Tailored solutions for your organization</div>
+                  
+                  <Button onClick={handleEnterpriseContact} size="lg" className="w-full mb-6">
+                    Contact Sales
+                  </Button>
+
+                  <div className="space-y-3">
+                    <PricingFeature>All Pro features included</PricingFeature>
+                    <PricingFeature>Custom learning paths</PricingFeature>
+                    <PricingFeature>Dedicated support team</PricingFeature>
+                    <PricingFeature>Custom integrations</PricingFeature>
+                    <PricingFeature>Analytics dashboard</PricingFeature>
+                    <PricingFeature>Priority feature requests</PricingFeature>
+                    <PricingFeature>SLA guarantees</PricingFeature>
+                  </div>
+                </div>
+              </div>
             </div>
           </TabsContent>
 
           {/* Creator Plans */}
           <TabsContent value="creator">
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {/* Freemium Creator Plan */}
               <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md">
                 <div className="p-6">
@@ -139,6 +166,29 @@ export default function PricingPage() {
                     <PricingFeature>Roll-over of unused tokens</PricingFeature>
                     <PricingFeature>Priority support for creators</PricingFeature>
                     <PricingFeature>Advanced analytics and insights</PricingFeature>
+                  </div>
+                </div>
+              </div>
+
+              {/* Enterprise Creator Plan */}
+              <div className="border rounded-lg overflow-hidden bg-card shadow-md transition-all duration-200 hover:shadow-lg">
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold mb-1">Enterprise Creator</h3>
+                  <div className="text-3xl font-bold mb-1">Custom</div>
+                  <div className="text-sm text-muted-foreground mb-4">For organizations and institutions</div>
+                  
+                  <Button onClick={handleEnterpriseContact} size="lg" className="w-full mb-6">
+                    Contact Sales
+                  </Button>
+
+                  <div className="space-y-3">
+                    <PricingFeature>All Pro Creator features included</PricingFeature>
+                    <PricingFeature>Multiple admin accounts</PricingFeature>
+                    <PricingFeature>Custom branding options</PricingFeature>
+                    <PricingFeature>Advanced analytics</PricingFeature>
+                    <PricingFeature>API access</PricingFeature>
+                    <PricingFeature>Custom integrations</PricingFeature>
+                    <PricingFeature>Dedicated success manager</PricingFeature>
                   </div>
                 </div>
               </div>
