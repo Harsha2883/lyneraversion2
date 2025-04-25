@@ -1,10 +1,28 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PricingTabs } from "@/components/pricing/PricingTabs";
 import { FAQSection } from "@/components/pricing/FAQSection";
 import { PublicLayout } from "@/components/layouts/PublicLayout";
+import { toast } from "sonner";
 
 export default function PricingPage() {
+  const [searchParams] = useSearchParams();
+  
+  useEffect(() => {
+    // Check for query parameters from Stripe redirects
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    
+    if (success === 'true') {
+      toast.success("Subscription successful! Welcome to your new plan.");
+    }
+    
+    if (canceled === 'true') {
+      toast.info("Payment canceled. If you have any questions, please contact support.");
+    }
+  }, [searchParams]);
+
   return (
     <PublicLayout>
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">

@@ -80,6 +80,7 @@ export function PlanCard({
 
   const handleSubscription = async () => {
     if (!user) {
+      toast.info("Please sign in to continue");
       navigate("/auth");
       return;
     }
@@ -100,12 +101,18 @@ export function PlanCard({
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Checkout invoke error:", error);
+        throw error;
+      }
+      
       if (data?.url) {
         window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
       }
-    } catch (error) {
-      toast.error("Failed to start checkout process");
+    } catch (error: any) {
+      toast.error(`Failed to start checkout process: ${error.message || 'Unknown error'}`);
       console.error("Checkout error:", error);
     } finally {
       setLoading(false);

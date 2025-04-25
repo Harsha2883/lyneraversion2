@@ -15,21 +15,34 @@ const PRICES = {
 };
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     const { priceId, email, userId, userType } = await req.json();
+    
+    if (!priceId) {
+      throw new Error('Price ID is required');
+    }
+    
+    if (!PRICES[priceId]) {
+      throw new Error(`Invalid price ID: ${priceId}`);
+    }
 
     // Create or retrieve customer
-    const customers = await stripe.customers.list({ email });
     let customer;
     
-    if (customers.data.length) {
-      customer = customers.data[0];
+    if (email) {
+      const customers = await stripe.customers.list({ email });
+      if (customers.data.length) {
+        customer = customers.data[0];
+      } else {
+        customer = await stripe.customers.create({ email });
+      }
     } else {
-      customer = await stripe.customers.create({ email });
+      throw new Error('Email is required');
     }
 
     // Create checkout session
@@ -45,10 +58,12 @@ Deno.serve(async (req) => {
       },
     });
 
+    console.log("Checkout session created:", session.id);
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
+    console.error("Error creating checkout session:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
