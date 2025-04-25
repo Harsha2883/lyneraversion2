@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { UserNav } from "@/components/user-nav";
-import { Logo } from "@/components/logo";
+import { Logo } from "@/components/ui/logo";
 
 export function Navbar() {
   const { profile, loading } = useAuth();
