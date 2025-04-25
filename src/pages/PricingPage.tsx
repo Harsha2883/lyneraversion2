@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { PricingTabs } from "@/components/pricing/PricingTabs";
 import { FAQSection } from "@/components/pricing/FAQSection";
 import { PublicLayout } from "@/components/layouts/PublicLayout";
+import { LoadingState } from "@/components/ui/loading-state";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,7 +15,6 @@ export default function PricingPage() {
   const { user, loading } = useAuth();
   
   useEffect(() => {
-    // Check for query parameters from Stripe redirects
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
     
@@ -27,22 +27,9 @@ export default function PricingPage() {
     }
   }, [searchParams]);
 
-  if (loading) {
-    return (
-      <PublicLayout>
-        <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-pulse text-muted-foreground">Loading pricing options...</div>
-          </div>
-        </div>
-      </PublicLayout>
-    );
-  }
-
   return (
     <PublicLayout>
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-        {/* Header Section */}
         <div className="container mx-auto px-4 pt-16 pb-12 text-center">
           <h1 className="text-4xl font-bold mb-4">Choose Your Plan</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -59,14 +46,16 @@ export default function PricingPage() {
           )}
         </div>
 
-        {/* Pricing Tabs wrapped in ErrorBoundary */}
         <div className="container mx-auto px-4 pb-8">
           <ErrorBoundary>
-            <PricingTabs />
+            {loading ? (
+              <LoadingState className="py-8" />
+            ) : (
+              <PricingTabs />
+            )}
           </ErrorBoundary>
         </div>
 
-        {/* FAQ Section wrapped in ErrorBoundary */}
         <ErrorBoundary>
           <FAQSection />
         </ErrorBoundary>
