@@ -81,21 +81,17 @@ export function useAuth() {
     let authListener: any;
 
     const setupAuthListener = () => {
-      // Setup auth listener FIRST before checking current session
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         (event, currentSession) => {
           console.log("Auth state changed:", event, currentSession?.user?.id);
           
           if (!mounted) return;
 
-          // Always update the session state
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
           
-          // Only handle profile fetching and navigation after initialization
           if (initialized) {
             if (currentSession?.user) {
-              // Use setTimeout to prevent Supabase deadlocks
               setTimeout(() => {
                 if (mounted) fetchProfile(currentSession.user.id);
               }, 0);
@@ -103,10 +99,9 @@ export function useAuth() {
               setProfile(null);
             }
 
-            // Only navigate on explicit sign in/out events
             if (event === 'SIGNED_IN') {
               toast.success("Successfully signed in!");
-              navigate("/dashboard");
+              navigate("/pricing");
             } else if (event === 'SIGNED_OUT') {
               toast.success("Successfully signed out!");
               navigate("/auth");
@@ -118,13 +113,10 @@ export function useAuth() {
       return subscription;
     };
 
-    // Initialize auth state
     const initializeAuth = async () => {
       try {
-        // Setup auth listener first
         authListener = setupAuthListener();
         
-        // Then get the initial session
         const { data } = await supabase.auth.getSession();
         const initialSession = data.session;
         
@@ -153,10 +145,8 @@ export function useAuth() {
       }
     };
 
-    // Set up auth
     initializeAuth();
 
-    // Cleanup
     return () => {
       mounted = false;
       if (authListener) {
@@ -168,7 +158,6 @@ export function useAuth() {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      // Let the auth listener handle state updates and navigation
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Failed to sign out");
