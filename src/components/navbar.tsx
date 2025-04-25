@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -16,10 +17,7 @@ export function Navbar() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex items-center">
           <a href="/" className="flex items-center">
-            <Logo className="h-8 w-8 text-primary" />
-            <span className="ml-2 text-xl font-semibold">
-              LynEra
-            </span>
+            <Logo size="md" variant="full" />
           </a>
         </div>
         <div className="hidden md:flex flex-1 items-center justify-between">
