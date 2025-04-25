@@ -35,8 +35,9 @@ export function LearnerPlans() {
         priceSubtext="or $200 billed annually (save $40)"
         description="Full access to all premium features and content."
         buttonText="Get Started"
-        onButtonClick={() => navigate("/auth")}
+        onButtonClick={() => {}}
         isRecommended
+        priceId="pro-learner-monthly"
         features={[
           { text: "Access to ALL courses, including premium" },
           { text: "Premium AI-enabled and data-backed courses" },

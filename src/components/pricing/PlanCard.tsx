@@ -1,7 +1,10 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { PricingFeature, PricingFeatureWithTooltip } from './PricingFeature';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface PlanCardProps {
   title: string;
@@ -16,6 +19,7 @@ interface PlanCardProps {
   buttonText: string;
   onButtonClick: () => void;
   priceSubtext?: string;
+  priceId?: string;
 }
 
 export function PlanCard({
@@ -25,9 +29,47 @@ export function PlanCard({
   features,
   isRecommended,
   buttonText,
-  onButtonClick,
-  priceSubtext
+  priceSubtext,
+  priceId
 }: PlanCardProps) {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscription = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    if (!priceId) {
+      onButtonClick();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId,
+          email: user.email,
+          userId: user.id,
+          userType: profile?.user_type
+        }
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      toast.error("Failed to start checkout process");
+      console.error("Checkout error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={`border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md ${isRecommended ? 'border-primary relative' : ''}`}>
       {isRecommended && (
@@ -46,10 +88,11 @@ export function PlanCard({
         <Button 
           size="lg" 
           className="w-full mb-6"
-          onClick={onButtonClick}
+          onClick={handleSubscription}
           variant={title.toLowerCase().includes('freemium') ? 'outline' : 'default'}
+          disabled={loading}
         >
-          {buttonText}
+          {loading ? "Loading..." : buttonText}
         </Button>
 
         <div className="space-y-3">

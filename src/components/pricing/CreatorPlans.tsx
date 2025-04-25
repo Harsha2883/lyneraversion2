@@ -35,8 +35,9 @@ export function CreatorPlans() {
         priceSubtext="or $200 billed annually (save $40)"
         description="Unlock premium features to enhance your course creation."
         buttonText="Get Started"
-        onButtonClick={() => navigate("/auth")}
+        onButtonClick={() => {}}
         isRecommended
+        priceId="pro-creator-monthly"
         features={[
           { text: "Conduct premium courses - AI enabled and data enabled" },
           { text: "Issue premium and blockchain-enabled certificates" },
