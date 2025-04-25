@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,7 @@ import AdminSystemPage from "./pages/admin/AdminSystemPage";
 import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 import TokenManagementPage from "./pages/admin/TokenManagementPage";
 import AdminCreatorCoursesPage from "./pages/admin/AdminCreatorCoursesPage";
+import PricingPage from "./pages/PricingPage";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,7 @@ const App = () => (
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/course/:courseId" element={<CourseDetailsPage />} />
           <Route path="/admin/creator-courses" element={<AdminCreatorCoursesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

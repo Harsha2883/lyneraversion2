@@ -1,112 +1,135 @@
-
-import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/logo";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { UserNav } from "./user-nav";
-import { useAuth } from "@/hooks/useAuth";
+import { Menu, X } from "lucide-react";
 
-const routes = [
-  { name: "Home", path: "/" },
-  { name: "Courses", path: "/marketplace" },  // Updated path to /marketplace
-  { name: "For Creators", path: "/auth" },
-  { name: "For Learners", path: "/auth" },
-  { name: "About", path: "/about" },
-];
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { UserNav } from "@/components/user-nav";
+import { Logo } from "@/components/logo";
 
 export function Navbar() {
-  const { profile } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { profile, loading } = useAuth();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Logo />
-
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-6">
-          {routes.map((route) => (
-            <Link
-              key={route.path}
-              to={route.path}
-              className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-            >
-              {route.name}
-            </Link>
-          ))}
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="mr-4 flex items-center">
+          <a href="/" className="flex items-center">
+            <Logo className="h-8 w-8 text-primary" />
+            <span className="ml-2 text-xl font-semibold">
+              LynEra
+            </span>
+          </a>
         </div>
-
-        {/* Auth Buttons or User Nav */}
-        <div className="hidden md:flex items-center space-x-4">
-          {profile ? (
-            <UserNav />
+        <div className="hidden md:flex flex-1 items-center justify-between">
+          <nav className="flex items-center gap-6 text-sm">
+            <Link
+              to="/"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Home
+            </Link>
+            <Link
+              to="/marketplace"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Explore Courses
+            </Link>
+            <Link
+              to="/pricing"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Pricing
+            </Link>
+            {profile && (
+              <Link
+                to="/dashboard"
+                className="transition-colors hover:text-foreground/80 text-foreground/60"
+              >
+                Dashboard
+              </Link>
+            )}
+          </nav>
+          <div className="flex items-center gap-2">
+            {!loading && !profile ? (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" className="mr-2">Log in</Button>
+                </Link>
+                <Link to="/auth?tab=register">
+                  <Button>Sign up</Button>
+                </Link>
+              </>
+            ) : (
+              <UserNav />
+            )}
+          </div>
+        </div>
+        <div className="flex md:hidden flex-1 justify-end">
+          {mobileNavOpen ? (
+            <Button
+              variant="ghost"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <X className="h-6 w-6" />
+            </Button>
           ) : (
-            <>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/auth">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link to="/auth">Sign Up</Link>
-              </Button>
-            </>
+            <Button
+              variant="ghost"
+              onClick={() => setMobileNavOpen(true)}
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
           )}
         </div>
-
-        {/* Mobile Menu */}
-        <div className="md:hidden">
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[85%] sm:w-[350px] pt-10">
-              <div className="flex flex-col h-full">
-                <div className="flex justify-between items-center mb-8">
-                  <Logo size="sm" />
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="flex flex-col space-y-6">
-                  {routes.map((route) => (
-                    <Link
-                      key={route.path}
-                      to={route.path}
-                      className="text-base font-medium text-foreground/80 hover:text-primary transition-colors"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {route.name}
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="mt-auto pt-6 flex flex-col space-y-4">
-                  {profile ? (
-                    <UserNav />
-                  ) : (
-                    <>
-                      <Button variant="outline" className="w-full" size="lg" asChild>
-                        <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign In</Link>
-                      </Button>
-                      <Button className="w-full" size="lg" asChild>
-                        <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign Up</Link>
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
       </div>
-    </div>
+      {mobileNavOpen && (
+        <div className="md:hidden border-t p-4">
+          <nav className="space-y-4">
+            <Link
+              to="/"
+              className="block py-2"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/marketplace"
+              className="block py-2"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              Explore Courses
+            </Link>
+            <Link
+              to="/pricing"
+              className="block py-2"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              Pricing
+            </Link>
+            {profile && (
+              <Link
+                to="/dashboard"
+                className="block py-2"
+                onClick={() => setMobileNavOpen(false)}
+              >
+                Dashboard
+              </Link>
+            )}
+            {!loading && !profile ? (
+              <div className="flex flex-col gap-2 mt-4">
+                <Link to="/auth" onClick={() => setMobileNavOpen(false)}>
+                  <Button variant="outline" className="w-full">Log in</Button>
+                </Link>
+                <Link to="/auth?tab=register" onClick={() => setMobileNavOpen(false)}>
+                  <Button className="w-full">Sign up</Button>
+                </Link>
+              </div>
+            ) : null}
+          </nav>
+        </div>
+      )}
+    </header>
   );
 }

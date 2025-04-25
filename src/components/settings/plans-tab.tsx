@@ -8,31 +8,34 @@ export function PlansTab() {
   const navigate = useNavigate();
   const plans = [
     {
-      name: "Basic",
+      name: "Freemium",
       price: "Free",
       features: [
         "Access to free courses",
-        "Basic learning tools",
-        "Community support",
-      ],
-      current: false,
-    },
-    {
-      name: "Premium",
-      price: "$29.99/month",
-      features: [
-        "Access to all courses",
-        "Advanced learning tools",
-        "Priority support",
-        "Offline downloads",
-        "Certificate of completion",
+        "Free certificates",
+        "Earn tokens for learning",
+        "E-library access (free content)",
+        "Standard Mentor AI agent",
       ],
       current: true,
+    },
+    {
+      name: "Pro Learner",
+      price: "$20/month",
+      features: [
+        "Access to ALL courses",
+        "Premium AI-enabled courses",
+        "Premium certificates",
+        "Full e-library access",
+        "Premium Mentor AI agent",
+        "Priority support",
+      ],
+      current: false,
     },
   ];
 
   const handleUpgrade = () => {
-    navigate("/pricing");  // Navigate to pricing page for plan selection
+    navigate("/pricing");  // Navigate to our new pricing page
   };
 
   return (
