@@ -3,6 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LearnerPlans } from './LearnerPlans';
 import { CreatorPlans } from './CreatorPlans';
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export function PricingTabs() {
   return (
@@ -13,11 +14,15 @@ export function PricingTabs() {
       </TabsList>
 
       <TabsContent value="learner">
-        <LearnerPlans />
+        <ErrorBoundary>
+          <LearnerPlans />
+        </ErrorBoundary>
       </TabsContent>
 
       <TabsContent value="creator">
-        <CreatorPlans />
+        <ErrorBoundary>
+          <CreatorPlans />
+        </ErrorBoundary>
       </TabsContent>
     </Tabs>
   );

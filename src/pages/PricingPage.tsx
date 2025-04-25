@@ -7,6 +7,7 @@ import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function PricingPage() {
   const [searchParams] = useSearchParams();
@@ -25,6 +26,18 @@ export default function PricingPage() {
       toast.info("Payment canceled. If you have any questions, please contact support.");
     }
   }, [searchParams]);
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-pulse text-muted-foreground">Loading pricing options...</div>
+          </div>
+        </div>
+      </PublicLayout>
+    );
+  }
 
   return (
     <PublicLayout>
@@ -46,13 +59,17 @@ export default function PricingPage() {
           )}
         </div>
 
-        {/* Pricing Tabs */}
+        {/* Pricing Tabs wrapped in ErrorBoundary */}
         <div className="container mx-auto px-4 pb-8">
-          <PricingTabs />
+          <ErrorBoundary>
+            <PricingTabs />
+          </ErrorBoundary>
         </div>
 
-        {/* FAQ Section */}
-        <FAQSection />
+        {/* FAQ Section wrapped in ErrorBoundary */}
+        <ErrorBoundary>
+          <FAQSection />
+        </ErrorBoundary>
       </div>
     </PublicLayout>
   );

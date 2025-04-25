@@ -5,18 +5,18 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { UserNav } from "@/components/user-nav";
 import { Logo } from "@/components/ui/logo";
+
 export function Navbar() {
-  const {
-    profile,
-    loading
-  } = useAuth();
+  const { profile, loading } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  return <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex items-center">
-          <a href="/" className="flex items-center">
-            
-          </a>
+          <Link to="/" className="flex items-center">
+            <Logo size="md" variant="full" />
+          </Link>
         </div>
         <div className="hidden md:flex flex-1 items-center justify-between">
           <nav className="flex items-center gap-6 text-sm">
@@ -76,5 +76,6 @@ export function Navbar() {
               </div> : null}
           </nav>
         </div>}
-    </header>;
+    </header>
+  );
 }
