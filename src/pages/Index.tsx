@@ -1,26 +1,17 @@
 
-import { AISection } from "@/components/ai-section";
-import { CourseCategories } from "@/components/course-categories";
-import { CoursesSection } from "@/components/courses-section";
-import { FeaturesSection } from "@/components/features-section";
-import { Footer } from "@/components/footer";
 import { HeroSection } from "@/components/hero-section";
-import { Navbar } from "@/components/navbar";
+import { FeaturesSection } from "@/components/features-section";
+import { CoursesSection } from "@/components/courses-section";
+import { PublicLayout } from "@/components/layouts/PublicLayout";
 
-const Index = () => {
+export default function Index() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1">
+    <PublicLayout>
+      <main>
         <HeroSection />
         <FeaturesSection />
-        <CourseCategories />
         <CoursesSection />
-        <AISection />
       </main>
-      <Footer />
-    </div>
+    </PublicLayout>
   );
-};
-
-export default Index;
+}
