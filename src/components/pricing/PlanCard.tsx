@@ -6,8 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Check, Info } from "lucide-react";
+import { Check, Info, AlertCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface PlanCardProps {
   title: string;
@@ -77,8 +78,12 @@ export function PlanCard({
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubscription = async () => {
+    // Clear previous errors
+    setError(null);
+    
     if (!user) {
       toast.info("Please sign in to continue");
       navigate("/auth");
@@ -92,27 +97,44 @@ export function PlanCard({
 
     setLoading(true);
     try {
+      console.log(`Starting checkout process for ${priceId}`);
+      
+      const requestData = {
+        priceId,
+        email: user.email,
+        userId: user.id,
+        userType: profile?.user_type
+      };
+      
+      console.log("Sending request data:", requestData);
+      
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          priceId,
-          email: user.email,
-          userId: user.id,
-          userType: profile?.user_type
-        }
+        body: requestData
       });
 
       if (error) {
         console.error("Checkout invoke error:", error);
-        throw error;
+        throw new Error(`Invoke error: ${error.message || JSON.stringify(error)}`);
+      }
+      
+      if (!data) {
+        throw new Error('No data returned from checkout function');
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
       }
       
       if (data?.url) {
+        console.log("Redirecting to checkout URL:", data.url);
         window.location.href = data.url;
       } else {
         throw new Error('No checkout URL returned');
       }
     } catch (error: any) {
-      toast.error(`Failed to start checkout process: ${error.message || 'Unknown error'}`);
+      const errorMessage = error.message || 'Unknown error';
+      setError(errorMessage);
+      toast.error(`Failed to start checkout process: ${errorMessage}`);
       console.error("Checkout error:", error);
     } finally {
       setLoading(false);
@@ -134,6 +156,14 @@ export function PlanCard({
         )}
         <p className="text-muted-foreground mb-6">{description}</p>
         
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <Button 
           size="lg" 
           className="w-full mb-6"
@@ -141,7 +171,7 @@ export function PlanCard({
           variant={title.toLowerCase().includes('freemium') ? 'outline' : 'default'}
           disabled={loading}
         >
-          {loading ? "Loading..." : buttonText}
+          {loading ? "Processing..." : buttonText}
         </Button>
 
         <div className="space-y-3">

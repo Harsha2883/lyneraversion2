@@ -5,9 +5,12 @@ import { PricingTabs } from "@/components/pricing/PricingTabs";
 import { FAQSection } from "@/components/pricing/FAQSection";
 import { PublicLayout } from "@/components/layouts/PublicLayout";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function PricingPage() {
   const [searchParams] = useSearchParams();
+  const { user, loading } = useAuth();
   
   useEffect(() => {
     // Check for query parameters from Stripe redirects
@@ -32,6 +35,15 @@ export default function PricingPage() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Select the plan that best fits your needs, whether you're learning or creating.
           </p>
+          
+          {!loading && !user && (
+            <Alert className="mt-6 mx-auto max-w-2xl">
+              <AlertDescription>
+                You'll need to sign in before subscribing to a plan. 
+                You can explore the plans below and will be prompted to sign in when you select one.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         {/* Pricing Tabs */}

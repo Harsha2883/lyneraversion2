@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -8,13 +7,21 @@ interface BillingToggleProps {
 }
 
 export function BillingToggle({ value, onValueChange }: BillingToggleProps) {
+  const handleValueChange = (val: string) => {
+    if (val) {
+      onValueChange(val as 'monthly' | 'annual');
+    } else {
+      console.log("Prevented toggle from having no selection");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center gap-2 mb-8">
       <div className="text-sm text-muted-foreground">Choose billing period</div>
       <ToggleGroup
         type="single"
         value={value}
-        onValueChange={(val) => val && onValueChange(val as 'monthly' | 'annual')}
+        onValueChange={handleValueChange}
         className="bg-muted p-1 rounded-lg"
       >
         <ToggleGroupItem value="monthly" className="px-6">Monthly</ToggleGroupItem>
