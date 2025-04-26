@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +25,6 @@ interface PlanCardProps {
   priceId?: string;
 }
 
-// Component for displaying a feature with a tooltip
 function PricingFeatureWithTooltip({ 
   feature, 
   tooltip,
@@ -54,7 +52,6 @@ function PricingFeatureWithTooltip({
   );
 }
 
-// Component for displaying a simple feature
 function PricingFeature({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center">
@@ -81,7 +78,6 @@ export function PlanCard({
   const [error, setError] = useState<string | null>(null);
 
   const handleSubscription = async () => {
-    // Clear previous errors
     setError(null);
     
     if (!user) {
@@ -99,26 +95,22 @@ export function PlanCard({
     try {
       console.log(`Starting checkout process for ${priceId}`);
       
-      const requestData = {
-        priceId,
-        email: user.email,
-        userId: user.id,
-        userType: profile?.user_type
-      };
-      
-      console.log("Sending request data:", requestData);
-      
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: requestData
+      const { data, error: invokeError } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId,
+          email: user.email,
+          userId: user.id,
+          userType: profile?.user_type
+        }
       });
 
-      if (error) {
-        console.error("Checkout invoke error:", error);
-        throw new Error(`Invoke error: ${error.message || JSON.stringify(error)}`);
+      if (invokeError) {
+        console.error("Checkout invoke error:", invokeError);
+        throw new Error(`Failed to start checkout: ${invokeError.message || 'Unknown error'}`);
       }
       
       if (!data) {
-        throw new Error('No data returned from checkout function');
+        throw new Error('No response from checkout function');
       }
       
       if (data.error) {

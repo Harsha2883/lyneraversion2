@@ -23,6 +23,13 @@ Deno.serve(async (req) => {
 
   try {
     console.log("Processing checkout request");
+
+    // Validate auth header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing authorization header');
+    }
+
     const { priceId, email, userId, userType } = await req.json();
     
     // Enhanced validation
