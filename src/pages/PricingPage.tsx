@@ -23,11 +23,20 @@ export default function PricingPage() {
     const canceled = searchParams.get('canceled');
     
     if (success === 'true') {
-      toast.success("Subscription successful! Welcome to your new plan.");
+      toast.success("Subscription successful! Welcome to your new plan.", {
+        duration: 6000,
+        id: "subscription-success" // Prevent duplicates
+      });
+      
+      // Could trigger a refresh of user subscription data here if needed
+      console.log("Subscription successful, refreshing user data...");
     }
     
     if (canceled === 'true') {
-      toast.info("Payment canceled. If you have any questions, please contact support.");
+      toast.info("Payment canceled. If you have any questions, please contact support.", {
+        duration: 6000,
+        id: "subscription-canceled" // Prevent duplicates
+      });
     }
 
     // Cleanup smooth scrolling
