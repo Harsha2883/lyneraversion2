@@ -5,6 +5,7 @@ import { EBookConversationHeader } from "./conversation/EBookConversationHeader"
 import { EBookChatSection } from "./conversation/EBookChatSection";
 import { EBookPlayerControls } from "./conversation/EBookPlayerControls";
 import { useAIChat } from "@/hooks/use-ai-chat";
+import { Button } from "@/components/ui/button";
 
 interface EBookConversationProps {
   book: EBook;
