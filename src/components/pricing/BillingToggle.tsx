@@ -4,7 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { CalendarDays, CalendarMonth } from "lucide-react";
+import { CalendarDays, CalendarDays as MonthlyIcon } from "lucide-react";
 
 interface BillingToggleProps {
   value: 'monthly' | 'annual';
@@ -51,7 +51,7 @@ export function BillingToggle({ value, onValueChange }: BillingToggleProps) {
             className="px-6 gap-2" 
             aria-label="Monthly billing"
           >
-            <CalendarMonth className="h-4 w-4" />
+            <MonthlyIcon className="h-4 w-4" />
             Monthly
           </ToggleGroupItem>
           <ToggleGroupItem 
