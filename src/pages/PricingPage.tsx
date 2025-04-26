@@ -9,12 +9,16 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { PricingNavigation } from "@/components/pricing/PricingNavigation";
 
 export default function PricingPage() {
   const [searchParams] = useSearchParams();
   const { user, loading } = useAuth();
   
   useEffect(() => {
+    // Add smooth scrolling behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
     
@@ -25,10 +29,16 @@ export default function PricingPage() {
     if (canceled === 'true') {
       toast.info("Payment canceled. If you have any questions, please contact support.");
     }
+
+    // Cleanup smooth scrolling
+    return () => {
+      document.documentElement.style.scrollBehavior = '';
+    };
   }, [searchParams]);
 
   return (
     <PublicLayout>
+      <PricingNavigation />
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
         <div className="container mx-auto px-4 pt-16 pb-12 text-center">
           <h1 className="text-4xl font-bold mb-4">Choose Your Plan</h1>
@@ -51,13 +61,17 @@ export default function PricingPage() {
             {loading ? (
               <LoadingState className="py-8" />
             ) : (
-              <PricingTabs />
+              <div id="pricing-tabs">
+                <PricingTabs />
+              </div>
             )}
           </ErrorBoundary>
         </div>
 
         <ErrorBoundary>
-          <FAQSection />
+          <div id="faq">
+            <FAQSection />
+          </div>
         </ErrorBoundary>
       </div>
     </PublicLayout>

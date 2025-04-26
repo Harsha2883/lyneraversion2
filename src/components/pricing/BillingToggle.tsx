@@ -4,6 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { CalendarDays, CalendarMonth } from "lucide-react";
 
 interface BillingToggleProps {
   value: 'monthly' | 'annual';
@@ -36,7 +37,7 @@ export function BillingToggle({ value, onValueChange }: BillingToggleProps) {
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col items-center gap-2 mb-8">
+      <div id="billing-toggle" className="flex flex-col items-center gap-4 mb-8 p-4 rounded-lg bg-secondary/50">
         <div className="text-sm text-muted-foreground">Choose billing period</div>
         <ToggleGroup
           type="single"
@@ -47,22 +48,27 @@ export function BillingToggle({ value, onValueChange }: BillingToggleProps) {
         >
           <ToggleGroupItem 
             value="monthly" 
-            className="px-6" 
+            className="px-6 gap-2" 
             aria-label="Monthly billing"
           >
+            <CalendarMonth className="h-4 w-4" />
             Monthly
           </ToggleGroupItem>
           <ToggleGroupItem 
             value="annual" 
-            className="px-6" 
+            className="px-6 gap-2" 
             aria-label="Annual billing"
           >
+            <CalendarDays className="h-4 w-4" />
             Annual
             <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
               Save 20%
             </span>
           </ToggleGroupItem>
         </ToggleGroup>
+        <p className="text-xs text-muted-foreground mt-2">
+          {value === 'annual' ? 'Save 20% with annual billing' : 'Switch to annual billing to save 20%'}
+        </p>
       </div>
     </ErrorBoundary>
   );
