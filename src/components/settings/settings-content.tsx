@@ -1,9 +1,8 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PaymentsTab } from "./payments-tab";
 import { PlansTab } from "./plans-tab";
 import { PrivacyPolicy } from "./privacy-policy";
-import { CodeOfConduct } from "./code-of-conduct";
+import { CodeOfConductTab } from "./code-of-conduct";
 import { BillingHistory } from "./billing-history";
 import { CheckSubscription } from "./check-subscription";
 
@@ -39,7 +38,7 @@ export function SettingsContent() {
       </TabsContent>
       
       <TabsContent value="conduct" className="space-y-4">
-        <CodeOfConduct />
+        <CodeOfConductTab />
       </TabsContent>
     </Tabs>
   );
