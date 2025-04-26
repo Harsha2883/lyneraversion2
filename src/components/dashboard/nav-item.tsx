@@ -14,10 +14,10 @@ export function NavItem({ item, onLogout }: NavItemProps) {
   const location = useLocation();
   const Icon = item.icon;
   
-  const handleClick = () => {
+  const handleClick = async () => {
     // If it's a logout item and onLogout is provided
     if (item.isLogout && onLogout) {
-      onLogout();
+      await onLogout();
       toast.success("Successfully logged out!");
     }
   };

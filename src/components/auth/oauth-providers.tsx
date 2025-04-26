@@ -18,7 +18,11 @@ export function OAuthProviders({ variant = "login" }: OAuthProviderProps) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: window.location.origin + "/dashboard"
+          redirectTo: window.location.origin + "/dashboard",
+          // Essential to pass query params to track provider and prevent redirect errors
+          queryParams: provider === 'linkedin_oidc' ? {
+            scope: 'openid profile email',
+          } : undefined
         }
       });
 
