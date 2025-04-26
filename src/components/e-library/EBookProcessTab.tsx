@@ -1,8 +1,9 @@
 
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, Volume } from "lucide-react";
 import { ChatMessages } from "@/components/conversational-ai/chat/chat-messages";
 import { ChatInput } from "@/components/conversational-ai/chat/chat-input";
 import { Message } from "@/hooks/use-ai-chat";
+import { Button } from "@/components/ui/button";
 import { EBook } from "./types/e-library-types";
 
 interface EBookProcessTabProps {
@@ -10,6 +11,8 @@ interface EBookProcessTabProps {
   messages: Message[];
   isLoading: boolean;
   inputMessage: string;
+  hasAudio?: boolean;
+  onPlayAudio?: () => void;
   setInputMessage: (value: string) => void;
   sendMessage: (msg: string) => void;
 }
@@ -19,6 +22,8 @@ export function EBookProcessTab({
   messages,
   isLoading,
   inputMessage,
+  hasAudio = false,
+  onPlayAudio,
   setInputMessage,
   sendMessage
 }: EBookProcessTabProps) {
@@ -36,6 +41,22 @@ export function EBookProcessTab({
           </p>
         </div>
       </div>
+      
+      <div className="flex justify-between items-center mb-1">
+        <h3 className="text-sm font-medium">AI Reading Assistant (GPT-4o)</h3>
+        {hasAudio && onPlayAudio && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onPlayAudio}
+            className="flex items-center gap-1"
+          >
+            <Volume className="h-4 w-4" />
+            Play Audio
+          </Button>
+        )}
+      </div>
+      
       <ChatMessages messages={messages} isLoading={isLoading} />
       <ChatInput 
         inputMessage={inputMessage}

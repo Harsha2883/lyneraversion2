@@ -9,3 +9,10 @@ verify_jwt = true
 
 [functions."check-subscription"]
 verify_jwt = true
+
+[functions."ai-course"]
+verify_jwt = true
+
+[functions."ai-assistant"]
+verify_jwt = true
+

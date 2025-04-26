@@ -3,47 +3,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Leaf, SendIcon, User } from "lucide-react";
-import { useState } from "react";
-
-interface Message {
-  id: string;
-  content: string;
-  role: "user" | "assistant";
-}
+import { Leaf, User, Mic, MicOff, Volume } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useAIChat } from "@/hooks/use-ai-chat";
 
 export function AIChat() {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content: "Hello! I'm your sustainability learning assistant. How can I help you learn today?",
-      role: "assistant",
-    },
-  ]);
+  const { 
+    messages, 
+    inputMessage, 
+    isLoading, 
+    isListening,
+    audioUrl,
+    sendMessage, 
+    setInputMessage,
+    startListening,
+    stopListening,
+    playAudioResponse
+  } = useAIChat(undefined, { contextType: "general", voiceEnabled: true });
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim()) return;
-
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: input,
-      role: "user",
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "This is a simulated response. In a real implementation, this would connect to an AI service to provide relevant sustainability knowledge.",
-        role: "assistant",
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    }, 1000);
+    if (inputMessage.trim()) {
+      sendMessage(inputMessage);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -52,12 +40,20 @@ export function AIChat() {
     }
   };
 
+  const handleVoiceToggle = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   return (
     <Card className="w-full h-[500px] flex flex-col">
       <CardHeader className="bg-primary/5 border-b">
         <CardTitle className="text-base flex items-center gap-2">
           <Leaf className="h-5 w-5 text-primary" />
-          Sustainability Learning Assistant
+          Sustainability Learning Assistant (GPT-4o)
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-4 flex flex-col">
@@ -90,6 +86,16 @@ export function AIChat() {
                   }`}
                 >
                   <p className="text-sm">{message.content}</p>
+                  {message.role === "assistant" && message.audio && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 mt-1"
+                      onClick={playAudioResponse}
+                    >
+                      <Volume className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
                 {message.role === "user" && (
                   <Avatar className="h-8 w-8 ml-2">
@@ -102,18 +108,35 @@ export function AIChat() {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       </CardContent>
       <div className="p-4 border-t flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleVoiceToggle}
+          className={isListening ? "bg-red-100" : ""}
+        >
+          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+        </Button>
         <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask anything about sustainability..."
           className="flex-1"
+          disabled={isListening}
         />
-        <Button size="icon" onClick={handleSend} disabled={!input.trim()}>
-          <SendIcon className="h-4 w-4" />
+        <Button size="icon" onClick={handleSend} disabled={!inputMessage.trim() || isLoading}>
+          {isLoading ? (
+            <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+              <path d="m3 3 3 9-3 9 19-9z"></path>
+              <path d="M6 12h16"></path>
+            </svg>
+          )}
         </Button>
       </div>
     </Card>

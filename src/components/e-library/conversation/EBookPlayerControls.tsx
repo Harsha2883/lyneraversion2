@@ -1,27 +1,39 @@
 
-import React from "react";
-import { Pause, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Volume } from "lucide-react";
 
-interface PlayerControlsProps {
+interface EBookPlayerControlsProps {
   isPlaying: boolean;
   onPlayPause: () => void;
+  hasAudio?: boolean;
+  onPlayAudio?: () => void;
 }
 
-export function EBookPlayerControls({ isPlaying, onPlayPause }: PlayerControlsProps) {
+export function EBookPlayerControls({ 
+  isPlaying, 
+  onPlayPause,
+  hasAudio = false,
+  onPlayAudio
+}: EBookPlayerControlsProps) {
   return (
-    <div className="aspect-video bg-muted rounded-md flex items-center justify-center mb-4">
-      <div className="text-center space-y-4">
-        <button onClick={onPlayPause} aria-label={isPlaying ? "Pause" : "Play"}>
-          {isPlaying ? (
-            <Pause className="h-16 w-16 text-primary mx-auto" />
-          ) : (
-            <Play className="h-16 w-16 text-primary mx-auto" />
-          )}
-        </button>
-        <p className="text-muted-foreground">
-          {isPlaying ? "Playing book content..." : "Click play to start listening"}
-        </p>
-      </div>
+    <div className="flex justify-between items-center mb-4">
+      <Button
+        variant={isPlaying ? "secondary" : "default"}
+        onClick={onPlayPause}
+      >
+        {isPlaying ? "Pause" : "Start Reading"}
+      </Button>
+      
+      {hasAudio && onPlayAudio && (
+        <Button 
+          variant="outline" 
+          onClick={onPlayAudio}
+          className="flex items-center gap-2"
+        >
+          <Volume className="h-4 w-4" />
+          Play AI Response
+        </Button>
+      )}
     </div>
   );
 }

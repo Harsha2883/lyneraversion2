@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Volume } from "lucide-react";
 import { toast } from "sonner";
 import { ProcessTab } from "./learning/process-tab";
 import { LearningHistoryTab } from "./learning/learning-history-tab";
@@ -23,9 +23,11 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
     messages, 
     inputMessage, 
     isLoading, 
+    audioUrl,
     sendMessage, 
-    setInputMessage 
-  } = useAIChat(courseId);
+    setInputMessage,
+    playAudioResponse 
+  } = useAIChat(courseId, { contextType: "course", voiceEnabled: true });
   
   const {
     isPlaying,
@@ -51,6 +53,16 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
     return stopped;
   };
 
+  // Function to play the latest audio response
+  const handlePlayLatestAudio = () => {
+    if (audioUrl) {
+      playAudioResponse();
+      toast.success("Playing audio response");
+    } else {
+      toast.info("No audio response available");
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
@@ -58,6 +70,17 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h2 className="text-xl font-semibold">Course Dashboard</h2>
+        {audioUrl && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handlePlayLatestAudio}
+            className="ml-auto flex items-center gap-1"
+          >
+            <Volume className="h-4 w-4" />
+            Play Audio
+          </Button>
+        )}
       </div>
 
       <Card className="border">
@@ -84,6 +107,8 @@ export function ProcessPlayDashboard({ courseId, onBack }: ProcessPlayDashboardP
               isLoading={isLoading}
               setInputMessage={setInputMessage}
               sendMessage={sendMessage}
+              hasAudio={!!audioUrl}
+              onPlayAudio={handlePlayLatestAudio}
             />
           </TabsContent>
           
