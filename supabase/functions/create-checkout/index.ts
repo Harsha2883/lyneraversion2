@@ -3,7 +3,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno"
 import { corsHeaders } from "../_shared/cors.ts"
 
-// Initialize Stripe with API key and configure HTTP client
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
@@ -17,8 +16,8 @@ const PRICES = {
   'pro-creator-annual': 'price_1RHjyJCYeyFKliob2mUDSPLm'
 };
 
-serve(async (req) => {
-  // CORS preflight handling
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -26,13 +25,12 @@ serve(async (req) => {
   try {
     console.log("Processing checkout request");
 
-    // Validate auth header - this is crucial for security
+    // Validate auth header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('Missing authorization header');
     }
 
-    // Parse request body and validate required fields
     const { priceId, email, userId, userType } = await req.json();
     
     // Enhanced validation
@@ -48,10 +46,10 @@ serve(async (req) => {
       throw new Error('Email is required');
     }
 
-    // Log the provided information for debugging
+    // Log the provided information
     console.log(`Creating checkout for ${email}, priceId: ${priceId}, userId: ${userId || 'none'}`);
     
-    // Create or retrieve customer with better error handling
+    // Create or retrieve customer
     let customer;
     try {
       const customers = await stripe.customers.list({ email });
@@ -67,7 +65,7 @@ serve(async (req) => {
       throw new Error(`Failed to process customer: ${stripeError.message}`);
     }
 
-    // Create checkout session with enhanced error handling
+    // Create checkout session with better error handling
     try {
       const sessionConfig = {
         customer: customer.id,
@@ -81,7 +79,6 @@ serve(async (req) => {
         },
       };
       
-      // Log the config for debugging
       console.log("Creating checkout session with config:", JSON.stringify(sessionConfig));
       const session = await stripe.checkout.sessions.create(sessionConfig);
 

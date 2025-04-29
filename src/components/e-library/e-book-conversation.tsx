@@ -1,87 +1,78 @@
 
 import React, { useState } from "react";
 import { EBook } from "./types/e-library-types";
+import { Message } from "@/hooks/use-ai-chat";
 import { EBookConversationHeader } from "./conversation/EBookConversationHeader";
 import { EBookChatSection } from "./conversation/EBookChatSection";
 import { EBookPlayerControls } from "./conversation/EBookPlayerControls";
-import { useAIChat } from "@/hooks/use-ai-chat";
-import { Button } from "@/components/ui/button";
 
 interface EBookConversationProps {
   book: EBook;
+  initialMessages?: Message[];
   onBack?: () => void;
 }
 
-export function EBookConversation({ book, onBack }: EBookConversationProps) {
+export function EBookConversation({ book, initialMessages = [], onBack }: EBookConversationProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  
-  const { 
-    messages, 
-    inputMessage, 
-    isLoading, 
-    audioUrl,
-    sendMessage, 
-    setInputMessage,
-    playAudioResponse 
-  } = useAIChat(book.id, { contextType: "ebook", voiceEnabled: true });
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePlayPause = () => setIsPlaying((prev) => !prev);
 
-  const stopPlayback = () => {
-    setIsPlaying(false);
-  };
-
-  const [isRecording, setIsRecording] = useState(false);
-
-  const toggleRecording = async () => {
-    setIsRecording(prev => !prev);
-    // In a real implementation, this would start/stop voice recording
-    // and process the audio to text
-    return !isRecording; // Return new state
-  };
-
-  const emailNotes = () => {
-    // In a real implementation, this would email the notes
-    alert("Notes emailed successfully!");
+  const sendMessage = (msg: string) => {
+    if (!msg.trim()) return;
+    setIsLoading(true);
+    
+    // Create a message with the timestamp as a Date object instead of a string
+    const newUserMessage: Message = { 
+      id: Date.now().toString(), 
+      content: msg, 
+      role: "user",
+      timestamp: new Date() // Changed from string to Date object
+    };
+    
+    setMessages((prev) => [...prev, newUserMessage]);
+    
+    // Simulate AI reply (replace with real API)
+    setTimeout(() => {
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(), 
+        content: "AI response...", 
+        role: "assistant",
+        timestamp: new Date() // Changed from string to Date object
+      };
+      
+      setMessages((prev) => [...prev, aiMessage]);
+      setIsLoading(false);
+    }, 1000);
+    
+    setInputMessage("");
   };
 
   return (
     <div className="max-w-3xl mx-auto bg-background rounded-lg shadow">
       <EBookConversationHeader book={book} />
       <div className="p-4">
-        <EBookPlayerControls 
-          isPlaying={isPlaying} 
-          onPlayPause={handlePlayPause} 
-          hasAudio={!!audioUrl}
-          onPlayAudio={playAudioResponse}
-        />
+        <EBookPlayerControls isPlaying={isPlaying} onPlayPause={handlePlayPause} />
         <EBookChatSection
           messages={messages}
           isLoading={isLoading}
           inputMessage={inputMessage}
           setInputMessage={setInputMessage}
           sendMessage={sendMessage}
-          hasAudio={!!audioUrl}
-          onPlayAudio={playAudioResponse}
         />
       </div>
-      <div className="border-t p-4">
-        <div className="flex justify-between">
-          <Button 
-            variant="outline"
+      {onBack && (
+        <div className="p-4 border-t">
+          <button 
             onClick={onBack}
-            className="text-primary"
+            className="text-primary hover:underline"
           >
             ← Back to Books
-          </Button>
-          <Button
-            variant="outline"
-            onClick={emailNotes}
-          >
-            Email Notes
-          </Button>
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
