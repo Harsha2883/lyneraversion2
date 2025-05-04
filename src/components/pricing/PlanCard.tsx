@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PlanHeader } from "./PlanHeader";
 import { PlanErrorAlert } from "./PlanErrorAlert";
 import { SubscriptionButton } from "./SubscriptionButton";
 import { PlanFeaturesList } from "./PlanFeaturesList";
-import { supabase } from "@/integrations/supabase/client";
 
 interface PlanCardProps {
   title: string;
@@ -59,13 +59,17 @@ export function PlanCard({
     setLoading(true);
     try {
       console.log(`Starting checkout process for ${priceId}`);
+      console.log("User authenticated:", !!user);
+      console.log("User profile:", profile);
+      console.log("Session exists:", !!session);
       
       if (!session) {
         throw new Error('No active session found. Please log in again.');
       }
 
       const accessToken = session.access_token;
-      
+      console.log("Using access token for authorization");
+
       const { data, error: invokeError } = await supabase.functions.invoke('create-checkout', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -78,7 +82,10 @@ export function PlanCard({
         }
       });
 
+      console.log("Checkout function response:", data, invokeError);
+
       if (invokeError) {
+        console.error("Checkout invoke error:", invokeError);
         throw new Error(`Failed to start checkout: ${invokeError.message || 'Unknown error'}`);
       }
       

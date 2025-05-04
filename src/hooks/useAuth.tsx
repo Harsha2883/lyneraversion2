@@ -1,5 +1,4 @@
-
-import { useEffect, useState, createContext, useContext, ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -23,43 +22,22 @@ export interface Profile {
   total_reviews?: number;
 }
 
-export interface SubscriptionInfo {
-  subscribed: boolean;
-  subscription_tier?: string;
-  subscription_end?: string;
-  subscription_id?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  profile: Profile | null;
-  subscription: SubscriptionInfo | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<Profile | null>;
-  checkSubscription: () => Promise<SubscriptionInfo | null>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log("Fetching profile for user:", userId);
+      
       if (!userId) {
         console.error("Invalid user ID provided to fetchProfile");
         return null;
       }
-      
-      console.log("Fetching profile for user:", userId);
       
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -72,8 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       
+      console.log("Profile data received:", profile);
+      
       if (profile) {
-        console.log("Profile found:", profile.user_type);
         setProfile(profile);
         return profile;
       } else {
@@ -83,39 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load user profile");
-      return null;
-    }
-  };
-
-  const checkSubscription = async (): Promise<SubscriptionInfo | null> => {
-    if (!user || !session) {
-      console.warn("Cannot check subscription: No authenticated user");
-      return null;
-    }
-
-    try {
-      console.log("Checking subscription status for user:", user.id);
-      
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: {
-          email: user.email,
-          userId: user.id
-        }
-      });
-      
-      if (error) {
-        console.error("Error checking subscription:", error);
-        throw new Error(error.message);
-      }
-      
-      console.log("Subscription status:", data);
-      setSubscription(data);
-      return data;
-    } catch (error) {
-      console.error("Error checking subscription:", error);
       return null;
     }
   };
@@ -135,11 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let authListener: any;
 
     const setupAuthListener = () => {
-      console.log("Setting up auth listener");
-      
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, currentSession) => {
-          console.log("Auth state changed:", event, currentSession?.user?.id ? "User signed in" : "No user");
+        (event, currentSession) => {
+          console.log("Auth state changed:", event, currentSession?.user?.id);
           
           if (!mounted) return;
 
@@ -148,29 +92,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           if (initialized) {
             if (currentSession?.user) {
-              // Use setTimeout to prevent Supabase auth deadlock
               setTimeout(() => {
-                if (mounted) {
-                  fetchProfile(currentSession.user.id);
-                  checkSubscription();
-                }
+                if (mounted) fetchProfile(currentSession.user.id);
               }, 0);
             } else {
               setProfile(null);
-              setSubscription(null);
             }
 
             if (event === 'SIGNED_IN') {
               toast.success("Successfully signed in!");
-              const redirectPath = localStorage.getItem("redirectAfterAuth");
-              if (redirectPath) {
-                console.log("Found redirect path after auth:", redirectPath);
-                localStorage.removeItem("redirectAfterAuth");
-                navigate(redirectPath);
-              } else {
-                console.log("No redirect path found, going to dashboard");
-                navigate("/dashboard");
-              }
+              navigate("/pricing");
             } else if (event === 'SIGNED_OUT') {
               toast.success("Successfully signed out!");
               navigate("/auth");
@@ -184,7 +115,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        console.log("Initializing auth");
         authListener = setupAuthListener();
         
         const { data } = await supabase.auth.getSession();
@@ -198,23 +128,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           if (initialSession?.user) {
             await fetchProfile(initialSession.user.id);
-            await checkSubscription();
           } else {
             console.log("No active session found during initialization");
-            
-            // Check current route
-            const currentPath = window.location.pathname;
-            console.log("Current path:", currentPath);
-            
-            // Redirect to auth if not already there and not on public paths
-            if (currentPath !== "/auth" && 
-                !currentPath.startsWith("/auth") && 
-                currentPath !== "/" && 
-                !currentPath.startsWith("/pricing")) {
-              console.log("No active session, redirecting to auth");
-              localStorage.setItem("redirectAfterAuth", currentPath);
-              navigate("/auth");
-            }
           }
           
           setLoading(false);
@@ -242,36 +157,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log("Signing out");
       await supabase.auth.signOut();
-      setProfile(null);
-      setSubscription(null);
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Failed to sign out");
     }
   };
 
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      session, 
-      profile, 
-      subscription,
-      loading, 
-      signOut, 
-      refreshProfile,
-      checkSubscription
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return { user, profile, session, loading, signOut, refreshProfile };
 }
