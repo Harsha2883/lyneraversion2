@@ -27,8 +27,8 @@ export function LoginForm() {
       return storedRedirect;
     }
     
-    // Default to pricing page if no redirect is specified
-    return "/pricing";
+    // Default to dashboard if no redirect is specified
+    return "/dashboard";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

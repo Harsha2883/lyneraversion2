@@ -1,9 +1,22 @@
 
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthTabs } from "@/components/auth/auth-tabs";
 import { Logo } from "@/components/ui/logo";
 import { Earth, Leaf, Recycle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const AuthPage = () => {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is already authenticated, redirect to dashboard
+    if (user && profile) {
+      navigate("/dashboard");
+    }
+  }, [user, profile, navigate]);
+
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       {/* Left Side - Auth Form */}

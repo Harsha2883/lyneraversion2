@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,7 +102,8 @@ export function useAuth() {
 
             if (event === 'SIGNED_IN') {
               toast.success("Successfully signed in!");
-              navigate("/pricing");
+              // Redirect to dashboard after signing in
+              navigate("/dashboard");
             } else if (event === 'SIGNED_OUT') {
               toast.success("Successfully signed out!");
               navigate("/auth");
