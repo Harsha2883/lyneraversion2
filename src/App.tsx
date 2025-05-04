@@ -28,41 +28,44 @@ import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 import TokenManagementPage from "./pages/admin/TokenManagementPage";
 import AdminCreatorCoursesPage from "./pages/admin/AdminCreatorCoursesPage";
 import PricingPage from "./pages/PricingPage";
+import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/dashboard/carbon" element={<CarbonFootprintPage />} />
-          <Route path="/dashboard/ai" element={<ConversationalAIPage />} />
-          <Route path="/dashboard/journey" element={<LearningJourneyPage />} />
-          <Route path="/dashboard/library" element={<ELibraryPage />} />
-          <Route path="/dashboard/profile" element={<ProfilePage />} />
-          <Route path="/dashboard/settings" element={<SettingsPage />} />
-          <Route path="/dashboard/create-course" element={<CreateCoursePage />} />
-          <Route path="/dashboard/courses-published" element={<CoursesPublishedPage />} />
-          <Route path="/dashboard/creator-e-library" element={<CreatorELibraryPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/creators" element={<AdminCreatorsPage />} />
-          <Route path="/admin/learners" element={<AdminLearnersPage />} />
-          <Route path="/admin/system" element={<AdminSystemPage />} />
-          <Route path="/admin/courses" element={<AdminCoursesPage />} />
-          <Route path="/admin/tokens" element={<TokenManagementPage />} />
-          <Route path="/dashboard/creator-journey" element={<CreatorJourneyPage />} />
-          <Route path="/marketplace" element={<MarketplacePage />} />
-          <Route path="/course/:courseId" element={<CourseDetailsPage />} />
-          <Route path="/admin/creator-courses" element={<AdminCreatorCoursesPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/carbon" element={<CarbonFootprintPage />} />
+            <Route path="/dashboard/ai" element={<ConversationalAIPage />} />
+            <Route path="/dashboard/journey" element={<LearningJourneyPage />} />
+            <Route path="/dashboard/library" element={<ELibraryPage />} />
+            <Route path="/dashboard/profile" element={<ProfilePage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
+            <Route path="/dashboard/create-course" element={<CreateCoursePage />} />
+            <Route path="/dashboard/courses-published" element={<CoursesPublishedPage />} />
+            <Route path="/dashboard/creator-e-library" element={<CreatorELibraryPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/creators" element={<AdminCreatorsPage />} />
+            <Route path="/admin/learners" element={<AdminLearnersPage />} />
+            <Route path="/admin/system" element={<AdminSystemPage />} />
+            <Route path="/admin/courses" element={<AdminCoursesPage />} />
+            <Route path="/admin/tokens" element={<TokenManagementPage />} />
+            <Route path="/dashboard/creator-journey" element={<CreatorJourneyPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/course/:courseId" element={<CourseDetailsPage />} />
+            <Route path="/admin/creator-courses" element={<AdminCreatorCoursesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

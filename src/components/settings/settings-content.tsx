@@ -1,41 +1,34 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AccountTab } from "./account-tab"
+import { SecurityTab } from "./security-tab"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PrivacyPolicy } from "./privacy-policy";
-import { BillingHistory } from "./billing-history";
+// Import our new component
+import { SubscriptionManagement } from "./subscription-management";
 import { PaymentsTab } from "./payments-tab";
 import { PlansTab } from "./plans-tab";
-import { CodeOfConductTab } from "./code-of-conduct";
 
 export function SettingsContent() {
   return (
-    <Tabs defaultValue="privacy" className="space-y-6">
-      <TabsList className="grid grid-cols-5 w-full max-w-2xl">
-        <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
-        <TabsTrigger value="billing">Billing History</TabsTrigger>
+    <Tabs defaultValue="account" className="space-y-4">
+      <TabsList className="grid grid-cols-4 max-w-md gap-4">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
         <TabsTrigger value="payments">Payments</TabsTrigger>
-        <TabsTrigger value="plans">Plans</TabsTrigger>
-        <TabsTrigger value="conduct">Code of Conduct</TabsTrigger>
+        <TabsTrigger value="security">Security</TabsTrigger>
       </TabsList>
-
-      <TabsContent value="privacy" className="space-y-4">
-        <PrivacyPolicy />
+      <TabsContent value="account" className="space-y-4">
+        <AccountTab />
       </TabsContent>
-
-      <TabsContent value="billing" className="space-y-4">
-        <BillingHistory />
+      <TabsContent value="subscriptions" className="space-y-4">
+        <SubscriptionManagement />
+        <PlansTab />
       </TabsContent>
-
       <TabsContent value="payments" className="space-y-4">
         <PaymentsTab />
       </TabsContent>
-
-      <TabsContent value="plans" className="space-y-4">
-        <PlansTab />
-      </TabsContent>
-
-      <TabsContent value="conduct" className="space-y-4">
-        <CodeOfConductTab />
+      <TabsContent value="security" className="space-y-4">
+        <SecurityTab />
       </TabsContent>
     </Tabs>
-  );
+  )
 }
