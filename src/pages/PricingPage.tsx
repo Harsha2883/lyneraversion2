@@ -15,7 +15,7 @@ import { RefreshCw } from 'lucide-react';
 
 export default function PricingPage() {
   const [searchParams] = useSearchParams();
-  const { user, loading, session } = useAuth();
+  const { user, loading, session, profile } = useAuth();
   const navigate = useNavigate();
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   
@@ -56,9 +56,10 @@ export default function PricingPage() {
       isLoading: loading,
       isAuthenticated: !!user,
       sessionExists: !!session,
-      userId: user?.id
+      userId: user?.id,
+      userType: profile?.user_type
     });
-  }, [loading, user, session]);
+  }, [loading, user, session, profile]);
 
   // Function to check subscription status
   const checkSubscriptionStatus = async () => {
