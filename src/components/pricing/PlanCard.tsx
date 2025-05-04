@@ -1,14 +1,13 @@
 
-import React from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
-import { Check, Info, AlertCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { PlanHeader } from "./PlanHeader";
+import { PlanErrorAlert } from "./PlanErrorAlert";
+import { SubscriptionButton } from "./SubscriptionButton";
+import { PlanFeaturesList } from "./PlanFeaturesList";
 
 interface PlanCardProps {
   title: string;
@@ -24,42 +23,6 @@ interface PlanCardProps {
   onButtonClick: () => void;
   priceSubtext?: string;
   priceId?: string;
-}
-
-function PricingFeatureWithTooltip({ 
-  feature, 
-  tooltip,
-  isNegative = false
-}: { 
-  feature: string; 
-  tooltip: string;
-  isNegative?: boolean;
-}) {
-  return (
-    <div className="flex items-center">
-      <Check className={`h-4 w-4 mr-2 flex-shrink-0 ${isNegative ? "text-muted-foreground" : "text-primary"}`} />
-      <span>{feature}</span>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Info className="h-4 w-4 ml-1.5 text-muted-foreground cursor-help" />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="max-w-xs">{tooltip}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  );
-}
-
-function PricingFeature({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center">
-      <Check className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
-      <span>{children}</span>
-    </div>
-  );
 }
 
 export function PlanCard({
@@ -83,7 +46,6 @@ export function PlanCard({
     
     if (!user) {
       toast.info("Please sign in to continue");
-      // Store the intended destination to redirect after login
       localStorage.setItem("redirectAfterAuth", "/pricing");
       navigate("/auth");
       return;
@@ -101,12 +63,10 @@ export function PlanCard({
       console.log("User profile:", profile);
       console.log("Session exists:", !!session);
       
-      // Ensure we have a valid session token
       if (!session) {
         throw new Error('No active session found. Please log in again.');
       }
 
-      // Get the current access token
       const accessToken = session.access_token;
       console.log("Using access token for authorization");
 
@@ -155,51 +115,25 @@ export function PlanCard({
 
   return (
     <div className={`border rounded-lg overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md ${isRecommended ? 'border-primary relative' : ''}`}>
-      {isRecommended && (
-        <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium rounded-bl-lg">
-          RECOMMENDED
-        </div>
-      )}
       <div className="p-6">
-        <h3 className="text-2xl font-bold mb-1">{title}</h3>
-        <div className="text-3xl font-bold mb-1">{price}</div>
-        {priceSubtext && (
-          <div className="text-sm text-muted-foreground mb-4">{priceSubtext}</div>
-        )}
-        <p className="text-muted-foreground mb-6">{description}</p>
+        <PlanHeader 
+          title={title}
+          price={price}
+          priceSubtext={priceSubtext}
+          description={description}
+          isRecommended={isRecommended}
+        />
         
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+        <PlanErrorAlert error={error} />
         
-        <Button 
-          size="lg" 
-          className="w-full mb-6"
+        <SubscriptionButton 
+          title={title}
+          buttonText={buttonText}
+          loading={loading}
           onClick={handleSubscription}
-          variant={title.toLowerCase().includes('freemium') ? 'outline' : 'default'}
-          disabled={loading}
-        >
-          {loading ? "Processing..." : buttonText}
-        </Button>
+        />
 
-        <div className="space-y-3">
-          {features.map((feature, index) => (
-            feature.tooltip ? (
-              <PricingFeatureWithTooltip
-                key={index}
-                feature={feature.text}
-                tooltip={feature.tooltip}
-                isNegative={feature.isNegative}
-              />
-            ) : (
-              <PricingFeature key={index}>{feature.text}</PricingFeature>
-            )
-          ))}
-        </div>
+        <PlanFeaturesList features={features} />
       </div>
     </div>
   );
