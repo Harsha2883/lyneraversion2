@@ -11,7 +11,7 @@ const stripePublishableKey = "pk_live_51PWvFWCYeyFKliobMknyrMiORbTqcnTnRUlu3QIWz
 
 // This creates a Stripe instance that can be used for frontend operations
 // (client-side only operations like creating payment elements)
-export const stripePromise = Promise.resolve(Stripe(stripePublishableKey));
+export const stripePromise = Promise.resolve(new Stripe(stripePublishableKey));
 
 // Helper functions for interacting with Stripe via Supabase Edge Functions
 export async function createCheckoutSession(priceId: string, userEmail: string, userId: string, userType?: string) {
