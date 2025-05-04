@@ -29,6 +29,10 @@ serve(async (req) => {
 
     const systemPrompt = courseContexts[courseId] || 'You are a sustainability education expert. Provide clear, engaging, and informative responses.'
 
+    console.log(`Processing request for course: ${courseId}`)
+    console.log(`System prompt: ${systemPrompt}`)
+    console.log(`User message: ${userMessage}`)
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -36,22 +40,25 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o', // Updated to use the latest GPT-4o model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage }
         ],
         temperature: 0.7,
-        max_tokens: 300,
+        max_tokens: 500, // Increased token limit for more comprehensive responses
       }),
     })
 
     if (!response.ok) {
       const errorBody = await response.text()
+      console.error(`OpenAI API error: ${errorBody}`)
       throw new Error(`OpenAI API error: ${errorBody}`)
     }
 
     const data = await response.json()
+    console.log("Successfully received response from OpenAI")
+    
     return new Response(JSON.stringify({
       message: data.choices[0].message.content,
       courseContext: courseContexts[courseId] || 'General Sustainability'

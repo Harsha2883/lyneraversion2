@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -15,7 +15,7 @@ export function useAIChat(courseId: string) {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = async (message: string) => {
+  const sendMessage = useCallback(async (message: string) => {
     if (!message.trim()) return;
 
     const userMessage: Message = {
@@ -30,11 +30,18 @@ export function useAIChat(courseId: string) {
     setIsLoading(true);
 
     try {
+      console.log(`Sending message to AI course function for course ID: ${courseId}`);
+      
       const { data, error } = await supabase.functions.invoke('ai-course', {
         body: { courseId, userMessage: message }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from AI course function:', error);
+        throw error;
+      }
+
+      console.log('Received response from AI course function:', data);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -46,11 +53,15 @@ export function useAIChat(courseId: string) {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Failed to get response from AI');
+      toast.error('Failed to get response from AI. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [courseId]);
+
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, []);
 
   return {
     messages,
@@ -58,5 +69,6 @@ export function useAIChat(courseId: string) {
     isLoading,
     sendMessage,
     setInputMessage,
+    clearMessages,
   };
 }
