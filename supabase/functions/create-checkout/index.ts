@@ -25,70 +25,89 @@ Deno.serve(async (req) => {
   try {
     console.log("Processing checkout request");
 
-    // Validate auth header
+    // Validate auth header with detailed logging
     const authHeader = req.headers.get('Authorization');
+    console.log("Auth header present:", !!authHeader);
+    
     if (!authHeader) {
+      console.error("Missing authorization header");
       throw new Error('Missing authorization header');
     }
 
-    const { priceId, email, userId, userType } = await req.json();
-    
-    // Enhanced validation
-    if (!priceId) {
-      throw new Error('Price ID is required');
-    }
-    
-    if (!PRICES[priceId]) {
-      throw new Error(`Invalid price ID: ${priceId}`);
-    }
-
-    if (!email) {
-      throw new Error('Email is required');
-    }
-
-    // Log the provided information
-    console.log(`Creating checkout for ${email}, priceId: ${priceId}, userId: ${userId || 'none'}`);
-    
-    // Create or retrieve customer
-    let customer;
     try {
-      const customers = await stripe.customers.list({ email });
-      if (customers.data.length) {
-        customer = customers.data[0];
-        console.log(`Using existing customer: ${customer.id}`);
-      } else {
-        console.log(`Creating new customer for: ${email}`);
-        customer = await stripe.customers.create({ email });
-      }
-    } catch (stripeError) {
-      console.error("Stripe customer error:", stripeError);
-      throw new Error(`Failed to process customer: ${stripeError.message}`);
-    }
-
-    // Create checkout session with better error handling
-    try {
-      const sessionConfig = {
-        customer: customer.id,
-        line_items: [{ price: PRICES[priceId], quantity: 1 }],
-        mode: 'subscription',
-        success_url: `${req.headers.get('origin')}/pricing?success=true`,
-        cancel_url: `${req.headers.get('origin')}/pricing?canceled=true`,
-        metadata: {
-          userId,
-          userType,
-        },
-      };
+      const requestBody = await req.json();
+      console.log("Request body received:", JSON.stringify(requestBody));
       
-      console.log("Creating checkout session with config:", JSON.stringify(sessionConfig));
-      const session = await stripe.checkout.sessions.create(sessionConfig);
+      const { priceId, email, userId, userType } = requestBody;
+      
+      // Enhanced validation with logging
+      if (!priceId) {
+        console.error("Price ID is missing in request");
+        throw new Error('Price ID is required');
+      }
+      
+      console.log("Checking price ID validity:", priceId);
+      console.log("Available price IDs:", Object.keys(PRICES));
+      
+      if (!PRICES[priceId]) {
+        console.error(`Invalid price ID: ${priceId}`);
+        throw new Error(`Invalid price ID: ${priceId}`);
+      }
 
-      console.log("Checkout session created:", session.id);
-      return new Response(JSON.stringify({ url: session.url }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    } catch (stripeError) {
-      console.error("Stripe session error:", stripeError);
-      throw new Error(`Failed to create checkout session: ${stripeError.message}`);
+      if (!email) {
+        console.error("Email is missing in request");
+        throw new Error('Email is required');
+      }
+
+      // Log the provided information
+      console.log(`Creating checkout for ${email}, priceId: ${priceId}, userId: ${userId || 'none'}, userType: ${userType || 'none'}`);
+      
+      // Create or retrieve customer with error handling
+      let customer;
+      try {
+        const customers = await stripe.customers.list({ email });
+        if (customers.data.length) {
+          customer = customers.data[0];
+          console.log(`Using existing customer: ${customer.id}`);
+        } else {
+          console.log(`Creating new customer for: ${email}`);
+          customer = await stripe.customers.create({ email });
+        }
+      } catch (stripeError) {
+        console.error("Stripe customer error:", stripeError);
+        throw new Error(`Failed to process customer: ${stripeError.message}`);
+      }
+
+      // Create checkout session with better error handling
+      try {
+        const sessionConfig = {
+          customer: customer.id,
+          line_items: [{ price: PRICES[priceId], quantity: 1 }],
+          mode: 'subscription',
+          success_url: `${req.headers.get('origin')}/pricing?success=true`,
+          cancel_url: `${req.headers.get('origin')}/pricing?canceled=true`,
+          metadata: {
+            userId,
+            userType,
+          },
+        };
+        
+        console.log("Creating checkout session with config:", JSON.stringify(sessionConfig));
+        const session = await stripe.checkout.sessions.create(sessionConfig);
+
+        console.log("Checkout session created:", session.id);
+        console.log("Checkout URL:", session.url);
+        
+        return new Response(JSON.stringify({ url: session.url }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (stripeError) {
+        console.error("Stripe session error:", stripeError);
+        throw new Error(`Failed to create checkout session: ${stripeError.message}`);
+      }
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError);
+      throw new Error(`Failed to parse request body: ${parseError.message}`);
     }
   } catch (error) {
     console.error("Error creating checkout session:", error.message);

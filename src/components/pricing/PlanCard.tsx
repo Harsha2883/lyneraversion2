@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -72,7 +73,7 @@ export function PlanCard({
   priceSubtext,
   priceId
 }: PlanCardProps) {
-  const { user, profile } = useAuth();
+  const { user, profile, session } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +95,15 @@ export function PlanCard({
     setLoading(true);
     try {
       console.log(`Starting checkout process for ${priceId}`);
+      console.log("User authenticated:", !!user);
+      console.log("User profile:", profile);
+      console.log("Session exists:", !!session);
       
+      // Ensure we have a valid session token
+      if (!session) {
+        throw new Error('No active session found. Please log in again.');
+      }
+
       const { data, error: invokeError } = await supabase.functions.invoke('create-checkout', {
         body: {
           priceId,

@@ -45,10 +45,12 @@ export function LoginForm() {
         return;
       }
 
-      navigate("/dashboard");
+      console.log("Login successful, redirecting to pricing page");
+      navigate("/pricing");
       toast.success("Successfully logged in!");
     } catch (error: any) {
       toast.error(error.message);
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }

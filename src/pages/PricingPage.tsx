@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { PricingTabs } from "@/components/pricing/PricingTabs";
 import { FAQSection } from "@/components/pricing/FAQSection";
 import { PublicLayout } from "@/components/layouts/PublicLayout";
@@ -13,7 +13,8 @@ import { PricingNavigation } from "@/components/pricing/PricingNavigation";
 
 export default function PricingPage() {
   const [searchParams] = useSearchParams();
-  const { user, loading } = useAuth();
+  const { user, loading, session } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Add smooth scrolling behavior
@@ -35,6 +36,16 @@ export default function PricingPage() {
       document.documentElement.style.scrollBehavior = '';
     };
   }, [searchParams]);
+
+  // Log authentication state
+  useEffect(() => {
+    console.log("PricingPage - Auth state:", {
+      isLoading: loading,
+      isAuthenticated: !!user,
+      sessionExists: !!session,
+      userId: user?.id
+    });
+  }, [loading, user, session]);
 
   return (
     <PublicLayout>
