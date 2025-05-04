@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { LoadingState } from "@/components/ui/loading-state";
 import { ArrowRight, RefreshCw, CreditCard, CalendarDays } from "lucide-react";
 
 interface SubscriptionInfo {
@@ -164,7 +163,12 @@ export function SubscriptionManagement() {
                     onClick={openCustomerPortal}
                     disabled={loading}
                   >
-                    {loading ? <LoadingState size="sm" /> : (
+                    {loading ? (
+                      <span className="flex items-center">
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                      </span>
+                    ) : (
                       <>
                         Manage Plan
                         <ArrowRight className="ml-1.5 h-4 w-4" />
