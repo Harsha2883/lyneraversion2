@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,20 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get redirect path from location state, query param, or localStorage
+  const getRedirectPath = () => {
+    // Check for stored redirect in localStorage first
+    const storedRedirect = localStorage.getItem("redirectAfterAuth");
+    if (storedRedirect) {
+      localStorage.removeItem("redirectAfterAuth");
+      return storedRedirect;
+    }
+    
+    // Default to pricing page if no redirect is specified
+    return "/pricing";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +59,9 @@ export function LoginForm() {
         return;
       }
 
-      console.log("Login successful, redirecting to pricing page");
-      navigate("/pricing");
+      const redirectPath = getRedirectPath();
+      console.log("Login successful, redirecting to:", redirectPath);
+      navigate(redirectPath);
       toast.success("Successfully logged in!");
     } catch (error: any) {
       toast.error(error.message);

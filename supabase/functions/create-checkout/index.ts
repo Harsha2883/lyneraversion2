@@ -16,102 +16,116 @@ const PRICES = {
   'pro-creator-annual': 'price_1RHjyJCYeyFKliob2mUDSPLm'
 };
 
+// Helper for more detailed logging
+function logStep(message: string, data?: any) {
+  if (data) {
+    console.log(`[CREATE-CHECKOUT] ${message}:`, JSON.stringify(data));
+  } else {
+    console.log(`[CREATE-CHECKOUT] ${message}`);
+  }
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    logStep("Handling CORS preflight request");
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    console.log("Processing checkout request");
+    logStep("Processing checkout request");
 
     // Validate auth header with detailed logging
     const authHeader = req.headers.get('Authorization');
-    console.log("Auth header present:", !!authHeader);
+    logStep("Auth header present:", !!authHeader);
     
     if (!authHeader) {
-      console.error("Missing authorization header");
-      throw new Error('Missing authorization header');
+      logStep("ERROR: Missing authorization header");
+      throw new Error('Missing authorization header. Please make sure you are logged in.');
     }
 
     try {
       const requestBody = await req.json();
-      console.log("Request body received:", JSON.stringify(requestBody));
+      logStep("Request body received", requestBody);
       
       const { priceId, email, userId, userType } = requestBody;
       
       // Enhanced validation with logging
       if (!priceId) {
-        console.error("Price ID is missing in request");
+        logStep("ERROR: Price ID is missing in request");
         throw new Error('Price ID is required');
       }
       
-      console.log("Checking price ID validity:", priceId);
-      console.log("Available price IDs:", Object.keys(PRICES));
+      logStep("Checking price ID validity", { priceId, availablePrices: Object.keys(PRICES) });
       
       if (!PRICES[priceId]) {
-        console.error(`Invalid price ID: ${priceId}`);
+        logStep(`ERROR: Invalid price ID: ${priceId}`);
         throw new Error(`Invalid price ID: ${priceId}`);
       }
 
       if (!email) {
-        console.error("Email is missing in request");
+        logStep("ERROR: Email is missing in request");
         throw new Error('Email is required');
       }
 
       // Log the provided information
-      console.log(`Creating checkout for ${email}, priceId: ${priceId}, userId: ${userId || 'none'}, userType: ${userType || 'none'}`);
+      logStep(`Creating checkout for user`, { email, priceId, userId: userId || 'none', userType: userType || 'none' });
       
       // Create or retrieve customer with error handling
       let customer;
       try {
+        logStep("Looking up existing customer with email", { email });
         const customers = await stripe.customers.list({ email });
         if (customers.data.length) {
           customer = customers.data[0];
-          console.log(`Using existing customer: ${customer.id}`);
+          logStep(`Using existing customer`, { customerId: customer.id });
         } else {
-          console.log(`Creating new customer for: ${email}`);
+          logStep(`Creating new customer for email`, { email });
           customer = await stripe.customers.create({ email });
+          logStep("New customer created", { customerId: customer.id });
         }
       } catch (stripeError) {
-        console.error("Stripe customer error:", stripeError);
+        logStep("ERROR: Stripe customer error", stripeError);
         throw new Error(`Failed to process customer: ${stripeError.message}`);
       }
 
       // Create checkout session with better error handling
       try {
+        const origin = req.headers.get('origin');
+        logStep("Using origin for redirect URLs", { origin });
+
         const sessionConfig = {
           customer: customer.id,
           line_items: [{ price: PRICES[priceId], quantity: 1 }],
           mode: 'subscription',
-          success_url: `${req.headers.get('origin')}/pricing?success=true`,
-          cancel_url: `${req.headers.get('origin')}/pricing?canceled=true`,
+          success_url: `${origin}/pricing?success=true`,
+          cancel_url: `${origin}/pricing?canceled=true`,
           metadata: {
             userId,
             userType,
           },
         };
         
-        console.log("Creating checkout session with config:", JSON.stringify(sessionConfig));
+        logStep("Creating checkout session with config", sessionConfig);
         const session = await stripe.checkout.sessions.create(sessionConfig);
 
-        console.log("Checkout session created:", session.id);
-        console.log("Checkout URL:", session.url);
+        logStep("Checkout session created", { sessionId: session.id, url: session.url });
         
         return new Response(JSON.stringify({ url: session.url }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (stripeError) {
-        console.error("Stripe session error:", stripeError);
+        logStep("ERROR: Stripe session error", stripeError);
         throw new Error(`Failed to create checkout session: ${stripeError.message}`);
       }
     } catch (parseError) {
-      console.error("Failed to parse request body:", parseError);
+      logStep("ERROR: Failed to parse request body", parseError);
       throw new Error(`Failed to parse request body: ${parseError.message}`);
     }
   } catch (error) {
-    console.error("Error creating checkout session:", error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR creating checkout session", { message: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

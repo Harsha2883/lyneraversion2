@@ -83,6 +83,8 @@ export function PlanCard({
     
     if (!user) {
       toast.info("Please sign in to continue");
+      // Store the intended destination to redirect after login
+      localStorage.setItem("redirectAfterAuth", "/pricing");
       navigate("/auth");
       return;
     }
@@ -104,7 +106,14 @@ export function PlanCard({
         throw new Error('No active session found. Please log in again.');
       }
 
+      // Get the current access token
+      const accessToken = session.access_token;
+      console.log("Using access token for authorization");
+
       const { data, error: invokeError } = await supabase.functions.invoke('create-checkout', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: {
           priceId,
           email: user.email,
@@ -112,6 +121,8 @@ export function PlanCard({
           userType: profile?.user_type
         }
       });
+
+      console.log("Checkout function response:", data, invokeError);
 
       if (invokeError) {
         console.error("Checkout invoke error:", invokeError);
