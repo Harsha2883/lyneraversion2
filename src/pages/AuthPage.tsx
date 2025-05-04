@@ -1,9 +1,37 @@
 
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthTabs } from "@/components/auth/auth-tabs";
 import { Logo } from "@/components/ui/logo";
 import { Earth, Leaf, Recycle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthDebug } from "@/components/auth/auth-debug";
 
 const AuthPage = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Check for redirect parameter
+  const redirectPath = searchParams.get("redirect");
+  
+  useEffect(() => {
+    // Store redirect path for after authentication
+    if (redirectPath) {
+      console.log("Storing redirect path:", redirectPath);
+      localStorage.setItem("redirectAfterAuth", redirectPath);
+    }
+    
+    // Redirect to dashboard if user is already logged in and not loading
+    if (user && !loading) {
+      console.log("User already logged in, redirecting to dashboard");
+      navigate("/dashboard");
+    }
+  }, [user, loading, navigate, redirectPath]);
+
+  // Get tab from URL params or default to login
+  const defaultTab = searchParams.get("tab") === "register" ? "register" : "login";
+
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       {/* Left Side - Auth Form */}
@@ -19,7 +47,10 @@ const AuthPage = () => {
             </p>
           </div>
           
-          <AuthTabs />
+          <AuthTabs defaultTab={defaultTab} />
+          
+          {/* Debug component for troubleshooting */}
+          <AuthDebug />
         </div>
       </div>
 

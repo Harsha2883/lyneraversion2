@@ -59,6 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return null;
       }
       
+      console.log("Fetching profile for user:", userId);
+      
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       if (profile) {
+        console.log("Profile found:", profile.user_type);
         setProfile(profile);
         return profile;
       } else {
@@ -108,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(error.message);
       }
       
+      console.log("Subscription status:", data);
       setSubscription(data);
       return data;
     } catch (error) {
@@ -131,9 +135,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let authListener: any;
 
     const setupAuthListener = () => {
+      console.log("Setting up auth listener");
+      
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, currentSession) => {
-          console.log("Auth state changed:", event, currentSession?.user?.id);
+          console.log("Auth state changed:", event, currentSession?.user?.id ? "User signed in" : "No user");
           
           if (!mounted) return;
 
@@ -142,6 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           if (initialized) {
             if (currentSession?.user) {
+              // Use setTimeout to prevent Supabase auth deadlock
               setTimeout(() => {
                 if (mounted) {
                   fetchProfile(currentSession.user.id);
@@ -157,9 +164,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               toast.success("Successfully signed in!");
               const redirectPath = localStorage.getItem("redirectAfterAuth");
               if (redirectPath) {
+                console.log("Found redirect path after auth:", redirectPath);
                 localStorage.removeItem("redirectAfterAuth");
                 navigate(redirectPath);
               } else {
+                console.log("No redirect path found, going to dashboard");
                 navigate("/dashboard");
               }
             } else if (event === 'SIGNED_OUT') {
@@ -175,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
+        console.log("Initializing auth");
         authListener = setupAuthListener();
         
         const { data } = await supabase.auth.getSession();
@@ -191,6 +201,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await checkSubscription();
           } else {
             console.log("No active session found during initialization");
+            
+            // Check current route
+            const currentPath = window.location.pathname;
+            console.log("Current path:", currentPath);
+            
+            // Redirect to auth if not already there and not on public paths
+            if (currentPath !== "/auth" && 
+                !currentPath.startsWith("/auth") && 
+                currentPath !== "/" && 
+                !currentPath.startsWith("/pricing")) {
+              console.log("No active session, redirecting to auth");
+              localStorage.setItem("redirectAfterAuth", currentPath);
+              navigate("/auth");
+            }
           }
           
           setLoading(false);
@@ -218,6 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
+      console.log("Signing out");
       await supabase.auth.signOut();
       setProfile(null);
       setSubscription(null);

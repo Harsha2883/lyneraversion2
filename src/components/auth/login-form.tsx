@@ -15,54 +15,95 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginDebug, setLoginDebug] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Debug info display
+  useEffect(() => {
+    if (loginDebug) {
+      console.log("Login debug info:", loginDebug);
+    }
+  }, [loginDebug]);
+
   // Get redirect path from location state, query param, or localStorage
   const getRedirectPath = () => {
-    // Check for stored redirect in localStorage first
+    console.log("Getting redirect path");
+    
+    // Check URL parameters for redirect
+    const searchParams = new URLSearchParams(location.search);
+    const urlRedirect = searchParams.get("redirect");
+    if (urlRedirect) {
+      console.log("Found URL redirect:", urlRedirect);
+      return urlRedirect;
+    }
+    
+    // Check for stored redirect in localStorage
     const storedRedirect = localStorage.getItem("redirectAfterAuth");
     if (storedRedirect) {
+      console.log("Found stored redirect:", storedRedirect);
       localStorage.removeItem("redirectAfterAuth");
       return storedRedirect;
     }
     
-    // Default to pricing page if no redirect is specified
-    return "/pricing";
+    // Default to dashboard if no redirect is specified
+    console.log("No redirect specified, defaulting to /dashboard");
+    return "/dashboard";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setLoginDebug(null);
 
     try {
+      console.log(`Attempting login with email: ${email} and user type: ${userType}`);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Authentication error:", error);
+        setLoginDebug(`Auth error: ${error.message}`);
+        throw error;
+      }
 
+      console.log("Authentication successful, fetching profile data");
+      
       // Fetch the user's profile to confirm user type
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('user_type')
+        .select('user_type, first_name, last_name')
         .eq('id', data.user?.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile fetch error:", profileError);
+        setLoginDebug(`Profile error: ${profileError.message}`);
+        throw profileError;
+      }
+
+      console.log("Profile data:", profileData);
 
       // Check if the logged-in user type matches the selected type
       if (profileData.user_type !== userType) {
+        setLoginDebug(`User type mismatch: Selected ${userType}, account is ${profileData.user_type}`);
+        console.error(`User type mismatch: Selected ${userType}, account is ${profileData.user_type}`);
+        
         await supabase.auth.signOut();
         toast.error(`Please log in as a ${profileData.user_type}`);
+        setLoading(false);
         return;
       }
 
+      // All checks passed, proceed with redirect
       const redirectPath = getRedirectPath();
       console.log("Login successful, redirecting to:", redirectPath);
+      
+      toast.success(`Welcome back${profileData.first_name ? ', ' + profileData.first_name : ''}!`);
       navigate(redirectPath);
-      toast.success("Successfully logged in!");
     } catch (error: any) {
       toast.error(error.message);
       console.error("Login error:", error);
@@ -125,6 +166,12 @@ export function LoginForm() {
               required 
             />
           </div>
+
+          {loginDebug && (
+            <div className="p-2 bg-amber-50 border border-amber-200 rounded text-amber-900 text-sm">
+              Debug info: {loginDebug}
+            </div>
+          )}
 
           <OAuthProviders variant="login" />
         </CardContent>
